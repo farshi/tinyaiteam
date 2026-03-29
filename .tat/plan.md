@@ -54,6 +54,24 @@
 - [x] Configurable models per review type (TAT_PLAN_REVIEW_MODEL, TAT_CODE_REVIEW_MODEL)
 - [x] Enforce self-review before GPT review in SKILL.md
 
+## Epic 7: PR Auto-generation (quick win)
+- [ ] Generate PR description from checkpoint artifacts (spec, task, diff, review)
+- [ ] Add script/helper that emits draft PR text for `gh pr create`
+
+## Epic 8: Session Continuity
+- [ ] Create `.tat/session.md` — machine-readable checkpoint (current phase, branch, task, last action)
+- [ ] Write session state at each checkpoint transition
+- [ ] Add resume flow: `/tat` reads session.md and picks up where it left off
+- [ ] Add `/tat recap` — summarize last session's work from session.md + git log
+
+## Epic 9: Error Recovery + Hardening
+- [ ] Add retry/fallback for GPT API failures in tat-gpt.sh
+- [ ] Add timeout handling for subagent runs
+- [ ] Fix zsh trap warnings and script fragility
+- [ ] Add smoke tests for core scripts (tat-gpt.sh, review scripts)
+- [ ] Support parallel Sonnet subagents for independent tasks
+- [ ] Improve `/tat init` quick-start for new users
+
 ## Backlog (captured during work)
 - [x] Install mechanism: done — skills + commands → ~/.claude, runtime → ~/.tinyaiteam (noted during Epic 1)
 - [x] GPT PR review before merge: already covered by pre-PR checklist + tat-code-review.sh. Keep tasks small instead. (noted during Epic 2)

@@ -97,26 +97,28 @@ Present as:
 
 **Important:** Opus critiques and refines. Do not rewrite everything GPT said. Build on it.
 
-### Phase C: User decides
+### Phase C: Auto-continue or User decides
 
-Ask the user:
+**Rounds 1-2 auto-continue:** After Opus critiques, feed the combined output (seed + GPT ideas + Opus critique) into the next round automatically. Do NOT stop to ask the user. The 3 rounds are GPT ↔ Opus reasoning back and forth.
+
+**Round 3 only — present to user:**
+After round 3, present the final synthesized result and ask:
 ```
-[BRAINSTORM] Round <N> complete. Options:
+[BRAINSTORM] 3 rounds complete. Options:
   1. Looks good — finalize into plan
-  2. Another round — here's what to adjust: <user feedback>
+  2. Edit before finalizing
   3. Start over with different direction
 ```
 
 - If **1**: go to Step 3 (finalize)
-- If **2**: start next round with user's feedback added to the seed
+- If **2**: let user edit, then finalize
 - If **3**: reset and restart from Step 1
-- If round 3 just finished: hard stop, must choose 1 or 3
 
 ### Round Narrowing
 
 - **Round 1:** Broad — explore approaches, generate options
-- **Round 2:** Focused — refine the chosen direction, merge ideas
-- **Round 3:** Final — polish tasks, resolve conflicts, lock it down
+- **Round 2:** Focused — GPT refines based on Opus's critique, Opus sharpens further
+- **Round 3:** Final — converge on concrete epics and tasks, resolve disagreements
 
 ## Step 3: Finalize
 
@@ -159,7 +161,7 @@ If **3**: save as draft for later.
 
 ## Important Rules
 
-1. **GPT goes first, always.** Never send Opus's opinion to GPT. Avoid groupthink.
+1. **GPT goes first in round 1.** Never send Opus's opinion to GPT in round 1. After that, GPT gets Opus's critique to refine — this is collaborative reasoning, not groupthink.
 2. **Max 3 rounds, hard stop.** No exceptions. User must decide after round 3.
 3. **Output is markdown.** No structured schemas, no JSON. Just epics and tasks.
 4. **Easiest first.** Sort by implementation ease, not importance.
