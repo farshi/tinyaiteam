@@ -55,7 +55,7 @@
 - [x] Enforce self-review before GPT review in SKILL.md
 
 ## Backlog (captured during work)
-- [ ] Install mechanism: copy TAT.md + skills + commands to ~/.claude (noted during Epic 1)
+- [x] Install mechanism: done — skills + commands → ~/.claude, runtime → ~/.tinyaiteam (noted during Epic 1)
 - [ ] GPT PR review before merge: send epic + tasks + full PR diff to GPT, max 2 fix rounds, then user decides (noted during Epic 2)
 - [ ] Brainstorming loop: Opus proposes → GPT critiques → Opus adjusts, max 3 rounds, hard stop, user decides (noted during Epic 2)
 - [ ] Summarize user input before storing: clean up typos/rough text into clear summary for context (noted during Epic 2)
