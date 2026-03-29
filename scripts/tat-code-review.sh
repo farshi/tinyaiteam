@@ -30,14 +30,17 @@ source "$SCRIPT_DIR/tat-gpt.sh"
 CODE_REVIEW_MODEL="${TAT_CODE_REVIEW_MODEL:-gpt-5.4-mini}"
 SYNOPSIS_MODEL="${TAT_CODE_REVIEW_SYNOPSIS_MODEL:-gpt-4o-mini}"
 
-# --- Read current task + epic ---
+# --- Read current task + epic (skip Backlog section) ---
 
 CURRENT_TASK=""
 CURRENT_EPIC=""
 if [ -f "$TAT_DIR/plan.md" ]; then
-  CURRENT_TASK=$(grep -m1 '\- \[~\]' "$TAT_DIR/plan.md" || true)
+  # Extract only epic tasks (everything before ## Backlog)
+  EPIC_SECTION=$(sed '/^## Backlog/,$d' "$TAT_DIR/plan.md")
+
+  CURRENT_TASK=$(echo "$EPIC_SECTION" | grep -m1 '\- \[~\]' || true)
   if [ -z "$CURRENT_TASK" ]; then
-    CURRENT_TASK=$(grep -m1 '\- \[ \]' "$TAT_DIR/plan.md" || echo "No active task found")
+    CURRENT_TASK=$(echo "$EPIC_SECTION" | grep -m1 '\- \[ \]' || echo "No active task found")
   fi
   if [ -n "$CURRENT_TASK" ]; then
     TASK_LINE=$(grep -n -m1 -F -- "$CURRENT_TASK" "$TAT_DIR/plan.md" | cut -d: -f1)
@@ -146,7 +149,10 @@ Your job:
 4. Is anything missing that the task requires?
 5. Is the code unnecessarily complex?
 
-IMPORTANT: Judge the diff against the stated task, not against backlog items or other unrelated work.
+IMPORTANT:
+- Judge the diff ONLY against the Epic and Task shown below. Nothing else.
+- The task description may have been updated since it was first written. Trust the current wording.
+- Do NOT compare against backlog items, other epics, or earlier task descriptions.
 
 $ADVISOR_FORMAT"
 
