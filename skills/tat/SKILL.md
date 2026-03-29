@@ -70,13 +70,10 @@ If `TAT_NOT_INSTALLED`: tell the user "TAT is not installed. Run `install.sh` fr
 
 ## Step 2: Detect current model
 
-```bash
-echo "MODEL: $CLAUDE_MODEL"
-```
-
-Identify your role:
-- If model contains `opus` → You are **Planner/Architect/Decider**. Focus on planning, spec, architecture, decisions. Can also code complex tasks.
-- If model contains `sonnet` → You are **Coder/Implementer**. Focus on coding the current subtask. Escalate architectural questions to Opus.
+You know which model you are from your system prompt (it states your model ID). Use that directly:
+- If you are `claude-opus-*` → You are **Planner/Architect/Decider**. Focus on planning, spec, architecture, decisions. Can also code complex tasks.
+- If you are `claude-sonnet-*` → You are **Coder/Implementer**. Focus on coding the current subtask. Escalate architectural questions to Opus.
+- If you are `claude-haiku-*` → You are **Quick Tasker**. Only handle simple, well-scoped tasks. Escalate anything complex.
 
 Announce your role:
 ```
@@ -194,7 +191,65 @@ Never silently dismiss an idea. Always confirm capture.
 - One subtask = one branch = one PR
 - Branch naming: `tat/<epic-number>/<task-name>`
 - Always work on a branch, never directly on main
-- After merge, update plan.md on main
+- After merge, update plan.md on main and run `install.sh` if skills/config changed
+
+### Pre-PR Checklist
+
+Before creating a PR, TAT must complete this checklist:
+
+```
+[TAT] Pre-PR checklist:
+  1. Rebase on latest main
+     git fetch origin && git rebase origin/main
+  2. Verify diff scope — only files related to the current task
+     git diff origin/main --name-only
+  3. No untracked files left behind
+     git ls-files --others --exclude-standard
+  4. GPT code review completed
+     ./scripts/tat-review.sh main
+  5. GPT review response summary written
+```
+
+Run each step. If step 1 has conflicts, resolve them before continuing. If step 2 shows unexpected files, flag scope creep to the user. If step 4 has blockers, address them before creating the PR.
+
+Then create the PR with this structure:
+
+```
+Title: <short description>
+
+## Summary
+- <what changed and why, 1-3 bullets>
+
+## Task
+<epic and task from plan.md>
+
+## GPT Review Response
+- "<GPT suggestion>" → <accept/dismiss with reasoning>
+
+## Test plan
+- [x] <what was tested>
+```
+
+### Post-Merge Checklist
+
+After a PR is merged:
+
+1. Sync local main:
+   ```bash
+   git checkout main && git pull origin main
+   ```
+2. Update plan.md — mark completed tasks `[x]`, pick next `[~]` task
+3. If skills or config files changed, run `install.sh`
+4. Commit plan update to main:
+   ```
+   git add .tat/plan.md && git commit -m "Update plan: mark <task> complete"
+   git push origin main
+   ```
+5. Show next task:
+   ```
+   [TAT] Merged. Next task: <next [ ] task>
+   [TAT] Model routing: <Opus or Sonnet recommendation for next task>
+   ```
 
 ---
 
