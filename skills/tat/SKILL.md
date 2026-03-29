@@ -168,45 +168,68 @@ This keeps Opus as the orchestrator and Sonnet as the executor. The user stays i
 
 ## Step 6: Enter the SSD loop
 
-From here, follow the SSD loop from TAT.md. At each transition:
+From here, follow the SSD loop from TAT.md. At each transition, print and follow the checkpoint map below. Do NOT skip steps or combine them.
 
-1. **After planning** → Offer GPT plan review: "Want a second opinion on the plan? I'll send to GPT."
-   If yes, run: `$PROJECT_ROOT/scripts/tat-plan-review.sh` (or the installed version)
+---
 
-2. **Before coding** → Confirm branch:
-   ```
-   [TAT] Task: <task description>
-   [TAT] Branch: tat/<epic>/<task-name>
-   [TAT] Scope: <files to change>
-   [TAT] Guardrails: <what NOT to touch>
-   ```
-   Create the branch if it doesn't exist.
+### Checkpoint Map
 
-3. **After coding** → Self-review FIRST, then GPT review:
+At every task transition, print this map and check off each step as you complete it. This is mandatory — not optional guidance.
 
-   **Step 3a: Self-review (mandatory, never skip)**
-   Before sending anything to GPT, review your own work:
-   - Read the full diff (`git diff main...HEAD`)
-   - Check: does it match the task scope? Any files that shouldn't be here?
-   - Check: any bugs, edge cases, missing error handling?
-   - Check: any leftover debug code, TODOs, or incomplete work?
-   - Fix anything you find. Commit the fixes.
-   - Show the user what you found and fixed:
-     ```
-     [TAT] Self-review:
-       ✓ Scope: <N files changed, all in scope>
-       ✓ Fixed: <what you caught and fixed, or "nothing — looks clean">
-       → Sending to GPT for second opinion.
-     ```
+**PLAN checkpoint:**
+```
+[TAT] ▶ PLAN checkpoint:
+  [ ] 1. Show task + epic from plan.md
+  [ ] 2. Offer GPT plan review (tat-plan-review.sh)
+  [ ] 3. User approves plan
+```
 
-   **Step 3b: GPT review (second opinion)**
-   Run `$PROJECT_ROOT/scripts/tat-code-review.sh` (or installed version)
-   Present GPT's feedback with `[GPT]` tag.
+**CODE checkpoint:**
+```
+[TAT] ▶ CODE checkpoint:
+  [ ] 1. Create branch: tat/<epic>/<task-name>
+  [ ] 2. Show scope: files to change + guardrails
+  [ ] 3. User confirms scope
+  [ ] 4. Code the task
+```
 
-4. **After review** → Show blockers if any, let user decide, then:
-   - Push branch
-   - Create PR
-   - Update plan.md (mark task [x], pick next)
+**REVIEW checkpoint (after coding, before PR):**
+```
+[TAT] ▶ REVIEW checkpoint:
+  [ ] 1. SELF-REVIEW: read full diff (git diff main...HEAD)
+  [ ] 2. SELF-REVIEW: check scope — any files that shouldn't be here?
+  [ ] 3. SELF-REVIEW: check for bugs, edge cases, incomplete work
+  [ ] 4. SELF-REVIEW: fix anything found, commit fixes
+  [ ] 5. Show self-review summary to user
+  [ ] 6. GPT REVIEW: run tat-code-review.sh
+  [ ] 7. Show GPT feedback to user
+  [ ] 8. Address GPT blockers if any
+```
+
+**SHIP checkpoint (after review, before merge):**
+```
+[TAT] ▶ SHIP checkpoint:
+  [ ] 1. Rebase on latest main
+  [ ] 2. Verify diff scope (git diff origin/main --name-only)
+  [ ] 3. No untracked files (git ls-files --others --exclude-standard)
+  [ ] 4. Push branch
+  [ ] 5. Create PR with GPT review response
+  [ ] 6. User approves merge
+```
+
+**POST-MERGE checkpoint:**
+```
+[TAT] ▶ POST-MERGE checkpoint:
+  [ ] 1. git checkout main && git pull origin main
+  [ ] 2. Update plan.md — mark task [x]
+  [ ] 3. Run install.sh if skills/config changed
+  [ ] 4. Commit plan update, push to main
+  [ ] 5. Show next task + model routing
+```
+
+---
+
+**Rule: print the checkpoint map at each transition.** Seeing the checklist prevents skipping steps. Check off each item as you complete it. If you catch yourself about to skip ahead, stop and go back to the map.
 
 ---
 
