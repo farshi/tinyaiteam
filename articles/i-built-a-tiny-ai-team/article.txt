@@ -1,36 +1,29 @@
-I Built a Tiny AI Team — Because Autonomous AI Kept Losing Control of My Project
+Autonomous AI Kept Breaking My Code — So I Built a Tiny AI Team in a Weekend
 
-Every week there's a new demo.
+Every week there's a new demo. Autonomous agents building apps. "Vibe coding." Just give AI a task and walk away.
 
-"This AI agent just built an entire app."
-"Vibe coding is the future."
-"Just give it a task and walk away."
+I tried it. On real projects. Not demos.
 
-I watched these videos. I read the posts. And I felt the pressure — if I'm not using autonomous AI to code, I'm falling behind.
+At first it was impressive — fast scaffolding, fast code, things moving quickly.
 
-So I tried it. For real, on real projects.
+But then I looked closer.
 
-I tried Cline. I tried LangChain-style autonomous agents. I tried coding loops that promised to handle entire features end to end.
-
-And at first, it was impressive. The AI would generate code fast, scaffold projects, wire things together.
-
-But then I'd look at what it actually built.
-
-It changed files I didn't ask it to change. I asked for a config option — it refactored the entire settings module, renamed three files, and broke two tests. It made architectural decisions without asking. It went in directions that made sense technically but not for the product. And the worst part — it forgot why we made certain decisions last session. Every new conversation started from zero.
+Files changed that I didn't ask to change. I asked for a config option — it refactored the entire settings module, renamed three files, and broke two tests. Architectural decisions were made silently. And every new session started from zero — no memory of why we made certain decisions.
 
 The more I used these tools, the more frustrated I got. Not because they were bad — but because I was losing control of my own project.
 
-It felt less like working with a team and more like managing a very fast junior developer who never sleeps and never remembers yesterday's meeting.
+It felt like managing a very fast junior developer who never sleeps and never remembers yesterday's meeting.
 
 That's when something clicked:
 
-The problem isn't intelligence. Autonomous coding has no structure, no memory, and no roles.
+The problem isn't intelligence.
+Autonomous coding has no structure, no memory, and no roles.
 
 And software has never been built like that.
 
 ⸻
 
-Software Is Not Written by a Brain — It's Built by a Team
+Software Is Built by Teams and Process
 
 In real software teams:
 → Someone writes the spec
@@ -39,16 +32,15 @@ In real software teams:
 → Someone reviews
 → Someone decides what not to build
 → Decisions are written down
-→ Work is broken into tasks
 → Nothing gets merged without review
 
-But with most AI coding tools today, we throw one AI at everything. One session. One brain. Architect, developer, reviewer, and product manager all at once.
+But with most AI coding tools today, we throw one model at everything. One session. One brain. Architect, developer, reviewer, and product manager all at once.
 
 That's not a team. That's chaos with good autocomplete.
 
 ⸻
 
-So I Started Something Simple
+So I Built Something Small
 
 I stopped chasing full autonomy. I wanted something I could control. Something I could watch behave and understand why it made each decision.
 
@@ -57,10 +49,6 @@ A weekend project. Version 1.
 I call it TAT — Tiny AI Team.
 
 The idea is simple: don't use AI like a solo developer. Use AI like a team with roles.
-
-⸻
-
-The Roles
 
 → Planner AI — Writes the spec, designs architecture, breaks work into tasks
 → Builder AI — Implements one task at a time, small focused work
@@ -75,15 +63,18 @@ The Workflow
 
 Spec → Tasks → Branch → Code → Review → Merge → Repeat
 
-Everything is written into the repository as markdown:
+The key is memory. Every project gets a small set of markdown files that the AI reads before it acts:
+
 → spec.md — what we're building and why
 → plan.md — epics and tasks, checked off as we go
 → decisions.md — why we chose X over Y
 → backlog.md — ideas captured, not forgotten
 
-The AI reads these before it acts. It doesn't guess from the current prompt — it knows the history. The repo becomes the source of truth, so context survives across sessions.
+These aren't just documentation. They're working memory. The AI reads them at the start of every session, so it knows the history, the plan, and the decisions — not just the current prompt.
 
-The project gets something most AI coding tools don't have: memory.
+No database. No external service. Just files that travel with the project.
+
+That's what most AI coding tools are missing: memory that persists across sessions.
 
 ⸻
 
@@ -118,7 +109,7 @@ I think the future looks more like this:
 → AI builder
 → AI reviewer
 → Human product owner
-→ Repo as memory
+→ Working memory that persists
 → Workflow as guardrails
 
 Not AI replacing the team. AI becoming the team — with a human leading it.
