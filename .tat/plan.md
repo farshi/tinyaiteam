@@ -18,6 +18,7 @@
 - [x] Implement model routing suggestions
 - [x] Implement .tat/ init for new projects
 - [x] Implement backlog capture ("noted, added to backlog" for off-scope ideas)
+- [x] Add /tat status command (compact project dashboard without entering TAT mode)
 
 ## Epic 2b: GPT Integration (fast-tracked)
 - [x] Design context bundle format
@@ -38,3 +39,6 @@
 
 ## Backlog (captured during work)
 - [ ] Install mechanism: copy TAT.md + skills + commands to ~/.claude (noted during Epic 1)
+- [ ] GPT PR review before merge: send epic + tasks + full PR diff to GPT, max 2 fix rounds, then user decides (noted during Epic 2)
+- [ ] Brainstorming loop: Opus proposes → GPT critiques → Opus adjusts, max 3 rounds, hard stop, user decides (noted during Epic 2)
+- [ ] Summarize user input before storing: clean up typos/rough text into clear summary for context (noted during Epic 2)

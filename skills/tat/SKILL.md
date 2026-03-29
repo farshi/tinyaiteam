@@ -4,7 +4,8 @@ version: 0.1.0
 description: |
   Tiny AI Team — structured multi-model workflow. Enters TAT mode: reads project
   state, enforces SSD loop (Spec → Subtask → Do), routes by model role, triggers
-  GPT reviews, tags guidance with source. Use when asked to "/tat" or "start tat".
+  GPT reviews, tags guidance with source. Use when asked to "/tat", "start tat",
+  or "/tat status".
 allowed-tools:
   - Bash
   - Read
@@ -17,6 +18,45 @@ allowed-tools:
 ---
 
 # /tat — Tiny AI Team
+
+## Subcommand Detection
+
+Parse the user's input:
+- `/tat` or `/tat` with no arguments → Full activation (Step 1 onwards)
+- `/tat status` → Jump to **Status Command** below, skip activation steps
+
+---
+
+## Status Command
+
+When the user says `/tat status`, show a compact project dashboard. No activation, no mode change — just info.
+
+Read `.tat/plan.md` and `.tat/spec.md`, then display:
+
+```
+[TAT] Status: <project name from spec>
+[TAT] Model: <current model> (Role: <Planner|Coder>)
+[TAT] Branch: <current git branch>
+──────────────────────────────
+[TAT] Current epic: <epic heading>
+[TAT] Current task: <first [~] or [ ] task>
+[TAT] Next up: <the task after current>
+──────────────────────────────
+[TAT] Progress:
+  Epic 1: ████████████ 8/8 done
+  Epic 2: ████████░░░░ 7/7 done
+  Epic 2b: ██████░░░░ 6/8 done  ← you are here
+  Epic 4: ░░░░░░░░░░ 0/4 done
+──────────────────────────────
+[TAT] Backlog: <N items>
+[TAT] Open PRs: <list or "none">
+```
+
+Then stop. Do not enter TAT mode or start the SSD loop.
+
+---
+
+## Full Activation
 
 You are entering TAT mode. Follow these instructions for the rest of the session.
 
