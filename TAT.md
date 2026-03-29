@@ -38,6 +38,47 @@ When `/tat` runs, it should suggest the right model: "This task is straightforwa
 - Opus or user evaluates review
 - Merge PR, update plan.md on main
 
+## Commit and PR Conventions
+
+Use conventional commits. This gives every model (Claude, GPT) and human a consistent signal about what changed.
+
+### Commit format
+```
+<type>(<scope>): <short description>
+```
+
+### Types
+| Type | When |
+|------|------|
+| `feat` | New feature or capability |
+| `fix` | Bug fix |
+| `docs` | Documentation only |
+| `refactor` | Code change that doesn't add a feature or fix a bug |
+| `chore` | Build, config, tooling, dependencies |
+| `test` | Adding or fixing tests |
+| `style` | Formatting, whitespace, no code change |
+
+### Scope
+Use the relevant area: `skill`, `review`, `plan`, `config`, `workflow`, `install`
+
+### Examples
+```
+feat(skill): add /tat status command
+fix(review): escape grep patterns for [~] markers
+docs(plan): mark Epic 2b tasks complete
+refactor(review): replace gatekeeper prompt with advisor format
+chore(config): update GPT model to gpt-4o-mini
+```
+
+### PR titles
+Same format as commits. The PR title IS the merge commit message:
+```
+feat(workflow): pre-PR and post-merge checklists
+```
+
+### Why this matters for TAT
+When GPT reviews a PR, the commit history tells it what KIND of changes to expect. A `fix()` commit should be small and targeted. A `feat()` commit introduces something new. If commits say `fix` but the diff adds a new feature, GPT can flag the mismatch.
+
 ## Review Tiers
 
 Not every change needs a deep review. The review tier is chosen automatically based on task type and diff size:
