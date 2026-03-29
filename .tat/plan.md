@@ -22,8 +22,11 @@
 - [x] Design context bundle format
 - [x] Design review tier logic (synopsis vs full bundle)
 - [x] Write tat-review.sh script (curl-based)
-- [ ] Test on TAT's own code (dogfood)
-- [ ] Iterate based on what we learn
+- [x] Test on TAT's own code (dogfood) — first run worked, found issues
+- [x] Fix task detection: prioritize [~] over [ ], include epic context
+- [x] Fix scope: include files-changed list in bundle
+- [x] Add config.sh to repo as source template
+- [~] Re-test after fixes (dogfood round 2)
 
 ## Epic 4: Git Workflow
 - [ ] Define branch naming convention
