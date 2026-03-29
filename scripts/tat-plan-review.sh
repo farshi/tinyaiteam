@@ -66,7 +66,15 @@ Rules:
 - Be specific — name the file, task, or decision you are referring to.
 - Never repeat feedback from a previous review round."
 
-PROJECT_CONTEXT="PROJECT CONTEXT: TAT (Tiny AI Team) is a Claude Code skill — NOT a standalone tool or CLI app. It is a set of markdown skill files, bash scripts, and config that plug into Claude Code (Anthropic's AI coding assistant). Claude Code loads skills from ~/.claude/skills/ and commands from ~/.claude/commands/. TAT's runtime files (config, scripts, workflow rules) live in ~/.tinyaiteam/. The .tat/ directory in each project holds project-specific state (spec, plan, decisions). TAT orchestrates multiple AI models: Opus plans, Sonnet codes (via subagents), GPT reviews."
+# --- Project context (read from spec) ---
+
+SPEC_SUMMARY=""
+[ -f "$TAT_DIR/spec.md" ] && SPEC_SUMMARY=$(cat "$TAT_DIR/spec.md")
+
+PROJECT_CONTEXT="TOOLING CONTEXT: This project uses TAT (Tiny AI Team), a Claude Code skill that orchestrates multi-model workflows. Claude Code is Anthropic's AI coding assistant. TAT is NOT a standalone tool — it's skill files + bash scripts + config that plug into Claude Code. Opus plans, Sonnet codes (via subagents), GPT reviews.
+
+PROJECT SPEC:
+$SPEC_SUMMARY"
 
 SYSTEM_PROMPT="You are a senior engineering advisor reviewing a project plan. You are NOT a gatekeeper — you are a second opinion. The human decides what to act on.
 
