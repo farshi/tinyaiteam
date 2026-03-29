@@ -47,6 +47,13 @@
 - [x] 5.6 GPT review + PR — SKIPPED: skill is local only for now
 - [x] 5.7 Improve SKILL.md boilerplate template — scaffold folder structure, platform export step, image direction in spec
 
+## Epic 6: Auto-delegation + Model Config
+- [x] Auto-delegate coding tasks to Sonnet subagents (Opus orchestrates, user never switches)
+- [x] Split review scripts: tat-plan-review.sh (gpt-5.4-pro) + tat-code-review.sh (gpt-5.4-mini)
+- [x] Shared GPT API caller (tat-gpt.sh) with Chat + Responses endpoint support
+- [x] Configurable models per review type (TAT_PLAN_REVIEW_MODEL, TAT_CODE_REVIEW_MODEL)
+- [x] Enforce self-review before GPT review in SKILL.md
+
 ## Backlog (captured during work)
 - [ ] Install mechanism: copy TAT.md + skills + commands to ~/.claude (noted during Epic 1)
 - [ ] GPT PR review before merge: send epic + tasks + full PR diff to GPT, max 2 fix rounds, then user decides (noted during Epic 2)
@@ -54,5 +61,4 @@
 - [ ] Summarize user input before storing: clean up typos/rough text into clear summary for context (noted during Epic 2)
 - [ ] GPT review response summary: Opus writes accept/dismiss reasoning into PR description as audit trail and context for future GPT reviews (noted during Epic 2b)
 - [ ] Pre-PR checklist: rebase on main, verify diff scope, no untracked files, GPT reviewed (noted during Epic 4)
-- [ ] Inline GPT review: post GPT feedback as GitHub PR review comments via gh api (noted during Epic 4)
-- [ ] Bug routing: when user flags a bug during TAT session, route it to tinyaiteam backlog, not current project backlog (noted during articles Epic 2)
+- [ ] Inline GPT second opinion: when user asks for a quick opinion, send context to GPT and show response inline — not PR comments, just a fast second opinion during work (noted during Epic 4)
