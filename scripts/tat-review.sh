@@ -34,9 +34,10 @@ fi
 
 # --- Load config ---
 
-TAT_GPT_MODEL="gpt-4.1-mini"
-TAT_GPT_SYNOPSIS_MODEL="gpt-4.1-nano"
+# Defaults — config.sh and env vars can override
 [ -f "$CONFIG" ] && source "$CONFIG"
+TAT_GPT_MODEL="${TAT_GPT_MODEL:-gpt-4o-mini}"
+TAT_GPT_SYNOPSIS_MODEL="${TAT_GPT_SYNOPSIS_MODEL:-gpt-4o-mini}"
 
 # --- Capture diff ---
 
@@ -66,9 +67,20 @@ DIFF_LINES=$(echo "$FULL_DIFF" | wc -l | tr -d ' ')
 # --- Read current task ---
 
 CURRENT_TASK=""
+CURRENT_EPIC=""
 if [ -f "$TAT_DIR/plan.md" ]; then
-  # Find first in-progress [~] or todo [ ] task
-  CURRENT_TASK=$(grep -m1 -E '^\s*- \[(~| )\]' "$TAT_DIR/plan.md" || echo "No active task found")
+  # Priority: find in-progress [~] first, then first todo [ ]
+  CURRENT_TASK=$(grep -m1 -E '^\s*- \[~\]' "$TAT_DIR/plan.md" || true)
+  if [ -z "$CURRENT_TASK" ]; then
+    CURRENT_TASK=$(grep -m1 -E '^\s*- \[ \]' "$TAT_DIR/plan.md" || echo "No active task found")
+  fi
+  # Find which epic the current task belongs to (nearest ## heading above it)
+  if [ -n "$CURRENT_TASK" ]; then
+    TASK_LINE=$(grep -n -m1 -F "$CURRENT_TASK" "$TAT_DIR/plan.md" | cut -d: -f1)
+    if [ -n "$TASK_LINE" ]; then
+      CURRENT_EPIC=$(head -n "$TASK_LINE" "$TAT_DIR/plan.md" | grep -E '^## ' | tail -1 || true)
+    fi
+  fi
 fi
 
 # --- Read spec excerpt ---
@@ -76,6 +88,17 @@ fi
 SPEC_EXCERPT=""
 if [ -f "$TAT_DIR/spec.md" ]; then
   SPEC_EXCERPT=$(head -20 "$TAT_DIR/spec.md")
+fi
+
+# --- Detect scope (files changed) ---
+
+FILES_CHANGED=$(git diff --name-only "$BASE_BRANCH"...HEAD 2>/dev/null || git diff --name-only HEAD)
+if [ -n "$UNSTAGED" ]; then
+  UNSTAGED_FILES=$(git diff --name-only)
+  FILES_CHANGED=$(printf '%s\n%s' "$FILES_CHANGED" "$UNSTAGED_FILES" | sort -u)
+fi
+if [ -n "$UNTRACKED_FILES" ]; then
+  FILES_CHANGED=$(printf '%s\n%s' "$FILES_CHANGED" "$UNTRACKED_FILES" | sort -u)
 fi
 
 # --- Decide tier ---
@@ -107,11 +130,17 @@ End your review with:
 VERDICT: APPROVED or VERDICT: CHANGES_NEEDED"
 
 if [ "$TIER" = "synopsis" ]; then
-  USER_PROMPT="## Task
+  USER_PROMPT="## Epic
+${CURRENT_EPIC:-Unknown}
+
+## Task
 $CURRENT_TASK
 
 ## Branch
 $CURRENT_BRANCH (based on $BASE_BRANCH)
+
+## Files Changed
+$FILES_CHANGED
 
 ## Summary
 Small change ($DIFF_LINES lines). Quick sanity check requested.
@@ -120,11 +149,17 @@ Small change ($DIFF_LINES lines). Quick sanity check requested.
 $FULL_DIFF"
 
 else
-  USER_PROMPT="## Task
+  USER_PROMPT="## Epic
+${CURRENT_EPIC:-Unknown}
+
+## Task
 $CURRENT_TASK
 
 ## Branch
 $CURRENT_BRANCH (based on $BASE_BRANCH)
+
+## Files Changed
+$FILES_CHANGED
 
 ## Spec Context
 $SPEC_EXCERPT
