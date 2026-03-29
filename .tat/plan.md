@@ -61,6 +61,6 @@
 - [x] Summarize user input before storing: already doing this when writing to plan.md/spec.md (noted during Epic 2)
 - [x] GPT review response summary: already doing this manually in PR descriptions (noted during Epic 2b)
 - [x] Pre-PR checklist: already in SKILL.md with full checklist (noted during Epic 4)
-- [ ] Inline GPT second opinion: when user asks for a quick GPT opinion during work, send context to GPT, show response, then wait for user to decide whether to update plans or not — no auto-changes (noted during Epic 4)
+- [~] Inline GPT second opinion: when user asks for a quick GPT opinion during work, send context to GPT, show response, then wait for user to decide whether to update plans or not — no auto-changes (noted during Epic 4)
 - [x] .tat/ schema: not needed — only 3 obvious files, add contract if structure grows (noted from GPT plan review)
 - [x] GPT script error handling: fixed in Epic 6 — multi-endpoint support, temp file parsing, model compatibility (noted from GPT plan review)
