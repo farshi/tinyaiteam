@@ -233,6 +233,24 @@ At every task transition, print this map and check off each step as you complete
 
 ---
 
+## Inline GPT Second Opinion
+
+When the user asks for a quick GPT opinion during work (e.g., "ask GPT about this", "what does GPT think", "can you check with GPT"):
+
+1. Run `ask-gpt.sh` with the question:
+   ```bash
+   $PROJECT_ROOT/scripts/ask-gpt.sh "<question>"
+   ```
+   Or call `tat_gpt_call` directly if you need custom context.
+
+2. Present GPT's response with `[GPT]` tag.
+
+3. **Opus gives its own opinion after GPT.** Agree, disagree, or add what GPT missed. Tag with `[OPUS]`.
+
+4. **Do NOT auto-update plans, spec, or any files.** Wait for the user to decide what to do with the opinions.
+
+---
+
 ## Source Tagging
 
 While in TAT mode, tag all guidance and warnings with their source:
