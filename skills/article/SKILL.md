@@ -30,10 +30,11 @@ Parse the user's input:
 
 ## Step 0: Check Existing State
 
-Before scaffolding, check what already exists:
+Articles live inside the current project under `articles/`. This keeps articles co-located with the code they describe.
 
 ```bash
-ls -d */ 2>/dev/null   # existing article folders
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+ls "$PROJECT_ROOT/articles/"*/spec.md 2>/dev/null   # existing articles
 ```
 
 If the user is continuing an existing article, skip to the relevant step.
@@ -43,13 +44,14 @@ If the user is continuing an existing article, skip to the relevant step.
 Derive a `<slug>` from the topic (lowercase, hyphens, no special chars).
 
 ```bash
-mkdir -p <slug>/cover <slug>/assets <slug>/platform
-touch <slug>/cover/.gitkeep <slug>/assets/.gitkeep
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+mkdir -p "$PROJECT_ROOT/articles/<slug>/cover" "$PROJECT_ROOT/articles/<slug>/assets" "$PROJECT_ROOT/articles/<slug>/platform"
+touch "$PROJECT_ROOT/articles/<slug>/cover/.gitkeep" "$PROJECT_ROOT/articles/<slug>/assets/.gitkeep"
 ```
 
 This creates:
 ```
-<slug>/
+articles/<slug>/
 ├── spec.md             # article spec (created in Step 2)
 ├── article.txt         # plain text draft (created in Step 3)
 ├── cover/              # generated cover images
