@@ -17,7 +17,7 @@ if [ $# -lt 1 ]; then
   exit 1
 fi
 
-QUESTION="$1"
+QUESTION="$*"
 
 if [ -z "${OPENAI_API_KEY:-}" ]; then
   echo "[TAT] ERROR: OPENAI_API_KEY not set" >&2
