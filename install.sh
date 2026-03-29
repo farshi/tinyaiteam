@@ -12,13 +12,9 @@ mkdir -p ~/.tinyaiteam
 cp "$SCRIPT_DIR/TAT.md" ~/.tinyaiteam/TAT.md
 echo "  ✓ TAT.md → ~/.tinyaiteam/"
 
-# Config (don't overwrite if exists — user may have customized)
-if [ ! -f ~/.tinyaiteam/config.sh ]; then
-  cp "$SCRIPT_DIR/config.sh" ~/.tinyaiteam/config.sh 2>/dev/null || true
-  echo "  ✓ config.sh → ~/.tinyaiteam/"
-else
-  echo "  ⏭ config.sh already exists, skipping (won't overwrite)"
-fi
+# Config
+cp "$SCRIPT_DIR/config.sh" ~/.tinyaiteam/config.sh
+echo "  ✓ config.sh → ~/.tinyaiteam/"
 
 # Claude Code skills
 for skill_dir in "$SCRIPT_DIR/skills/"*/; do
