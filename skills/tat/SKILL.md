@@ -212,9 +212,11 @@ At every task transition, print this map and check off each step as you complete
   [ ] 1. Rebase on latest main
   [ ] 2. Verify diff scope (git diff origin/main --name-only)
   [ ] 3. No untracked files (git ls-files --others --exclude-standard)
-  [ ] 4. Push branch
-  [ ] 5. Create PR with GPT review response
-  [ ] 6. User approves merge
+  [ ] 4. Confirm REVIEW checkpoint completed (self-review + GPT review)
+  [ ] 5. Push branch
+  [ ] 6. Create PR with GPT review response
+  [ ] 7. GPT reviews the PR (run tat-code-review.sh on final state)
+  [ ] 8. User approves merge
 ```
 
 **POST-MERGE checkpoint:**
@@ -230,6 +232,29 @@ At every task transition, print this map and check off each step as you complete
 ---
 
 **Rule: print the checkpoint map at each transition.** Seeing the checklist prevents skipping steps. Check off each item as you complete it. If you catch yourself about to skip ahead, stop and go back to the map.
+
+---
+
+## Inline GPT Second Opinion
+
+When the user asks for a quick GPT opinion during work (e.g., "ask GPT about this", "what does GPT think", "can you check with GPT"):
+
+1. Run `ask-gpt.sh` with the question:
+   ```bash
+   $PROJECT_ROOT/scripts/ask-gpt.sh "<question>"
+   ```
+   Or call `tat_gpt_call` directly if you need custom context.
+
+2. Present GPT's response with `[GPT]` tag.
+
+3. **Opus gives its own opinion after GPT.** Agree, disagree, or add what GPT missed. Tag with `[OPUS]`.
+
+4. **Do NOT auto-update plans, spec, or any files.** Wait for the user to decide what to do with the opinions.
+
+5. **If the user makes a decision**, offer to record it as an ADR in `.tat/decisions/`:
+   ```
+   [TAT] Record this decision as an ADR? (e.g., ADR-005: chose X because Y)
+   ```
 
 ---
 

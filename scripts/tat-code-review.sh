@@ -35,11 +35,11 @@ SYNOPSIS_MODEL="${TAT_CODE_REVIEW_SYNOPSIS_MODEL:-gpt-4o-mini}"
 CURRENT_TASK=""
 CURRENT_EPIC=""
 if [ -f "$TAT_DIR/plan.md" ]; then
-  # Extract only epic tasks (everything before ## Backlog)
-  EPIC_SECTION=$(sed '/^## Backlog/,$d' "$TAT_DIR/plan.md")
-
-  CURRENT_TASK=$(echo "$EPIC_SECTION" | grep -m1 '\- \[~\]' || true)
+  # In-progress [~] tasks: search the whole file (could be epic or backlog)
+  CURRENT_TASK=$(grep -m1 '\- \[~\]' "$TAT_DIR/plan.md" || true)
   if [ -z "$CURRENT_TASK" ]; then
+    # Next [ ] task: only from epics (skip backlog to avoid false matches)
+    EPIC_SECTION=$(sed '/^## Backlog/,$d' "$TAT_DIR/plan.md")
     CURRENT_TASK=$(echo "$EPIC_SECTION" | grep -m1 '\- \[ \]' || echo "No active task found")
   fi
   if [ -n "$CURRENT_TASK" ]; then
