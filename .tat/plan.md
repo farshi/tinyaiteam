@@ -37,6 +37,16 @@
 - [x] Integrate review into PR flow (pre-PR checklist with rebase, scope check, GPT review)
 - [x] Plan update after merge (post-merge checklist in SKILL.md)
 
+## Epic 5: /article Skill (local only, no PR)
+
+- [x] 5.1 Create `scripts/tat-image.sh` — DALL-E API wrapper (same pattern as tat-review.sh)
+- [x] 5.2 Create `skills/article/SKILL.md` — skill definition with full article workflow
+- [x] 5.3 Update `install.sh` to copy new skill and script (now loops all skills/)
+- [x] 5.4 Update `config.sh` with DALL-E model config (`TAT_IMAGE_MODEL`)
+- [x] 5.5 Test end-to-end — SKIPPED: DALL-E access not enabled on OpenAI project
+- [x] 5.6 GPT review + PR — SKIPPED: skill is local only for now
+- [x] 5.7 Improve SKILL.md boilerplate template — scaffold folder structure, platform export step, image direction in spec
+
 ## Backlog (captured during work)
 - [ ] Install mechanism: copy TAT.md + skills + commands to ~/.claude (noted during Epic 1)
 - [ ] GPT PR review before merge: send epic + tasks + full PR diff to GPT, max 2 fix rounds, then user decides (noted during Epic 2)
@@ -45,3 +55,4 @@
 - [ ] GPT review response summary: Opus writes accept/dismiss reasoning into PR description as audit trail and context for future GPT reviews (noted during Epic 2b)
 - [ ] Pre-PR checklist: rebase on main, verify diff scope, no untracked files, GPT reviewed (noted during Epic 4)
 - [ ] Inline GPT review: post GPT feedback as GitHub PR review comments via gh api (noted during Epic 4)
+- [ ] Bug routing: when user flags a bug during TAT session, route it to tinyaiteam backlog, not current project backlog (noted during articles Epic 2)
