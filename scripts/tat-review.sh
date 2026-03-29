@@ -70,13 +70,13 @@ CURRENT_TASK=""
 CURRENT_EPIC=""
 if [ -f "$TAT_DIR/plan.md" ]; then
   # Priority: find in-progress [~] first, then first todo [ ]
-  CURRENT_TASK=$(grep -m1 -E '^\s*- \[~\]' "$TAT_DIR/plan.md" || true)
+  CURRENT_TASK=$(grep -m1 '\- \[~\]' "$TAT_DIR/plan.md" || true)
   if [ -z "$CURRENT_TASK" ]; then
-    CURRENT_TASK=$(grep -m1 -E '^\s*- \[ \]' "$TAT_DIR/plan.md" || echo "No active task found")
+    CURRENT_TASK=$(grep -m1 '\- \[ \]' "$TAT_DIR/plan.md" || echo "No active task found")
   fi
   # Find which epic the current task belongs to (nearest ## heading above it)
   if [ -n "$CURRENT_TASK" ]; then
-    TASK_LINE=$(grep -n -m1 -F "$CURRENT_TASK" "$TAT_DIR/plan.md" | cut -d: -f1)
+    TASK_LINE=$(grep -n -m1 -F -- "$CURRENT_TASK" "$TAT_DIR/plan.md" | cut -d: -f1)
     if [ -n "$TASK_LINE" ]; then
       CURRENT_EPIC=$(head -n "$TASK_LINE" "$TAT_DIR/plan.md" | grep -E '^## ' | tail -1 || true)
     fi
