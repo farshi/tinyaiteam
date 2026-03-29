@@ -56,10 +56,10 @@
 
 ## Backlog (captured during work)
 - [x] Install mechanism: done — skills + commands → ~/.claude, runtime → ~/.tinyaiteam (noted during Epic 1)
-- [ ] GPT PR review before merge: send epic + tasks + full PR diff to GPT, max 2 fix rounds, then user decides (noted during Epic 2)
+- [x] GPT PR review before merge: already covered by pre-PR checklist + tat-code-review.sh. Keep tasks small instead. (noted during Epic 2)
 - [ ] Brainstorming loop: Opus proposes → GPT critiques → Opus adjusts, max 3 rounds, hard stop, user decides (noted during Epic 2)
 - [ ] Summarize user input before storing: clean up typos/rough text into clear summary for context (noted during Epic 2)
-- [ ] GPT review response summary: Opus writes accept/dismiss reasoning into PR description as audit trail and context for future GPT reviews (noted during Epic 2b)
+- [x] GPT review response summary: already doing this manually in PR descriptions (noted during Epic 2b)
 - [x] Pre-PR checklist: already in SKILL.md with full checklist (noted during Epic 4)
 - [ ] Inline GPT second opinion: when user asks for a quick opinion, send context to GPT and show response inline — not PR comments, just a fast second opinion during work (noted during Epic 4)
 - [ ] .tat/ schema: define file contract, ownership (which command writes what), stale-data rules (noted from GPT plan review)
