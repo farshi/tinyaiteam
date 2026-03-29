@@ -63,6 +63,4 @@
 - [ ] Pre-PR checklist: rebase on main, verify diff scope, no untracked files, GPT reviewed (noted during Epic 4)
 - [ ] Inline GPT second opinion: when user asks for a quick opinion, send context to GPT and show response inline — not PR comments, just a fast second opinion during work (noted during Epic 4)
 - [ ] .tat/ schema: define file contract, ownership (which command writes what), stale-data rules (noted from GPT plan review)
-- [ ] Security: redaction/confirmation before sending code to GPT — no secrets/proprietary code leaked (noted from GPT plan review)
 - [ ] GPT script error handling: timeout, rate limit, network errors, invalid model config (noted from GPT plan review)
-- [ ] Delegation audit trail: log which model/subagent acted and why, for debugging routing mistakes (noted from GPT plan review)
