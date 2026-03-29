@@ -159,9 +159,9 @@ When Opus identifies a coding task, delegate it using the Agent tool with `model
    - Instruction to commit when done with a conventional commit message
 
 3. **Review the result** — when Sonnet returns, Opus:
-   - Checks what was changed (`git diff`, `git log`)
-   - Runs GPT review
-   - Presents the result to the user
+   - Self-review first: read the diff, check scope, check for bugs, fix anything found
+   - Then run GPT review (`tat-code-review.sh`) as second opinion
+   - Present both self-review and GPT feedback to the user
    - Proceeds with PR flow if approved
 
 This keeps Opus as the orchestrator and Sonnet as the executor. The user stays in one session.
@@ -182,7 +182,24 @@ From here, follow the SSD loop from TAT.md. At each transition:
    ```
    Create the branch if it doesn't exist.
 
-3. **After coding** → Auto-trigger GPT review:
+3. **After coding** → Self-review FIRST, then GPT review:
+
+   **Step 3a: Self-review (mandatory, never skip)**
+   Before sending anything to GPT, review your own work:
+   - Read the full diff (`git diff main...HEAD`)
+   - Check: does it match the task scope? Any files that shouldn't be here?
+   - Check: any bugs, edge cases, missing error handling?
+   - Check: any leftover debug code, TODOs, or incomplete work?
+   - Fix anything you find. Commit the fixes.
+   - Show the user what you found and fixed:
+     ```
+     [TAT] Self-review:
+       ✓ Scope: <N files changed, all in scope>
+       ✓ Fixed: <what you caught and fixed, or "nothing — looks clean">
+       → Sending to GPT for second opinion.
+     ```
+
+   **Step 3b: GPT review (second opinion)**
    Run `$PROJECT_ROOT/scripts/tat-code-review.sh` (or installed version)
    Present GPT's feedback with `[GPT]` tag.
 
@@ -299,3 +316,4 @@ After a PR is merged:
 4. **Stay focused.** Off-scope ideas go to backlog, not into the current task.
 5. **Tag your guidance.** The user should always know why you're saying something.
 6. **Delegate, don't suggest.** If you're Opus and the task is coding, spawn a Sonnet subagent — don't ask the user to switch models. If you're Sonnet and the task needs architecture, escalate to Opus.
+7. **Self-review before GPT review. Always.** Read the diff, check scope, fix issues — THEN send to GPT. GPT is a second opinion, not a substitute for your own QA. Never skip this.
