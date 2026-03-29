@@ -127,6 +127,36 @@ Only for non-obvious decisions. Format:
 <Why — the reasoning, not just the conclusion>
 ```
 
+## Source Tagging
+
+When in TAT mode, tag all guidance, warnings, and workflow messages with their source. Normal conversation and code output is NOT tagged.
+
+### Tags
+- `[SYSTEM]` — Built-in Claude safety rules (destructive actions, security, reversibility checks)
+- `[CLAUDE.md]` — User's global `~/.claude/CLAUDE.md` rules
+- `[PROJECT]` — Project-level CLAUDE.md rules
+- `[TAT]` — TAT workflow rules (from TAT.md or `.tat/` state)
+- `[GPT]` — Feedback from GPT review
+
+### When to tag
+- Warnings and blocks: `[SYSTEM] This will delete the remote branch. Confirm?`
+- Workflow guidance: `[TAT] Current task: Epic 2, Task 2.1 — switching to plan mode`
+- Rule enforcement: `[CLAUDE.md] Entering plan mode — non-trivial task (3+ steps)`
+- Review results: `[GPT] VERDICT: APPROVED — no issues found`
+- Model routing: `[TAT] This is architectural — stay on Opus`
+
+### When NOT to tag
+- Normal conversation
+- Code output
+- Answering questions
+- Tool calls
+
+## Mode Activation
+
+- `/tat` activates TAT mode for the session
+- No explicit exit needed — session end or not invoking `/tat` means normal mode
+- TAT is a way of working you invoke when you want structure, not a persistent state to manage
+
 ## Rules for /tat Behavior
 
 1. Always start in planning mode — never jump to code
@@ -135,3 +165,4 @@ Only for non-obvious decisions. Format:
 4. Suggest model routing for the current task
 5. Enforce the SSD loop — no skipping steps
 6. User is product owner — final authority on everything
+7. Tag all guidance with source (see Source Tagging above)
