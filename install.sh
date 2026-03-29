@@ -20,12 +20,15 @@ else
   echo "  ⏭ config.sh already exists, skipping (won't overwrite)"
 fi
 
-# Claude Code skill
-if [ -d "$SCRIPT_DIR/skills/tat" ]; then
-  mkdir -p ~/.claude/skills/tat
-  cp "$SCRIPT_DIR/skills/tat/SKILL.md" ~/.claude/skills/tat/SKILL.md
-  echo "  ✓ SKILL.md → ~/.claude/skills/tat/"
-fi
+# Claude Code skills
+for skill_dir in "$SCRIPT_DIR/skills/"*/; do
+  skill_name=$(basename "$skill_dir")
+  if [ -f "$skill_dir/SKILL.md" ]; then
+    mkdir -p ~/.claude/skills/"$skill_name"
+    cp "$skill_dir/SKILL.md" ~/.claude/skills/"$skill_name"/SKILL.md
+    echo "  ✓ SKILL.md → ~/.claude/skills/$skill_name/"
+  fi
+done
 
 # Claude Code commands
 if [ -d "$SCRIPT_DIR/commands" ]; then
