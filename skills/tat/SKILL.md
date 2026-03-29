@@ -91,10 +91,16 @@ ls "$PROJECT_ROOT/.tat/" 2>/dev/null || echo "NO_TAT_DIR"
 If `NO_TAT_DIR`:
 - If Opus: offer to initialize — "No .tat/ found. Want me to set up TAT for this project?"
   If yes:
-  1. Create `.tat/spec.md` and `.tat/plan.md` with empty templates
-  2. Offer to install git hooks: "[TAT] Install commit-msg and pre-push hooks? They enforce conventional commits and prevent direct pushes to main."
+  1. Check if git is initialized:
+     ```bash
+     git rev-parse --is-inside-work-tree 2>/dev/null || echo "NO_GIT"
+     ```
+     - If `NO_GIT`: run `git init` and make an initial commit
+     - If git exists: skip git init, do NOT re-initialize
+  2. Create `.tat/spec.md` and `.tat/plan.md` with empty templates
+  3. Offer to install git hooks: "[TAT] Install commit-msg and pre-push hooks? They enforce conventional commits and prevent direct pushes to main."
      If yes: `cp ~/dev/tinyaiteam/hooks/* .git/hooks/ && chmod +x .git/hooks/commit-msg .git/hooks/pre-push`
-  3. Ask the user what they're building
+  4. Ask the user what they're building
 - If Sonnet: "No .tat/ found. Start an Opus session first to create the project plan."
 
 If `.tat/` exists, read the state:
