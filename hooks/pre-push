@@ -1,0 +1,34 @@
+#!/bin/bash
+# TAT pre-push hook — warns if pushing directly to main without a plan update
+# Install: cp hooks/pre-push .git/hooks/pre-push && chmod +x .git/hooks/pre-push
+
+BRANCH=$(git branch --show-current)
+
+if [ "$BRANCH" = "main" ]; then
+  # Check if the latest commit is a plan update (allowed on main)
+  LAST_MSG=$(git log -1 --format=%s)
+  if echo "$LAST_MSG" | grep -qE '^docs\(plan\):'; then
+    exit 0
+  fi
+
+  # Check if it's a merge commit (from PR merge)
+  if echo "$LAST_MSG" | grep -qE '^Merge '; then
+    exit 0
+  fi
+
+  echo ""
+  echo "[TAT] Direct push to main detected."
+  echo ""
+  echo "  TAT workflow requires: branch → PR → GPT review → merge"
+  echo "  Only plan updates (docs(plan): ...) are allowed directly on main."
+  echo ""
+  echo "  Last commit: $LAST_MSG"
+  echo ""
+  echo "  Push anyway? Set TAT_FORCE=1 to override."
+  echo ""
+
+  if [ "${TAT_FORCE:-0}" = "1" ]; then
+    exit 0
+  fi
+  exit 1
+fi

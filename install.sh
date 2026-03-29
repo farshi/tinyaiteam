@@ -38,3 +38,6 @@ fi
 
 echo ""
 echo "TAT installed. Use /tat in any project to start."
+echo ""
+echo "To add git hooks to a project, run from the project root:"
+echo "  cp ~/dev/tinyaiteam/hooks/* .git/hooks/ && chmod +x .git/hooks/commit-msg .git/hooks/pre-push"
