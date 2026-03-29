@@ -6,7 +6,7 @@
 # Responses-only models (v1/responses): gpt-5.4-pro, gpt-5.2-codex
 
 # Plan review — rare, high-stakes, use the deep thinker
-TAT_PLAN_REVIEW_MODEL="${TAT_PLAN_REVIEW_MODEL:-gpt-5.4-pro}"
+TAT_PLAN_REVIEW_MODEL="${TAT_PLAN_REVIEW_MODEL:-gpt-5.2-codex}"
 
 # Code review — frequent, use the fast one
 TAT_CODE_REVIEW_MODEL="${TAT_CODE_REVIEW_MODEL:-gpt-5.4-mini}"
