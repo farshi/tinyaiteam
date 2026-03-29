@@ -42,3 +42,4 @@
 - [ ] GPT PR review before merge: send epic + tasks + full PR diff to GPT, max 2 fix rounds, then user decides (noted during Epic 2)
 - [ ] Brainstorming loop: Opus proposes → GPT critiques → Opus adjusts, max 3 rounds, hard stop, user decides (noted during Epic 2)
 - [ ] Summarize user input before storing: clean up typos/rough text into clear summary for context (noted during Epic 2)
+- [ ] GPT review response summary: Opus writes accept/dismiss reasoning into PR description as audit trail and context for future GPT reviews (noted during Epic 2b)
