@@ -16,6 +16,15 @@ echo "  ✓ TAT.md → ~/.tinyaiteam/"
 cp "$SCRIPT_DIR/config.sh" ~/.tinyaiteam/config.sh
 echo "  ✓ config.sh → ~/.tinyaiteam/"
 
+# Scripts
+if [ -d "$SCRIPT_DIR/scripts" ]; then
+  mkdir -p ~/.tinyaiteam/scripts
+  for script in "$SCRIPT_DIR/scripts/"*.sh; do
+    [ -f "$script" ] && cp "$script" ~/.tinyaiteam/scripts/ && chmod +x ~/.tinyaiteam/scripts/"$(basename "$script")"
+  done
+  echo "  ✓ scripts → ~/.tinyaiteam/scripts/"
+fi
+
 # Claude Code skills
 for skill_dir in "$SCRIPT_DIR/skills/"*/; do
   skill_name=$(basename "$skill_dir")

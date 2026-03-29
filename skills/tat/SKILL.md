@@ -71,13 +71,13 @@ If `TAT_NOT_INSTALLED`: tell the user "TAT is not installed. Run `install.sh` fr
 ## Step 2: Detect current model
 
 You know which model you are from your system prompt (it states your model ID). Use that directly:
-- If you are `claude-opus-*` → You are **Planner/Architect/Decider**. Focus on planning, spec, architecture, decisions. Can also code complex tasks.
+- If you are `claude-opus-*` → You are **Orchestrator**. Plan, spec, architect, decide, AND delegate coding to Sonnet subagents. You stay in control the entire session — the user never needs to switch models.
 - If you are `claude-sonnet-*` → You are **Coder/Implementer**. Focus on coding the current subtask. Escalate architectural questions to Opus.
 - If you are `claude-haiku-*` → You are **Quick Tasker**. Only handle simple, well-scoped tasks. Escalate anything complex.
 
 Announce your role:
 ```
-[TAT] Active. Role: <Planner|Coder> (<model name>)
+[TAT] Active. Role: <Orchestrator|Coder> (<model name>)
 ```
 
 ## Step 3: Read project state
@@ -125,25 +125,53 @@ Parse `plan.md` and display:
 
 Based on the current task and your model role:
 
-**If Opus (Planner):**
+**If Opus (Orchestrator):**
 - If no spec exists → "Let's start with the spec. What are you building?"
 - If spec exists but no plan → "Spec is ready. Let me break this into epics and tasks."
 - If plan exists, assess current task complexity:
-  - Complex (multi-file, architectural, new system) → "This is complex — I'll handle this on Opus."
-  - Simple (fix, single file, doc change) → "[TAT] This task is straightforward. Consider switching to Sonnet (`/model sonnet`) for implementation."
+  - Complex (multi-file, architectural, new system) → "This is complex — I'll handle this directly on Opus."
+  - Standard coding task → Delegate to a Sonnet subagent (see **Delegation** below)
 - If all tasks done → "All tasks complete. Want to review, add new work, or wrap up?"
 
 **If Sonnet (Coder):**
 - Show the current task context bundle (scope, guardrails, files to change)
 - "Ready to code. Confirm the task or adjust scope."
-- If the task looks architectural → "[TAT] This task looks complex. Consider switching to Opus (`/model opus`) for this one."
+- If the task looks architectural → "[TAT] This task needs architecture decisions. Start an Opus session for this one."
+
+### Delegation (Opus → Sonnet subagent)
+
+When Opus identifies a coding task, delegate it using the Agent tool with `model: "sonnet"`. The user never switches models — Opus orchestrates everything.
+
+1. **Prepare the context bundle** — gather everything Sonnet needs:
+   ```
+   [TAT] Delegating to Sonnet →
+   [TAT] Task: <task description>
+   [TAT] Branch: tat/<epic>/<task-name>
+   [TAT] Files to change: <list>
+   [TAT] Guardrails: <what NOT to touch>
+   ```
+
+2. **Spawn the subagent** with a detailed prompt containing:
+   - The task description and acceptance criteria
+   - Branch name (create it first if needed)
+   - Files to read and modify
+   - Guardrails (files/patterns to avoid)
+   - Instruction to commit when done with a conventional commit message
+
+3. **Review the result** — when Sonnet returns, Opus:
+   - Checks what was changed (`git diff`, `git log`)
+   - Runs GPT review
+   - Presents the result to the user
+   - Proceeds with PR flow if approved
+
+This keeps Opus as the orchestrator and Sonnet as the executor. The user stays in one session.
 
 ## Step 6: Enter the SSD loop
 
 From here, follow the SSD loop from TAT.md. At each transition:
 
 1. **After planning** → Offer GPT plan review: "Want a second opinion on the plan? I'll send to GPT."
-   If yes, run: `$PROJECT_ROOT/scripts/tat-review.sh --plan` (or the installed version)
+   If yes, run: `$PROJECT_ROOT/scripts/tat-plan-review.sh` (or the installed version)
 
 2. **Before coding** → Confirm branch:
    ```
@@ -155,7 +183,7 @@ From here, follow the SSD loop from TAT.md. At each transition:
    Create the branch if it doesn't exist.
 
 3. **After coding** → Auto-trigger GPT review:
-   Run `$PROJECT_ROOT/scripts/tat-review.sh` (or installed version)
+   Run `$PROJECT_ROOT/scripts/tat-code-review.sh` (or installed version)
    Present GPT's feedback with `[GPT]` tag.
 
 4. **After review** → Show blockers if any, let user decide, then:
@@ -216,7 +244,7 @@ Before creating a PR, TAT must complete this checklist:
   3. No untracked files left behind
      git ls-files --others --exclude-standard
   4. GPT code review completed
-     ./scripts/tat-review.sh main
+     ./scripts/tat-code-review.sh main
   5. GPT review response summary written
 ```
 
@@ -270,4 +298,4 @@ After a PR is merged:
 3. **GPT is an advisor, not a gatekeeper.** Present GPT feedback, let user decide.
 4. **Stay focused.** Off-scope ideas go to backlog, not into the current task.
 5. **Tag your guidance.** The user should always know why you're saying something.
-6. **Be honest about model fit.** If you're Sonnet and the task needs Opus, say so. If you're Opus and the task is simple, suggest Sonnet.
+6. **Delegate, don't suggest.** If you're Opus and the task is coding, spawn a Sonnet subagent — don't ask the user to switch models. If you're Sonnet and the task needs architecture, escalate to Opus.

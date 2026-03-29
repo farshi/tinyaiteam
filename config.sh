@@ -2,9 +2,15 @@
 # Source this file before calling GPT review
 # Environment variables take precedence over these defaults
 
-# Available models: gpt-4o-mini, gpt-3.5-turbo, gpt-5.2-codex, gpt-5.4-mini, gpt-5.4-pro
-TAT_GPT_MODEL="${TAT_GPT_MODEL:-gpt-5.4-pro}"
-TAT_GPT_SYNOPSIS_MODEL="${TAT_GPT_SYNOPSIS_MODEL:-gpt-4o-mini}"
+# Chat models (v1/chat/completions): gpt-4o-mini, gpt-3.5-turbo, gpt-5.4-mini
+# Responses-only models (v1/responses): gpt-5.4-pro, gpt-5.2-codex
+
+# Plan review — rare, high-stakes, use the deep thinker
+TAT_PLAN_REVIEW_MODEL="${TAT_PLAN_REVIEW_MODEL:-gpt-5.4-pro}"
+
+# Code review — frequent, use the fast one
+TAT_CODE_REVIEW_MODEL="${TAT_CODE_REVIEW_MODEL:-gpt-5.4-mini}"
+TAT_CODE_REVIEW_SYNOPSIS_MODEL="${TAT_CODE_REVIEW_SYNOPSIS_MODEL:-gpt-4o-mini}"
 
 # DALL-E image generation
 TAT_IMAGE_MODEL="${TAT_IMAGE_MODEL:-dall-e-3}"
