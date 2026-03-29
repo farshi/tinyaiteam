@@ -171,7 +171,7 @@ This keeps Opus as the orchestrator and Sonnet as the executor. The user stays i
 From here, follow the SSD loop from TAT.md. At each transition:
 
 1. **After planning** → Offer GPT plan review: "Want a second opinion on the plan? I'll send to GPT."
-   If yes, run: `$PROJECT_ROOT/scripts/tat-review.sh --plan` (or the installed version)
+   If yes, run: `$PROJECT_ROOT/scripts/tat-plan-review.sh` (or the installed version)
 
 2. **Before coding** → Confirm branch:
    ```
@@ -183,7 +183,7 @@ From here, follow the SSD loop from TAT.md. At each transition:
    Create the branch if it doesn't exist.
 
 3. **After coding** → Auto-trigger GPT review:
-   Run `$PROJECT_ROOT/scripts/tat-review.sh` (or installed version)
+   Run `$PROJECT_ROOT/scripts/tat-code-review.sh` (or installed version)
    Present GPT's feedback with `[GPT]` tag.
 
 4. **After review** → Show blockers if any, let user decide, then:
@@ -244,7 +244,7 @@ Before creating a PR, TAT must complete this checklist:
   3. No untracked files left behind
      git ls-files --others --exclude-standard
   4. GPT code review completed
-     ./scripts/tat-review.sh main
+     ./scripts/tat-code-review.sh main
   5. GPT review response summary written
 ```
 
