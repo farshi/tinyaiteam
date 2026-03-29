@@ -1,0 +1,31 @@
+#!/bin/bash
+# TAT commit-msg hook — validates conventional commit format
+# Install: cp hooks/commit-msg .git/hooks/commit-msg && chmod +x .git/hooks/commit-msg
+
+MSG=$(head -1 "$1")
+
+# Allow merge commits
+if echo "$MSG" | grep -qE '^Merge '; then
+  exit 0
+fi
+
+# Allow plan updates (direct to main)
+if echo "$MSG" | grep -qE '^docs\(plan\):'; then
+  exit 0
+fi
+
+# Validate conventional commit format: type(scope): description
+if ! echo "$MSG" | grep -qE '^(feat|fix|docs|refactor|chore|test|style)\([a-z]+\): .+'; then
+  echo ""
+  echo "[TAT] Invalid commit message format."
+  echo ""
+  echo "  Expected: <type>(<scope>): <description>"
+  echo ""
+  echo "  Types:  feat, fix, docs, refactor, chore, test, style"
+  echo "  Scopes: skill, review, plan, config, workflow, install, hooks"
+  echo ""
+  echo "  Example: feat(skill): add /tat status command"
+  echo "  Got:     $MSG"
+  echo ""
+  exit 1
+fi

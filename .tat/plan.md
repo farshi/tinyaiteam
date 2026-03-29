@@ -28,14 +28,14 @@
 - [x] Add plan review mode (--plan flag, sends spec + plan instead of diff)
 - [x] Add source tagging ([TAT], [GPT], [SYSTEM], [CLAUDE.md], [PROJECT])
 - [x] Record decisions: ADR-001 mode switching, ADR-002 source tagging
-- [~] Test on TAT's own code (dogfood round 2)
-- [ ] Iterate based on what we learn
+- [x] Test on TAT's own code (dogfood round 2)
+- [x] Iterate: fixed model detection, documented 7 dogfood lessons
 
 ## Epic 4: Git Workflow
 - [x] Define branch naming convention (in TAT.md: tat/<epic>/<task-name>)
 - [x] Define PR template for TAT tasks (in SKILL.md: push + PR after review)
-- [ ] Integrate review into PR flow
-- [ ] Plan update after merge
+- [x] Integrate review into PR flow (pre-PR checklist with rebase, scope check, GPT review)
+- [x] Plan update after merge (post-merge checklist in SKILL.md)
 
 ## Backlog (captured during work)
 - [ ] Install mechanism: copy TAT.md + skills + commands to ~/.claude (noted during Epic 1)
@@ -43,3 +43,5 @@
 - [ ] Brainstorming loop: Opus proposes → GPT critiques → Opus adjusts, max 3 rounds, hard stop, user decides (noted during Epic 2)
 - [ ] Summarize user input before storing: clean up typos/rough text into clear summary for context (noted during Epic 2)
 - [ ] GPT review response summary: Opus writes accept/dismiss reasoning into PR description as audit trail and context for future GPT reviews (noted during Epic 2b)
+- [ ] Pre-PR checklist: rebase on main, verify diff scope, no untracked files, GPT reviewed (noted during Epic 4)
+- [ ] Inline GPT review: post GPT feedback as GitHub PR review comments via gh api (noted during Epic 4)
