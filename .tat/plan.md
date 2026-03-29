@@ -57,7 +57,7 @@
 ## Backlog (captured during work)
 - [x] Install mechanism: done — skills + commands → ~/.claude, runtime → ~/.tinyaiteam (noted during Epic 1)
 - [x] GPT PR review before merge: already covered by pre-PR checklist + tat-code-review.sh. Keep tasks small instead. (noted during Epic 2)
-- [ ] Brainstorming loop: Opus proposes → GPT critiques → Opus adjusts, max 3 rounds, hard stop, user decides (noted during Epic 2)
+- [x] Brainstorming loop: /brainstorm skill — GPT first (no bias), Opus critiques, user decides, max 3 rounds (noted during Epic 2)
 - [ ] Summarize user input before storing: clean up typos/rough text into clear summary for context (noted during Epic 2)
 - [x] GPT review response summary: already doing this manually in PR descriptions (noted during Epic 2b)
 - [x] Pre-PR checklist: already in SKILL.md with full checklist (noted during Epic 4)
