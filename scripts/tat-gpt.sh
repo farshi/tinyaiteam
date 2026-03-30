@@ -7,9 +7,13 @@ tat_gpt_call() {
   local MODEL="$1"
   local SYSTEM_PROMPT="$2"
   local USER_PROMPT="$3"
-  local TMPFILE
+
+  local TMPFILE PAYLOAD_FILE SYSTEM_FILE USER_FILE
   TMPFILE=$(mktemp)
-  trap "rm -f '$TMPFILE'" EXIT
+  PAYLOAD_FILE=$(mktemp)
+  SYSTEM_FILE=$(mktemp)
+  USER_FILE=$(mktemp)
+  trap "rm -f '$TMPFILE' '$PAYLOAD_FILE' '$SYSTEM_FILE' '$USER_FILE'" EXIT
 
   # Detect endpoint: some models only work with v1/responses
   local RESPONSES_ONLY_MODELS="gpt-5.4-pro gpt-5.2-codex"
@@ -18,25 +22,29 @@ tat_gpt_call() {
     [ "$MODEL" = "$rm" ] && USE_RESPONSES=true
   done
 
-  local SYSTEM_JSON USER_JSON
-
-  SYSTEM_JSON=$(printf '%s' "$SYSTEM_PROMPT" | python3 -c 'import sys,json; print(json.dumps(sys.stdin.read()))')
-  USER_JSON=$(printf '%s' "$USER_PROMPT" | python3 -c 'import sys,json; print(json.dumps(sys.stdin.read()))')
+  # Write prompts to temp files to avoid shell escaping issues.
+  # Python reads from files — no shell interpolation can mangle the content.
+  printf '%s' "$SYSTEM_PROMPT" > "$SYSTEM_FILE"
+  printf '%s' "$USER_PROMPT" > "$USER_FILE"
 
   if [ "$USE_RESPONSES" = true ]; then
-    local COMBINED="$SYSTEM_PROMPT
-
-$USER_PROMPT"
-    local COMBINED_JSON
-    COMBINED_JSON=$(printf '%s' "$COMBINED" | python3 -c 'import sys,json; print(json.dumps(sys.stdin.read()))')
+    # Build the full JSON payload in Python — safe from shell escaping
+    python3 -c '
+import json, sys
+with open(sys.argv[1]) as f:
+    system = f.read()
+with open(sys.argv[2]) as f:
+    user = f.read()
+combined = system + "\n\n" + user
+payload = json.dumps({"model": sys.argv[3], "input": combined})
+with open(sys.argv[4], "w") as f:
+    f.write(payload)
+' "$SYSTEM_FILE" "$USER_FILE" "$MODEL" "$PAYLOAD_FILE"
 
     curl -s https://api.openai.com/v1/responses \
       -H "Authorization: Bearer $OPENAI_API_KEY" \
       -H "Content-Type: application/json" \
-      -d "{
-        \"model\": \"$MODEL\",
-        \"input\": $COMBINED_JSON
-      }" > "$TMPFILE"
+      -d "@$PAYLOAD_FILE" > "$TMPFILE"
 
     REVIEW=$(python3 -c '
 import sys, json
@@ -51,17 +59,29 @@ for item in r.get("output", []):
 print("")
 ' "$TMPFILE" 2>/dev/null)
   else
+    # Build the full JSON payload in Python — safe from shell escaping
+    python3 -c '
+import json, sys
+with open(sys.argv[1]) as f:
+    system = f.read()
+with open(sys.argv[2]) as f:
+    user = f.read()
+payload = json.dumps({
+    "model": sys.argv[3],
+    "messages": [
+        {"role": "system", "content": system},
+        {"role": "user", "content": user}
+    ],
+    "temperature": 0.3
+})
+with open(sys.argv[4], "w") as f:
+    f.write(payload)
+' "$SYSTEM_FILE" "$USER_FILE" "$MODEL" "$PAYLOAD_FILE"
+
     curl -s https://api.openai.com/v1/chat/completions \
       -H "Authorization: Bearer $OPENAI_API_KEY" \
       -H "Content-Type: application/json" \
-      -d "{
-        \"model\": \"$MODEL\",
-        \"messages\": [
-          {\"role\": \"system\", \"content\": $SYSTEM_JSON},
-          {\"role\": \"user\", \"content\": $USER_JSON}
-        ],
-        \"temperature\": 0.3
-      }" > "$TMPFILE"
+      -d "@$PAYLOAD_FILE" > "$TMPFILE"
 
     REVIEW=$(python3 -c '
 import sys, json
