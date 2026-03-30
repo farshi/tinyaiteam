@@ -1,19 +1,20 @@
 {
   "version": 1,
   "project": "TAT — Tiny AI Team",
-  "phase": "IDLE",
-  "epic": null,
-  "task": null,
+  "phase": "PLAN",
+  "epic": "Epic 8: State Machine + Task IDs",
+  "task": "8.3 Add task IDs + sprint format",
   "task_id": null,
-  "branch": null,
+  "branch": "tat/8/task-ids",
   "last_action": {
-    "type": null,
+    "type": "PLAN",
     "model": null,
-    "timestamp": null
+    "timestamp": "2026-03-30T09:18:17Z"
   },
   "session": {
-    "model": null,
+    "model": "claude-opus-4-6",
     "started_at": null,
-    "updated_at": null
-  }
+    "updated_at": "2026-03-30T09:18:17Z"
+  },
+  "next_task_id": 68
 }

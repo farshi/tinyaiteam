@@ -135,10 +135,28 @@ Each project using TAT has:
 <project>/
 └── .tat/
     ├── spec.md         # What we're building and why
-    ├── plan.md         # Epics, tasks, status
+    ├── plan.md         # Sprints, tasks (TAT-XXX IDs), status
+    ├── state.json      # Machine-readable state (phase, current task, counters)
     └── decisions/      # ADR files for non-obvious decisions
         └── 001-<title>.md
 ```
+
+### Plan Format
+
+Plans use sprint-based tables. Epics define WHAT to build, sprints define WHAT ORDER.
+
+```markdown
+## Current Sprint: Sprint N — <goal>
+
+| ID | Task | Epic | Status |
+|----|------|------|--------|
+| TAT-001 | First task | E1 | [~] |
+| TAT-002 | Second task | E1 | [ ] |
+```
+
+- **Task IDs**: `TAT-XXX` format, auto-generated, never reused
+- **Sprints**: group tasks by delivery value, reprioritize after each sprint
+- **Status**: `[x]` done, `[~]` in progress, `[ ]` todo
 
 Global TAT config:
 ```
