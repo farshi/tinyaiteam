@@ -128,15 +128,36 @@ Rules:
 - Be specific — name the file, task, or decision you are referring to.
 - Never repeat feedback from a previous review round."
 
-# --- Project context (read from spec) ---
+# --- Project context (trimmed — send summary, not full spec) ---
 
 SPEC_SUMMARY=""
-[ -f "$TAT_DIR/spec.md" ] && SPEC_SUMMARY=$(cat "$TAT_DIR/spec.md")
+if [ -f "$TAT_DIR/spec.md" ]; then
+  # Extract project name (first heading) + first paragraph (what it does)
+  SPEC_SUMMARY=$(awk '
+    /^#/ && !found_title { found_title=1; print; next }
+    found_title && /^##/ && !found_section { found_section=1; print; next }
+    found_section && /^$/ && got_content { exit }
+    found_section { got_content=1; print }
+  ' "$TAT_DIR/spec.md" | head -10)
+fi
 
-PROJECT_CONTEXT="TOOLING CONTEXT: This project uses TAT (Tiny AI Team), a Claude Code skill that orchestrates multi-model workflows. Claude Code is Anthropic's AI coding assistant. TAT is NOT a standalone tool — it's skill files + bash scripts + config that plug into Claude Code. Opus plans, Sonnet codes (via subagents), GPT reviews.
+# Also extract the current task's full description from plan.md
+TASK_DESCRIPTION=""
+if [ -n "$CURRENT_TASK" ] && [ -f "$TAT_DIR/plan.md" ]; then
+  # Get everything from the task heading to the next heading
+  TASK_HEADING=$(echo "$CURRENT_TASK" | sed 's/^- \[.\] //' | head -1)
+  TASK_DESCRIPTION=$(awk -v task="$TASK_HEADING" '
+    index($0, task) { found=1; print; next }
+    found && /^###/ { exit }
+    found && /^## / { exit }
+    found { print }
+  ' "$TAT_DIR/plan.md")
+fi
 
-PROJECT SPEC:
-$SPEC_SUMMARY"
+PROJECT_CONTEXT="PROJECT: $SPEC_SUMMARY
+
+CURRENT TASK DETAILS:
+$TASK_DESCRIPTION"
 
 SYSTEM_PROMPT="You are a senior code reviewer. You are NOT a gatekeeper — you are a second opinion. The human decides what to act on.
 
