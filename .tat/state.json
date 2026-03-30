@@ -3,18 +3,18 @@
   "project": "TAT — Tiny AI Team",
   "phase": "PLAN",
   "epic": "Epic 8: State Machine + Task IDs",
-  "task": "TAT-054 Add /tat resume",
-  "task_id": "TAT-054",
-  "branch": "tat/8/resume",
+  "task": "TAT-055 Add /tat recap",
+  "task_id": "TAT-055",
+  "branch": "tat/8/recap",
   "last_action": {
     "type": "PLAN",
     "model": null,
-    "timestamp": "2026-03-30T09:32:33Z"
+    "timestamp": "2026-03-30T09:51:57Z"
   },
   "session": {
     "model": "claude-opus-4-6",
     "started_at": null,
-    "updated_at": "2026-03-30T09:32:33Z"
+    "updated_at": "2026-03-30T09:51:57Z"
   },
   "next_task_id": 68
 }

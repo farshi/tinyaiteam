@@ -26,6 +26,7 @@ Parse the user's input:
 - `/tat status` → Jump to **Status Command** below, skip activation steps
 - `/tat init` → Jump to **Init Flow** below (explicit project setup)
 - `/tat resume` → Jump to **Resume Command** below (pick up where you left off)
+- `/tat recap` → Jump to **Recap Command** below (summarize last session)
 
 ---
 
@@ -100,6 +101,52 @@ Then:
 4. Print the checkpoint map for that phase and continue from where you left off
 
 This lets a new session pick up mid-task without re-reading the full plan or re-running earlier checkpoints.
+
+---
+
+## Recap Command
+
+When the user says `/tat recap`, show a summary of the last session's work. Read-only — no mode change.
+
+1. Read `.tat/state.json`:
+   ```bash
+   PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+   cat "$PROJECT_ROOT/.tat/state.json" 2>/dev/null || echo "NO_STATE"
+   ```
+
+   If `NO_STATE`: `[TAT] No state.json found. Nothing to recap.` Then stop.
+
+2. Get recent commits using the session timestamp as anchor:
+   ```bash
+   # Use last_action.timestamp from state.json, or fall back to last 24h
+   git log --oneline --since="<last_action.timestamp or 24 hours ago>" main
+   ```
+
+3. Get recently merged PRs:
+   ```bash
+   gh pr list --state merged --limit 10 --json number,title,mergedAt --jq '.[] | select(.mergedAt > "<timestamp>") | "#\(.number) \(.title)"'
+   ```
+
+4. Read `plan.md` to find the next open task.
+
+5. Display the recap:
+   ```
+   [TAT] ▶ Session Recap
+   [TAT] Last task: <task_id> — <task>
+   [TAT] Phase: <phase>
+   [TAT] Model: <session.model>
+   [TAT] Session time: <last_action.timestamp>
+   ──────────────────────────────
+   [TAT] Recent commits on main:
+     <hash> <message>
+     <hash> <message>
+   ──────────────────────────────
+   [TAT] PRs merged: <list or "none">
+   ──────────────────────────────
+   [TAT] Next task: <next [ ] task from plan.md>
+   ```
+
+Then stop. Do not enter TAT mode or start the SSD loop.
 
 ---
 
