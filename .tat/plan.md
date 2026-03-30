@@ -59,7 +59,7 @@
 - [x] Add script/helper that emits draft PR text for `gh pr create` (tat-pr-description.sh — same as task 1)
 
 ## Epic 8: State Machine + Task IDs
-- [ ] 8.1 Create `.tat/state.json` — machine-readable project state (current phase, epic, task, branch, last action, timestamp)
+- [x] 8.1 Create `.tat/state.json` — machine-readable project state (current phase, epic, task, branch, last action, timestamp)
 - [ ] 8.2 Write state.json at each checkpoint transition (PLAN → CODE → REVIEW → SHIP → POST-MERGE)
 - [ ] 8.3 Add task IDs (TAT-001 format) to plan.md tasks, with lifecycle tracking in state.json
 - [ ] 8.4 Add `/tat resume` — reads state.json, shows where you left off, offers to continue
