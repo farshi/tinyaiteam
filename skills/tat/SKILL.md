@@ -493,7 +493,8 @@ TAT maintains machine-readable state in `.tat/state.json`. Managed by `scripts/t
     "model": null,
     "started_at": null,
     "updated_at": null
-  }
+  },
+  "next_task_id": 1
 }
 ```
 
@@ -505,6 +506,41 @@ Use `scripts/tat-state.sh <subcommand>` to read and update state:
 - `set <field> <value>` — write a field
 - `transition <phase>` — set phase and update timestamps
 - `show` — pretty-print current state
+- `new-task-id` — generate next TAT-XXX ID and increment counter
+
+---
+
+## Plan Format (Sprint Tables)
+
+Plans use sprint-based tables with task IDs. Epics define WHAT to build, sprints define WHAT ORDER.
+
+```markdown
+## Current Sprint: Sprint N — <goal>
+
+Goal: <one-line sprint goal>
+
+| ID | Task | Epic | Status |
+|----|------|------|--------|
+| TAT-053 | Add task IDs + sprint format | E8 | [~] |
+| TAT-054 | Add /tat resume | E8 | [ ] |
+
+### Sprint N+1 — <goal>
+| ID | Task | Epic | Status |
+|----|------|------|--------|
+| TAT-058 | Optional gstack integration | E9 | [ ] |
+```
+
+**Task IDs:**
+- Format: `TAT-XXX` (zero-padded to 3 digits)
+- Generated via `tat-state.sh new-task-id` (auto-increments counter in state.json)
+- Assigned when a task is created, never reused
+- Used in branch names, review artifacts, and state.json tracking
+
+**Sprint rules:**
+- Group tasks by delivery value, not by epic
+- Current sprint at the top, future sprints below
+- Completed sprints collapse into a "Completed Sprints" section
+- After completing a sprint, reprioritize remaining tasks into the next sprint
 
 ---
 

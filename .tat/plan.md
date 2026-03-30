@@ -1,98 +1,111 @@
 # Plan
 
-## Epic 1: Foundation
-- [x] Create project structure and git repo
-- [x] Write spec.md
-- [x] Write plan.md (this file)
-- [x] Write TAT.md (global workflow rules) at ~/.tinyaiteam/
-- [x] Write config.sh (GPT API config) at ~/.tinyaiteam/
-- [x] Create .gitignore
-- [x] Create CLAUDE.md for the project
-- [x] Create install.sh
+## Completed Sprints
 
-## Epic 2: /tat Skill
-- [x] Design SKILL.md structure
-- [x] Implement model detection (Opus vs Sonnet)
-- [x] Implement project state reader (.tat/ folder)
-- [x] Implement SSD loop guidance
-- [x] Implement model routing suggestions
-- [x] Implement .tat/ init for new projects
-- [x] Implement backlog capture ("noted, added to backlog" for off-scope ideas)
-- [x] Add /tat status command (compact project dashboard without entering TAT mode)
+### Sprint 1 — Foundation + Core Skill (Epics 1–2)
 
-## Epic 2b: GPT Integration (fast-tracked)
-- [x] Design context bundle format
-- [x] Design review tier logic (synopsis vs full bundle)
-- [x] Write tat-review.sh script (curl-based)
-- [x] Rewrite GPT prompt: advisor (BLOCKERS/SUGGESTIONS/NOTES), not gatekeeper (VERDICT)
-- [x] Add plan review mode (--plan flag, sends spec + plan instead of diff)
-- [x] Add source tagging ([TAT], [GPT], [SYSTEM], [CLAUDE.md], [PROJECT])
-- [x] Record decisions: ADR-001 mode switching, ADR-002 source tagging
-- [x] Test on TAT's own code (dogfood round 2)
-- [x] Iterate: fixed model detection, documented 7 dogfood lessons
+| ID | Task | Epic | Status |
+|----|------|------|--------|
+| TAT-001 | Create project structure and git repo | E1 | [x] |
+| TAT-002 | Write spec.md | E1 | [x] |
+| TAT-003 | Write plan.md | E1 | [x] |
+| TAT-004 | Write TAT.md (global workflow rules) | E1 | [x] |
+| TAT-005 | Write config.sh (GPT API config) | E1 | [x] |
+| TAT-006 | Create .gitignore | E1 | [x] |
+| TAT-007 | Create CLAUDE.md for the project | E1 | [x] |
+| TAT-008 | Create install.sh | E1 | [x] |
+| TAT-009 | Design SKILL.md structure | E2 | [x] |
+| TAT-010 | Implement model detection (Opus vs Sonnet) | E2 | [x] |
+| TAT-011 | Implement project state reader (.tat/ folder) | E2 | [x] |
+| TAT-012 | Implement SSD loop guidance | E2 | [x] |
+| TAT-013 | Implement model routing suggestions | E2 | [x] |
+| TAT-014 | Implement .tat/ init for new projects | E2 | [x] |
+| TAT-015 | Implement backlog capture | E2 | [x] |
+| TAT-016 | Add /tat status command | E2 | [x] |
 
-## Epic 4: Git Workflow
-- [x] Define branch naming convention (in TAT.md: tat/<epic>/<task-name>)
-- [x] Define PR template for TAT tasks (in SKILL.md: push + PR after review)
-- [x] Integrate review into PR flow (pre-PR checklist with rebase, scope check, GPT review)
-- [x] Plan update after merge (post-merge checklist in SKILL.md)
+### Sprint 2 — GPT Integration + Git Workflow (Epics 2b, 4)
 
-## Epic 5: /article Skill (local only, no PR)
+| ID | Task | Epic | Status |
+|----|------|------|--------|
+| TAT-017 | Design context bundle format | E2b | [x] |
+| TAT-018 | Design review tier logic (synopsis vs full bundle) | E2b | [x] |
+| TAT-019 | Write tat-review.sh script (curl-based) | E2b | [x] |
+| TAT-020 | Rewrite GPT prompt: advisor, not gatekeeper | E2b | [x] |
+| TAT-021 | Add plan review mode (--plan flag) | E2b | [x] |
+| TAT-022 | Add source tagging ([TAT], [GPT], [SYSTEM], etc.) | E2b | [x] |
+| TAT-023 | Record decisions: ADR-001, ADR-002 | E2b | [x] |
+| TAT-024 | Test on TAT's own code (dogfood round 2) | E2b | [x] |
+| TAT-025 | Iterate: fixed model detection, 7 dogfood lessons | E2b | [x] |
+| TAT-026 | Define branch naming convention | E4 | [x] |
+| TAT-027 | Define PR template for TAT tasks | E4 | [x] |
+| TAT-028 | Integrate review into PR flow (pre-PR checklist) | E4 | [x] |
+| TAT-029 | Plan update after merge (post-merge checklist) | E4 | [x] |
 
-- [x] 5.1 Create `scripts/tat-image.sh` — DALL-E API wrapper (same pattern as tat-review.sh)
-- [x] 5.2 Create `skills/article/SKILL.md` — skill definition with full article workflow
-- [x] 5.3 Update `install.sh` to copy new skill and script (now loops all skills/)
-- [x] 5.4 Update `config.sh` with DALL-E model config (`TAT_IMAGE_MODEL`)
-- [x] 5.5 Test end-to-end — SKIPPED: DALL-E access not enabled on OpenAI project
-- [x] 5.6 GPT review + PR — SKIPPED: skill is local only for now
-- [x] 5.7 Improve SKILL.md boilerplate template — scaffold folder structure, platform export step, image direction in spec
+### Sprint 3 — Skills + Auto-delegation (Epics 5–7)
 
-## Epic 6: Auto-delegation + Model Config
-- [x] Auto-delegate coding tasks to Sonnet subagents (Opus orchestrates, user never switches)
-- [x] Split review scripts: tat-plan-review.sh (gpt-5.4-pro) + tat-code-review.sh (gpt-5.4-mini)
-- [x] Shared GPT API caller (tat-gpt.sh) with Chat + Responses endpoint support
-- [x] Configurable models per review type (TAT_PLAN_REVIEW_MODEL, TAT_CODE_REVIEW_MODEL)
-- [x] Enforce self-review before GPT review in SKILL.md
+| ID | Task | Epic | Status |
+|----|------|------|--------|
+| TAT-030 | Create scripts/tat-image.sh (DALL-E wrapper) | E5 | [x] |
+| TAT-031 | Create skills/article/SKILL.md | E5 | [x] |
+| TAT-032 | Update install.sh to loop all skills/ | E5 | [x] |
+| TAT-033 | Update config.sh with DALL-E model config | E5 | [x] |
+| TAT-034 | Test article skill end-to-end — SKIPPED | E5 | [x] |
+| TAT-035 | GPT review + PR — SKIPPED (local only) | E5 | [x] |
+| TAT-036 | Improve SKILL.md boilerplate template | E5 | [x] |
+| TAT-037 | Auto-delegate coding tasks to Sonnet subagents | E6 | [x] |
+| TAT-038 | Split review scripts (plan + code) | E6 | [x] |
+| TAT-039 | Shared GPT API caller (tat-gpt.sh) | E6 | [x] |
+| TAT-040 | Configurable models per review type | E6 | [x] |
+| TAT-041 | Enforce self-review before GPT review | E6 | [x] |
+| TAT-042 | Generate PR description from checkpoint artifacts | E7 | [x] |
+| TAT-043 | Add tat-pr-description.sh script | E7 | [x] |
 
-## Epic 7: PR Auto-generation (quick win) ✓
-- [x] Generate PR description from checkpoint artifacts (spec, task, diff, review)
-- [x] Add script/helper that emits draft PR text for `gh pr create` (tat-pr-description.sh — same as task 1)
+### Sprint 4 — State Machine + Hardening (Epic 8, 10 partial)
 
-## Epic 8: State Machine + Task IDs
-- [x] 8.1 Create `.tat/state.json` — machine-readable project state (current phase, epic, task, branch, last action, timestamp)
-- [x] 8.2 Write state.json at each checkpoint transition (PLAN → CODE → REVIEW → SHIP → POST-MERGE)
-- [ ] 8.3 Add task IDs (TAT-001 format) to plan.md tasks, with lifecycle tracking in state.json
-- [ ] 8.4 Add `/tat resume` — reads state.json, shows where you left off, offers to continue
-- [ ] 8.5 Add `/tat recap` — summarize last session's work from state.json + git log
+| ID | Task | Epic | Status |
+|----|------|------|--------|
+| TAT-044 | Create .tat/state.json schema + tat-state.sh | E8 | [x] |
+| TAT-045 | Wire state.json into all checkpoints | E8 | [x] |
+| TAT-046 | Graceful degradation when state.json missing | E8 | [x] |
+| TAT-047 | Fix zsh trap warnings in tat-gpt.sh | E10 | [x] |
+| TAT-048 | Improve /tat init quick-start | E10 | [x] |
+| TAT-049 | Add smoke tests (smoke-test.sh) | E10 | [x] |
+| TAT-050 | Fix install.sh (version, validation, paths) | E10 | [x] |
+| TAT-051 | Update README (what TAT is/isn't, quick start) | E11 | [x] |
+| TAT-052 | Fix TAT.md model reference drift | E11 | [x] |
 
-## Epic 9: Review Gates + gstack Integration
-- [ ] 9.1 Strict review gates — refuse to advance past REVIEW checkpoint without review artifacts (self-review + GPT review must exist)
-- [ ] 9.2 Add review artifact storage (`.tat/reviews/TAT-xxx-review.md`) so gates can verify
-- [ ] 9.3 Optional gstack integration — detect installed gstack skills, use them as specialist subroutines in TAT's loop (e.g., gstack /review for code review, /qa for testing)
-- [ ] 9.4 Graceful fallback — if gstack not installed, TAT's built-in review flow works as-is
+---
 
-## Epic 10: Hardening + Developer Experience
-- [x] 10.1 Fix zsh trap warnings in tat-gpt.sh (RETURN → EXIT)
-- [ ] 10.2 Add retry/fallback for GPT API failures in tat-gpt.sh
-- [x] 10.3 Improve `/tat init` quick-start — explicit subcommand, templates, smoother onboarding
-- [x] 10.4 Add smoke tests for core scripts (smoke-test.sh)
-- [x] 10.5 Fix install.sh — version display, API key validation, hooks copy, $SCRIPT_DIR paths
-- [ ] 10.6 Support parallel Sonnet subagents for independent tasks
+## Current Sprint: Sprint 5 — State IDs + Resume + Review Gates
 
-## Epic 11: Professional Polish
-- [x] 11.1 Update README with "What TAT is / is not" section, quick start, dogfooding note
-- [x] 11.2 Fix TAT.md model reference drift (gpt-4.1-mini → gpt-5.4-mini)
-- [ ] 11.3 Add CONTRIBUTING.md with setup instructions and issue templates
-- [ ] 11.4 Clean up repo structure — consistent naming, remove dead files
-- [ ] 11.5 Record architecture decisions as ADRs in `.tat/decisions/`
+Goal: complete the state machine (task IDs, resume, recap) and add review enforcement.
 
-## Backlog (captured during work)
-- [x] Install mechanism: done — skills + commands → ~/.claude, runtime → ~/.tinyaiteam (noted during Epic 1)
-- [x] GPT PR review before merge: already covered by pre-PR checklist + tat-code-review.sh. Keep tasks small instead. (noted during Epic 2)
-- [x] Brainstorming loop: /brainstorm skill — GPT first (no bias), Opus critiques, user decides, max 3 rounds (noted during Epic 2)
-- [x] Summarize user input before storing: already doing this when writing to plan.md/spec.md (noted during Epic 2)
-- [x] GPT review response summary: already doing this manually in PR descriptions (noted during Epic 2b)
-- [x] Pre-PR checklist: already in SKILL.md with full checklist (noted during Epic 4)
-- [x] Inline GPT second opinion: ask-gpt.sh — GPT answers, Opus gives opinion, user decides. ADR recording offered. (noted during Epic 4)
-- [x] .tat/ schema: not needed — only 3 obvious files, add contract if structure grows (noted from GPT plan review)
-- [x] GPT script error handling: fixed in Epic 6 — multi-endpoint support, temp file parsing, model compatibility (noted from GPT plan review)
+| ID | Task | Epic | Status |
+|----|------|------|--------|
+| TAT-053 | Add task IDs (TAT-001 format) + sprint plan format | E8 | [~] |
+| TAT-054 | Add /tat resume (read state.json, continue where left off) | E8 | [ ] |
+| TAT-055 | Add /tat recap (summarize last session from state + git log) | E8 | [ ] |
+| TAT-056 | Strict review gates (refuse to advance without review artifacts) | E9 | [ ] |
+| TAT-057 | Review artifact storage (.tat/reviews/TAT-xxx-review.md) | E9 | [ ] |
+
+### Sprint 6 — Integration + Polish
+
+| ID | Task | Epic | Status |
+|----|------|------|--------|
+| TAT-058 | Optional gstack integration (detect + use specialist skills) | E9 | [ ] |
+| TAT-059 | Graceful fallback if gstack not installed | E9 | [ ] |
+| TAT-060 | Add retry/fallback for GPT API failures | E10 | [ ] |
+| TAT-061 | Support parallel Sonnet subagents | E10 | [ ] |
+| TAT-062 | Add CONTRIBUTING.md with setup + issue templates | E11 | [ ] |
+| TAT-063 | Clean up repo structure (naming, dead files) | E11 | [ ] |
+| TAT-064 | Record architecture decisions as ADRs | E11 | [ ] |
+
+---
+
+## Backlog
+
+| ID | Idea | Noted during |
+|----|------|--------------|
+| TAT-065 | Tagged releases / versioning for install.sh | E8 |
+| TAT-066 | /tat sprint command (show current sprint backlog) | PatchPilot lessons |
+| TAT-067 | /tat replan (GPT reprioritizes remaining tasks into sprints) | PatchPilot lessons |

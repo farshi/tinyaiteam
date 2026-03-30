@@ -81,7 +81,8 @@ cmd_init() {
         model: null,
         started_at: null,
         updated_at: null
-      }
+      },
+      next_task_id: 1
     }' > "$STATE_FILE"
 
   echo "[TAT] Initialized $STATE_FILE"
@@ -171,6 +172,24 @@ cmd_show() {
   jq '.' "$STATE_FILE"
 }
 
+cmd_new_task_id() {
+  _require_jq
+  _require_state || return 0
+
+  local next_id
+  next_id=$(jq -r '.next_task_id // 1' "$STATE_FILE")
+
+  local formatted
+  formatted=$(printf "TAT-%03d" "$next_id")
+
+  # Increment counter
+  local updated
+  updated=$(jq ".next_task_id = $(( next_id + 1 ))" "$STATE_FILE")
+  echo "$updated" > "$STATE_FILE"
+
+  echo "$formatted"
+}
+
 usage() {
   cat >&2 <<'EOF'
 [TAT] tat-state.sh — TAT project state manager
@@ -181,6 +200,7 @@ Usage:
   tat-state.sh set <field> <val>  Set a field value
   tat-state.sh transition <phase> Set phase + update timestamps
   tat-state.sh show               Pretty-print current state
+  tat-state.sh new-task-id        Generate next TAT-XXX ID and increment counter
 
 Valid phases: IDLE PLAN CODE REVIEW SHIP POST-MERGE
 EOF
@@ -197,11 +217,12 @@ SUBCOMMAND="$1"
 shift
 
 case "$SUBCOMMAND" in
-  init)       cmd_init "$@" ;;
-  get)        cmd_get "$@" ;;
-  set)        cmd_set "$@" ;;
-  transition) cmd_transition "$@" ;;
-  show)       cmd_show "$@" ;;
+  init)        cmd_init "$@" ;;
+  get)         cmd_get "$@" ;;
+  set)         cmd_set "$@" ;;
+  transition)  cmd_transition "$@" ;;
+  show)        cmd_show "$@" ;;
+  new-task-id) cmd_new_task_id "$@" ;;
   *)
     echo "[TAT] ERROR: Unknown subcommand '$SUBCOMMAND'" >&2
     usage
