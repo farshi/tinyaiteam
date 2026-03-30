@@ -55,7 +55,7 @@
 - [x] Enforce self-review before GPT review in SKILL.md
 
 ## Epic 7: PR Auto-generation (quick win)
-- [ ] Generate PR description from checkpoint artifacts (spec, task, diff, review)
+- [x] Generate PR description from checkpoint artifacts (spec, task, diff, review)
 - [ ] Add script/helper that emits draft PR text for `gh pr create`
 
 ## Epic 8: Session Continuity
