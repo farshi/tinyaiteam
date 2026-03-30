@@ -84,7 +84,7 @@ Goal: complete the state machine (task IDs, resume, recap) and add review enforc
 |----|------|------|--------|
 | TAT-053 | Add task IDs (TAT-001 format) + sprint plan format | E8 | [x] |
 | TAT-054 | Add /tat resume (read state.json, continue where left off) | E8 | [x] |
-| TAT-055 | Add /tat recap (summarize last session from state + git log) | E8 | [ ] |
+| TAT-055 | Add /tat recap (summarize last session from state + git log) | E8 | [x] |
 | TAT-056 | Strict review gates (refuse to advance without review artifacts) | E9 | [ ] |
 | TAT-057 | Review artifact storage (.tat/reviews/TAT-xxx-review.md) | E9 | [ ] |
 
