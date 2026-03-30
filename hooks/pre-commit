@@ -1,0 +1,40 @@
+#!/bin/bash
+# TAT pre-commit hook — blocks non-plan commits on main
+# Install: cp hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+
+BRANCH=$(git branch --show-current)
+
+if [ "$BRANCH" = "main" ]; then
+  # Check staged files — only .tat/plan.md is allowed on main
+  STAGED=$(git diff --cached --name-only)
+  ONLY_PLAN=true
+
+  for file in $STAGED; do
+    if [ "$file" != ".tat/plan.md" ]; then
+      ONLY_PLAN=false
+      break
+    fi
+  done
+
+  if [ "$ONLY_PLAN" = true ]; then
+    exit 0
+  fi
+
+  echo ""
+  echo "[TAT] Committing to main is not allowed."
+  echo ""
+  echo "  TAT workflow: create a branch first → code → review → PR → merge"
+  echo "  Only plan updates (.tat/plan.md) are allowed directly on main."
+  echo ""
+  echo "  Staged files:"
+  echo "$STAGED" | sed 's/^/    /'
+  echo ""
+  echo "  Create a branch:  git checkout -b tat/<epic>/<task-name>"
+  echo "  Override:          TAT_FORCE=1 git commit ..."
+  echo ""
+
+  if [ "${TAT_FORCE:-0}" = "1" ]; then
+    exit 0
+  fi
+  exit 1
+fi
