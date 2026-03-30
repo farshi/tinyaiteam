@@ -43,6 +43,13 @@ if [ -f "$TAT_DIR/plan.md" ]; then
   fi
 fi
 
+# --- Read spec context ---
+
+SPEC_SUMMARY=""
+if [ -f "$TAT_DIR/spec.md" ]; then
+  SPEC_SUMMARY=$(head -5 "$TAT_DIR/spec.md" | grep -E '^\#|^-|^[A-Z]' | head -2 || true)
+fi
+
 # --- Gather git info ---
 
 CURRENT_BRANCH=$(git branch --show-current 2>/dev/null)
@@ -91,6 +98,9 @@ ${CURRENT_TASK:-No active task found}
 
 ## Files Changed
 ${FILES_LIST}
+## GPT Review Response
+- (add after running tat-code-review.sh)
+
 ## Test plan
 - [ ]
 EOF
