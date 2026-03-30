@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "project": "TAT — Tiny AI Team",
+  "phase": "IDLE",
+  "epic": null,
+  "task": null,
+  "task_id": null,
+  "branch": null,
+  "last_action": {
+    "type": null,
+    "model": null,
+    "timestamp": null
+  },
+  "session": {
+    "model": null,
+    "started_at": null,
+    "updated_at": null
+  }
+}

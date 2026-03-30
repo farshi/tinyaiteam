@@ -451,6 +451,43 @@ After a PR is merged:
 
 ---
 
+## Project State Schema
+
+TAT maintains machine-readable state in `.tat/state.json`. Managed by `scripts/tat-state.sh`.
+
+```json
+{
+  "version": 1,
+  "project": "<name from spec.md>",
+  "phase": "IDLE",
+  "epic": null,
+  "task": null,
+  "task_id": null,
+  "branch": null,
+  "last_action": {
+    "type": null,
+    "model": null,
+    "timestamp": null
+  },
+  "session": {
+    "model": null,
+    "started_at": null,
+    "updated_at": null
+  }
+}
+```
+
+**Valid phases:** `IDLE` | `PLAN` | `CODE` | `REVIEW` | `SHIP` | `POST-MERGE`
+
+Use `scripts/tat-state.sh <subcommand>` to read and update state:
+- `init` — create state.json with IDLE defaults
+- `get <field>` — read a field (dot notation)
+- `set <field> <value>` — write a field
+- `transition <phase>` — set phase and update timestamps
+- `show` — pretty-print current state
+
+---
+
 ## Important Rules
 
 1. **Never jump to code without a plan.** If there's no spec or plan, create one first.
