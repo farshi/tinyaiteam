@@ -335,8 +335,9 @@ At every task transition, print this map and check off each step as you complete
 **Rule: print the checkpoint map at each transition.** Seeing the checklist prevents skipping steps. Check off each item as you complete it. If you catch yourself about to skip ahead, stop and go back to the map.
 
 **State update protocol (step 0 in each checkpoint):**
+Step 0 is **graceful** — if `.tat/state.json` doesn't exist, the script prints a skip message and continues. Projects without state.json are unaffected.
 ```bash
-# Transition phase
+# Transition phase (no-op if state.json missing)
 ./scripts/tat-state.sh transition <PHASE>
 
 # Set context fields (at PLAN checkpoint — these persist through the task lifecycle)

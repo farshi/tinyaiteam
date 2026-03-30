@@ -29,8 +29,8 @@ _require_jq() {
 
 _require_state() {
   if [ ! -f "$STATE_FILE" ]; then
-    echo "[TAT] ERROR: $STATE_FILE not found. Run: tat-state.sh init" >&2
-    exit 1
+    echo "[TAT] state.json not found — skipping (run tat-state.sh init to enable)" >&2
+    return 1
   fi
 }
 
@@ -90,7 +90,7 @@ cmd_init() {
 
 cmd_get() {
   _require_jq
-  _require_state
+  _require_state || return 0
 
   if [ $# -lt 1 ]; then
     echo "[TAT] Usage: tat-state.sh get <field>" >&2
@@ -104,7 +104,7 @@ cmd_get() {
 
 cmd_set() {
   _require_jq
-  _require_state
+  _require_state || return 0
 
   if [ $# -lt 2 ]; then
     echo "[TAT] Usage: tat-state.sh set <field> <value>" >&2
@@ -123,7 +123,7 @@ cmd_set() {
 
 cmd_transition() {
   _require_jq
-  _require_state
+  _require_state || return 0
 
   if [ $# -lt 1 ]; then
     echo "[TAT] Usage: tat-state.sh transition <phase>" >&2
@@ -167,7 +167,7 @@ cmd_transition() {
 
 cmd_show() {
   _require_jq
-  _require_state
+  _require_state || return 0
   jq '.' "$STATE_FILE"
 }
 
