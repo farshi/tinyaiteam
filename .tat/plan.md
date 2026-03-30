@@ -92,8 +92,6 @@ Goal: complete the state machine (task IDs, resume, recap) and add review enforc
 
 | ID | Task | Epic | Status |
 |----|------|------|--------|
-| TAT-058 | Optional gstack integration (detect + use specialist skills) | E9 | [ ] |
-| TAT-059 | Graceful fallback if gstack not installed | E9 | [ ] |
 | TAT-060 | Add retry/fallback for GPT API failures | E10 | [ ] |
 | TAT-061 | Support parallel Sonnet subagents | E10 | [ ] |
 | TAT-062 | Add CONTRIBUTING.md with setup + issue templates | E11 | [ ] |
@@ -109,3 +107,4 @@ Goal: complete the state machine (task IDs, resume, recap) and add review enforc
 | TAT-065 | Tagged releases / versioning for install.sh | E8 |
 | TAT-066 | /tat sprint command (show current sprint backlog) | PatchPilot lessons |
 | TAT-067 | /tat replan (GPT reprioritizes remaining tasks into sprints) | PatchPilot lessons |
+| TAT-068 | Optional skill adapter hooks — detect/use external skills as plugins (v2) | E9 dropped |

@@ -401,20 +401,22 @@ At every task transition, print this map and check off each step as you complete
   [ ] 6. GPT REVIEW: run tat-code-review.sh
   [ ] 7. Show GPT feedback to user
   [ ] 8. Address GPT blockers if any
+  [ ] 9. Save review artifact: tat-save-review.sh <task-id> "<self-review summary>"
 ```
 
 **SHIP checkpoint (after review, before merge):**
 ```
 [TAT] ▶ SHIP checkpoint:
   [ ] 0. Update state: tat-state.sh transition SHIP
-  [ ] 1. Rebase on latest main
-  [ ] 2. Verify diff scope (git diff origin/main --name-only)
-  [ ] 3. No untracked files (git ls-files --others --exclude-standard)
-  [ ] 4. Confirm REVIEW checkpoint completed (self-review + GPT review)
-  [ ] 5. Push branch
-  [ ] 6. Create PR with GPT review response
-  [ ] 7. GPT reviews the PR (run tat-code-review.sh on final state)
-  [ ] 8. User approves merge
+  [ ] 1. REVIEW GATE: verify .tat/reviews/<task-id>-review.md exists (refuse if missing)
+  [ ] 2. Rebase on latest main
+  [ ] 3. Verify diff scope (git diff origin/main --name-only)
+  [ ] 4. No untracked files (git ls-files --others --exclude-standard)
+  [ ] 5. Confirm REVIEW checkpoint completed (review artifact exists)
+  [ ] 6. Push branch
+  [ ] 7. Create PR with GPT review response
+  [ ] 8. GPT reviews the PR (run tat-code-review.sh on final state)
+  [ ] 9. User approves merge
 ```
 
 **POST-MERGE checkpoint:**
@@ -446,6 +448,25 @@ Step 0 is **graceful** — if `.tat/state.json` doesn't exist, the script prints
 ./scripts/tat-state.sh set session.model "<model name>"
 ```
 Context fields are set once at PLAN and carry through CODE → REVIEW → SHIP. Reset to IDLE at POST-MERGE.
+
+**Review artifact protocol (step 9 in REVIEW checkpoint):**
+```bash
+# Save review artifact after self-review + GPT review are complete
+./scripts/tat-save-review.sh <task-id> "<self-review summary>"
+```
+This creates `.tat/reviews/<task-id>-review.md`. The SHIP checkpoint gate checks for this file.
+
+**Review gate (step 1 in SHIP checkpoint):**
+```bash
+# Check review artifact exists — refuse to ship without it
+ls .tat/reviews/<task-id>-review.md 2>/dev/null || echo "GATE_FAILED"
+```
+If `GATE_FAILED`:
+```
+[TAT] ✗ REVIEW gate failed — no review artifact for <task-id>
+[TAT] Complete the REVIEW checkpoint first (self-review + GPT review + save artifact).
+```
+**This is a hard stop.** Do not proceed to push/PR without the review artifact.
 
 ---
 
