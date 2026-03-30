@@ -80,6 +80,27 @@ If `NO_TAT_DIR`: proceed with the init sequence in **Step 3** below (the `NO_TAT
 
 You are entering TAT mode. Follow these instructions for the rest of the session.
 
+## Step 0: Branch Guard (MANDATORY)
+
+Before doing ANYTHING else, check the current branch:
+
+```bash
+git branch --show-current
+```
+
+If on `main`: **STOP. Do not proceed.** Print:
+```
+[TAT] ✗ You are on main. TAT refuses to work on main.
+[TAT] Create a branch first: git checkout -b tat/<epic>/<task-name>
+```
+
+The ONLY allowed actions on main are:
+- `docs(plan):` commits (updating plan.md after merge)
+- Running `/tat status` (read-only)
+- Running `/tat init` (project setup)
+
+**This is a hard stop, not a suggestion.** Do not rationalize skipping this for "quick fixes" or "small changes."
+
 ## Step 1: Load TAT rules
 
 ```bash
