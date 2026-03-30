@@ -5,18 +5,21 @@
 BRANCH=$(git branch --show-current)
 
 if [ "$BRANCH" = "main" ]; then
-  # Check staged files — only .tat/plan.md is allowed on main
+  # Check staged files — only .tat/ workflow metadata is allowed on main
+  # This includes: plan.md, lessons.md, decisions/, spec.md, alignment logs
+  # Code changes (agent/, tests/, cli.py, etc.) must go through branches + PRs
   STAGED=$(git diff --cached --name-only)
-  ONLY_PLAN=true
+  ONLY_TAT_METADATA=true
 
   for file in $STAGED; do
-    if [ "$file" != ".tat/plan.md" ]; then
-      ONLY_PLAN=false
-      break
-    fi
+    case "$file" in
+      .tat/*) ;; # All .tat/ files are workflow metadata — allowed
+      docs/MAP.md) ;; # Spec→docs traceability map — allowed
+      *) ONLY_TAT_METADATA=false; break ;;
+    esac
   done
 
-  if [ "$ONLY_PLAN" = true ]; then
+  if [ "$ONLY_TAT_METADATA" = true ]; then
     exit 0
   fi
 
@@ -24,7 +27,7 @@ if [ "$BRANCH" = "main" ]; then
   echo "[TAT] Committing to main is not allowed."
   echo ""
   echo "  TAT workflow: create a branch first → code → review → PR → merge"
-  echo "  Only plan updates (.tat/plan.md) are allowed directly on main."
+  echo "  Allowed on main: .tat/ metadata (plan, lessons, decisions, spec)"
   echo ""
   echo "  Staged files:"
   echo "$STAGED" | sed 's/^/    /'
