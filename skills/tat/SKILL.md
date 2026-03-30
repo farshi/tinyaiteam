@@ -167,15 +167,35 @@ If `NO_TAT_DIR`:
 
      ## Backlog
      ```
-  4. Offer to install git hooks:
+  4. Install git hooks (automatic — best practices by default):
+     ```bash
+     if [ -d ~/.tinyaiteam/hooks ]; then
+       cp ~/.tinyaiteam/hooks/* .git/hooks/ && chmod +x .git/hooks/*
+     fi
      ```
-     [TAT] Install commit-msg and pre-push hooks? They enforce conventional commits and prevent direct pushes to main.
-     (Hooks source: ~/.tinyaiteam/hooks/ — requires tinyaiteam to be installed)
+     Print:
      ```
-     If yes: `cp ~/.tinyaiteam/hooks/* .git/hooks/ && chmod +x .git/hooks/commit-msg .git/hooks/pre-push`
-  5. Print:
+     [TAT] ✓ Git hooks installed:
+       - pre-commit: blocks non-plan commits on main
+       - commit-msg: enforces conventional commit format
+       - pre-push: blocks direct pushes to main
      ```
-     [TAT] Project initialized. Let's start with the spec — what are you building?
+     If hooks directory doesn't exist, warn: `[TAT] ⚠ No hooks found at ~/.tinyaiteam/hooks/. Run install.sh from the tinyaiteam repo first.`
+  5. Enable GitHub branch protection if `gh` is available:
+     ```bash
+     gh api repos/:owner/:repo/branches/main/protection -X PUT --silent --input - <<'PROTECTION'
+     {"required_pull_request_reviews":{"required_approving_review_count":0},"enforce_admins":true,"required_status_checks":null,"restrictions":null}
+     PROTECTION
+     ```
+     Print: `[TAT] ✓ GitHub branch protection enabled on main`
+     If `gh` not available or fails, warn: `[TAT] ⚠ Could not set branch protection. Do it manually in GitHub settings.`
+  6. Print:
+     ```
+     [TAT] Project initialized with best practices:
+       ✓ .tat/ project state (spec + plan)
+       ✓ Git hooks (commit format, branch enforcement)
+       ✓ Branch protection (PRs required)
+     [TAT] Let's start with the spec — what are you building?
      ```
 
 If `.tat/` exists, read the state:
