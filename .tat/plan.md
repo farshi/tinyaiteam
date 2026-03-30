@@ -60,7 +60,7 @@
 
 ## Epic 8: State Machine + Task IDs
 - [x] 8.1 Create `.tat/state.json` — machine-readable project state (current phase, epic, task, branch, last action, timestamp)
-- [ ] 8.2 Write state.json at each checkpoint transition (PLAN → CODE → REVIEW → SHIP → POST-MERGE)
+- [x] 8.2 Write state.json at each checkpoint transition (PLAN → CODE → REVIEW → SHIP → POST-MERGE)
 - [ ] 8.3 Add task IDs (TAT-001 format) to plan.md tasks, with lifecycle tracking in state.json
 - [ ] 8.4 Add `/tat resume` — reads state.json, shows where you left off, offers to continue
 - [ ] 8.5 Add `/tat recap` — summarize last session's work from state.json + git log
