@@ -92,6 +92,8 @@ Goal: complete the state machine (task IDs, resume, recap) and add review enforc
 
 | ID | Task | Epic | Status |
 |----|------|------|--------|
+| TAT-069 | /tat sprint-start — readiness gate (goal, scope, risks, DoD → sprint.md) | E12 | [ ] |
+| TAT-070 | /tat sprint-end — retro gate (shipped, slipped, lessons, drift check → retro.md) | E12 | [ ] |
 | TAT-060 | Add retry/fallback for GPT API failures | E10 | [ ] |
 | TAT-061 | Support parallel Sonnet subagents | E10 | [ ] |
 | TAT-062 | Add CONTRIBUTING.md with setup + issue templates | E11 | [ ] |
