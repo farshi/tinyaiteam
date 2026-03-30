@@ -25,6 +25,7 @@ Parse the user's input:
 - `/tat` or `/tat` with no arguments → Full activation (Step 1 onwards)
 - `/tat status` → Jump to **Status Command** below, skip activation steps
 - `/tat init` → Jump to **Init Flow** below (explicit project setup)
+- `/tat resume` → Jump to **Resume Command** below (pick up where you left off)
 
 ---
 
@@ -54,6 +55,51 @@ Read `.tat/plan.md` and `.tat/spec.md`, then display:
 ```
 
 Then stop. Do not enter TAT mode or start the SSD loop.
+
+---
+
+## Resume Command
+
+When the user says `/tat resume`, restore the session from `.tat/state.json`. No fresh activation — jump straight back to where you were.
+
+```bash
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+cat "$PROJECT_ROOT/.tat/state.json" 2>/dev/null || echo "NO_STATE"
+```
+
+If `NO_STATE` or state.json doesn't exist:
+```
+[TAT] No state.json found. Use /tat to start a new session.
+```
+Then stop.
+
+If `phase` is `IDLE`:
+```
+[TAT] No active task. Use /tat to pick the next task.
+```
+Then stop.
+
+If `phase` is anything else, show the resume dashboard:
+```
+[TAT] ▶ Resuming session
+[TAT] Task: <task_id> — <task>
+[TAT] Epic: <epic>
+[TAT] Phase: <phase>
+[TAT] Branch: <branch>
+[TAT] Last action: <last_action.timestamp>
+[TAT] Model: <session.model>
+──────────────────────────────
+[TAT] Pick up from <phase> checkpoint?
+```
+
+Then:
+1. Load TAT rules (Step 1) and detect model (Step 2) — same as full activation
+2. Verify you're on the correct branch: `git branch --show-current` must match `state.json branch`
+   - If on wrong branch: `[TAT] ⚠ Expected branch <branch> but on <current>. Switch first: git checkout <branch>`
+3. Enter TAT mode and jump directly to the checkpoint map for the stored phase
+4. Print the checkpoint map for that phase and continue from where you left off
+
+This lets a new session pick up mid-task without re-reading the full plan or re-running earlier checkpoints.
 
 ---
 
@@ -203,6 +249,12 @@ If `.tat/` exists, read the state:
 ```bash
 cat "$PROJECT_ROOT/.tat/spec.md" 2>/dev/null
 cat "$PROJECT_ROOT/.tat/plan.md" 2>/dev/null
+cat "$PROJECT_ROOT/.tat/state.json" 2>/dev/null
+```
+
+If `state.json` exists and `phase` is not `IDLE`, hint about resume:
+```
+[TAT] Active session detected (phase: <phase>, task: <task_id>). Use /tat resume to continue, or proceed to pick a new task.
 ```
 
 ## Step 4: Show current position
