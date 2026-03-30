@@ -9,7 +9,7 @@ tat_gpt_call() {
   local USER_PROMPT="$3"
   local TMPFILE
   TMPFILE=$(mktemp)
-  trap "rm -f '$TMPFILE'" RETURN
+  trap "rm -f '$TMPFILE'" EXIT
 
   # Detect endpoint: some models only work with v1/responses
   local RESPONSES_ONLY_MODELS="gpt-5.4-pro gpt-5.2-codex"

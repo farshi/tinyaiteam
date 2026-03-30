@@ -24,6 +24,7 @@ allowed-tools:
 Parse the user's input:
 - `/tat` or `/tat` with no arguments → Full activation (Step 1 onwards)
 - `/tat status` → Jump to **Status Command** below, skip activation steps
+- `/tat init` → Jump to **Init Flow** below (explicit project setup)
 
 ---
 
@@ -53,6 +54,25 @@ Read `.tat/plan.md` and `.tat/spec.md`, then display:
 ```
 
 Then stop. Do not enter TAT mode or start the SSD loop.
+
+---
+
+## Init Flow
+
+When the user types `/tat init` explicitly:
+
+```bash
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+ls "$PROJECT_ROOT/.tat/" 2>/dev/null || echo "NO_TAT_DIR"
+```
+
+If `.tat/` already exists:
+```
+[TAT] Project already initialized. Use /tat to continue.
+```
+Then stop.
+
+If `NO_TAT_DIR`: proceed with the init sequence in **Step 3** below (the `NO_TAT_DIR` branch). Skip to that block directly — do not run Steps 1–2 first.
 
 ---
 
@@ -89,19 +109,53 @@ ls "$PROJECT_ROOT/.tat/" 2>/dev/null || echo "NO_TAT_DIR"
 ```
 
 If `NO_TAT_DIR`:
-- If Opus: offer to initialize — "No .tat/ found. Want me to set up TAT for this project?"
-  If yes:
+- If Sonnet: "No .tat/ found. Start an Opus session first to create the project plan."
+- If Opus: announce and proceed:
+  ```
+  [TAT] ▶ Project Setup
+  ```
   1. Check if git is initialized:
      ```bash
      git rev-parse --is-inside-work-tree 2>/dev/null || echo "NO_GIT"
      ```
      - If `NO_GIT`: run `git init` and make an initial commit
      - If git exists: skip git init, do NOT re-initialize
-  2. Create `.tat/spec.md` and `.tat/plan.md` with empty templates
-  3. Offer to install git hooks: "[TAT] Install commit-msg and pre-push hooks? They enforce conventional commits and prevent direct pushes to main."
-     If yes: `cp ~/dev/tinyaiteam/hooks/* .git/hooks/ && chmod +x .git/hooks/commit-msg .git/hooks/pre-push`
-  4. Ask the user what they're building
-- If Sonnet: "No .tat/ found. Start an Opus session first to create the project plan."
+  2. Create `.tat/spec.md` with this template:
+     ```
+     # <Project Name>
+
+     ## What
+     <describe your project>
+
+     ## Why
+     <why are you building this>
+
+     ## Constraints
+     <any constraints>
+
+     ## Non-goals
+     <what this is NOT>
+     ```
+  3. Create `.tat/plan.md` with this template:
+     ```
+     # Plan
+
+     ## Epic 1: Foundation
+     - [ ] Define project scope and spec
+     - [ ] Set up project structure
+
+     ## Backlog
+     ```
+  4. Offer to install git hooks:
+     ```
+     [TAT] Install commit-msg and pre-push hooks? They enforce conventional commits and prevent direct pushes to main.
+     (Hooks source: ~/.tinyaiteam/hooks/ — requires tinyaiteam to be installed)
+     ```
+     If yes: `cp ~/.tinyaiteam/hooks/* .git/hooks/ && chmod +x .git/hooks/commit-msg .git/hooks/pre-push`
+  5. Print:
+     ```
+     [TAT] Project initialized. Let's start with the spec — what are you building?
+     ```
 
 If `.tat/` exists, read the state:
 
