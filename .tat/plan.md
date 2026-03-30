@@ -54,23 +54,37 @@
 - [x] Configurable models per review type (TAT_PLAN_REVIEW_MODEL, TAT_CODE_REVIEW_MODEL)
 - [x] Enforce self-review before GPT review in SKILL.md
 
-## Epic 7: PR Auto-generation (quick win)
+## Epic 7: PR Auto-generation (quick win) ✓
 - [x] Generate PR description from checkpoint artifacts (spec, task, diff, review)
-- [ ] Add script/helper that emits draft PR text for `gh pr create`
+- [x] Add script/helper that emits draft PR text for `gh pr create` (tat-pr-description.sh — same as task 1)
 
-## Epic 8: Session Continuity
-- [ ] Create `.tat/session.md` — machine-readable checkpoint (current phase, branch, task, last action)
-- [ ] Write session state at each checkpoint transition
-- [ ] Add resume flow: `/tat` reads session.md and picks up where it left off
-- [ ] Add `/tat recap` — summarize last session's work from session.md + git log
+## Epic 8: State Machine + Task IDs
+- [ ] 8.1 Create `.tat/state.json` — machine-readable project state (current phase, epic, task, branch, last action, timestamp)
+- [ ] 8.2 Write state.json at each checkpoint transition (PLAN → CODE → REVIEW → SHIP → POST-MERGE)
+- [ ] 8.3 Add task IDs (TAT-001 format) to plan.md tasks, with lifecycle tracking in state.json
+- [ ] 8.4 Add `/tat resume` — reads state.json, shows where you left off, offers to continue
+- [ ] 8.5 Add `/tat recap` — summarize last session's work from state.json + git log
 
-## Epic 9: Error Recovery + Hardening
-- [ ] Add retry/fallback for GPT API failures in tat-gpt.sh
-- [ ] Add timeout handling for subagent runs
-- [ ] Fix zsh trap warnings and script fragility
-- [ ] Add smoke tests for core scripts (tat-gpt.sh, review scripts)
-- [ ] Support parallel Sonnet subagents for independent tasks
-- [ ] Improve `/tat init` quick-start for new users
+## Epic 9: Review Gates + gstack Integration
+- [ ] 9.1 Strict review gates — refuse to advance past REVIEW checkpoint without review artifacts (self-review + GPT review must exist)
+- [ ] 9.2 Add review artifact storage (`.tat/reviews/TAT-xxx-review.md`) so gates can verify
+- [ ] 9.3 Optional gstack integration — detect installed gstack skills, use them as specialist subroutines in TAT's loop (e.g., gstack /review for code review, /qa for testing)
+- [ ] 9.4 Graceful fallback — if gstack not installed, TAT's built-in review flow works as-is
+
+## Epic 10: Hardening + Developer Experience
+- [x] 10.1 Fix zsh trap warnings in tat-gpt.sh (RETURN → EXIT)
+- [ ] 10.2 Add retry/fallback for GPT API failures in tat-gpt.sh
+- [x] 10.3 Improve `/tat init` quick-start — explicit subcommand, templates, smoother onboarding
+- [x] 10.4 Add smoke tests for core scripts (smoke-test.sh)
+- [x] 10.5 Fix install.sh — version display, API key validation, hooks copy, $SCRIPT_DIR paths
+- [ ] 10.6 Support parallel Sonnet subagents for independent tasks
+
+## Epic 11: Professional Polish
+- [x] 11.1 Update README with "What TAT is / is not" section, quick start, dogfooding note
+- [x] 11.2 Fix TAT.md model reference drift (gpt-4.1-mini → gpt-5.4-mini)
+- [ ] 11.3 Add CONTRIBUTING.md with setup instructions and issue templates
+- [ ] 11.4 Clean up repo structure — consistent naming, remove dead files
+- [ ] 11.5 Record architecture decisions as ADRs in `.tat/decisions/`
 
 ## Backlog (captured during work)
 - [x] Install mechanism: done — skills + commands → ~/.claude, runtime → ~/.tinyaiteam (noted during Epic 1)

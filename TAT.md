@@ -24,7 +24,7 @@ USER says what they want
 | Complex coding (multi-file, new systems) | Opus | Must hold the full architectural picture |
 | Simple coding (fix, single file, small feature) | Sonnet | Fast, efficient, good enough |
 | Which model to use | Opus decides | Self-routing based on task complexity |
-| GPT review | gpt-4.1-mini | Cheap, fast second opinion |
+| GPT review | gpt-5.4-mini | Cheap, fast second opinion |
 | PR review before merge | Opus | Final technical authority (user is final authority) |
 
 When `/tat` runs, it should suggest the right model: "This task is straightforward — switch to Sonnet" or "This is architectural — stay on Opus."

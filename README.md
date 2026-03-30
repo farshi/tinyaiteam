@@ -4,7 +4,24 @@
 
 TAT is a lightweight orchestration workflow for [Claude Code](https://claude.ai/code) that gives your AI coding sessions structure, roles, memory, and review — without a framework, database, or ceremony.
 
+*The persistent execution loop for AI-assisted projects.*
+
 *For engineers using Claude Code who want repeatable planning, review, and memory across AI coding sessions.*
+
+## What TAT Is
+
+- An **orchestration loop**: Spec → Plan → Branch → Code → Review → Ship → Repeat
+- **Persistent project state** via `.tat/` files (spec, plan, decisions)
+- **Multi-model coordination**: Opus plans, Sonnet codes, GPT reviews
+- **Checkpoint-driven execution** with strict gates between phases
+- A system that **gets smarter as you use it** — every lesson becomes a rule
+
+## What TAT Is Not
+
+- Not a toolkit of independent skills (that's [gstack](https://github.com/garrytandev/gstack)'s strength — TAT can use gstack skills)
+- Not a fully autonomous agent — you're the product owner, always in the loop
+- Not replacing Claude Code — orchestrating it
+- Not a complex framework — markdown files, bash scripts, Claude Code skills
 
 ## The Problem
 
@@ -131,36 +148,39 @@ TAT installs as Claude Code skills:
 | `tat-gpt.sh` | Shared GPT API caller (Chat + Responses API) |
 | `tat-image.sh` | DALL-E image generation wrapper |
 
-## Setup
-
-### Prerequisites
-
-- [Claude Code](https://claude.ai/code) installed
-- OpenAI API key (for GPT reviews)
-
-### Install
+## Quick Start (5 minutes)
 
 ```bash
+# 1. Install
 git clone https://github.com/farshi/tinyaiteam.git
 cd tinyaiteam
 export OPENAI_API_KEY="your-key"
 ./install.sh
+
+# 2. Verify installation
+./scripts/smoke-test.sh
+
+# 3. Use in any project
+cd ~/your-project
+# Then in Claude Code:
+> /tat init    # First time — sets up .tat/ with spec + plan templates
+> /tat         # Every time after — enters the SSD loop
+> /tat status  # Quick dashboard — see where you are
 ```
 
-This copies:
-- Skills → `~/.claude/skills/`
-- Workflow rules + config → `~/.tinyaiteam/`
-- Git hooks → available for new projects
+### What gets installed
 
-### Start using TAT
+| Source | Destination | What |
+|--------|------------|------|
+| `skills/` | `~/.claude/skills/` | Claude Code skills (/tat, /brainstorm, /article) |
+| `TAT.md` + `config.sh` | `~/.tinyaiteam/` | Workflow rules + GPT model config |
+| `scripts/` | `~/.tinyaiteam/scripts/` | GPT review scripts |
+| `hooks/` | `~/.tinyaiteam/hooks/` | Git hooks (optional, per-project) |
 
-In any project:
+### Prerequisites
 
-```
-> /tat
-```
-
-TAT reads your project state (or offers to set one up), shows your current position, and enters the SSD loop.
+- [Claude Code](https://claude.ai/code) installed
+- OpenAI API key (for GPT reviews) — TAT works without it, but you lose the second-brain review
 
 ## Git Workflow
 
@@ -193,9 +213,13 @@ TAT_CODE_REVIEW_SYNOPSIS_MODEL="gpt-4o-mini"
 - **Process over intelligence**: Structure prevents drift. Checkpoints prevent skipping.
 - **Human in the loop**: Not a weakness. The steering wheel.
 
+## Dogfooding
+
+TAT was built using TAT. Every epic, task, review, and PR in this repo went through the same SSD loop and checkpoint workflow that TAT provides. The `.tat/` directory in this repo is live — check `plan.md` to see the real roadmap.
+
 ## Contributing
 
-This is an early project. If you're experimenting with AI coding workflows, I'd love to hear what's working for you and what isn't.
+This is v0.1.0 — a weekend project that works. If you're experimenting with AI coding workflows, I'd love to hear what's working for you and what isn't.
 
 - Open an [issue](https://github.com/farshi/tinyaiteam/issues) with feedback or ideas
 - Check `.tat/plan.md` for the current roadmap

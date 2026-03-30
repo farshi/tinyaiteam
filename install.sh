@@ -3,9 +3,10 @@
 
 set -e
 
+TAT_VERSION="0.1.0"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-echo "Installing TAT..."
+echo "Installing TAT v$TAT_VERSION..."
 
 # Global workflow rules
 mkdir -p ~/.tinyaiteam
@@ -23,6 +24,15 @@ if [ -d "$SCRIPT_DIR/scripts" ]; then
     [ -f "$script" ] && cp "$script" ~/.tinyaiteam/scripts/ && chmod +x ~/.tinyaiteam/scripts/"$(basename "$script")"
   done
   echo "  ✓ scripts → ~/.tinyaiteam/scripts/"
+fi
+
+# Git hooks (available for project setup via /tat init)
+if [ -d "$SCRIPT_DIR/hooks" ]; then
+  mkdir -p ~/.tinyaiteam/hooks
+  for hook in "$SCRIPT_DIR/hooks/"*; do
+    [ -f "$hook" ] && cp "$hook" ~/.tinyaiteam/hooks/ && chmod +x ~/.tinyaiteam/hooks/"$(basename "$hook")"
+  done
+  echo "  ✓ hooks → ~/.tinyaiteam/hooks/"
 fi
 
 # Claude Code skills
@@ -48,4 +58,12 @@ echo ""
 echo "TAT installed. Use /tat in any project to start."
 echo ""
 echo "To add git hooks to a project, run from the project root:"
-echo "  cp ~/dev/tinyaiteam/hooks/* .git/hooks/ && chmod +x .git/hooks/commit-msg .git/hooks/pre-push"
+echo "  cp $SCRIPT_DIR/hooks/* .git/hooks/ && chmod +x .git/hooks/commit-msg .git/hooks/pre-push"
+
+if [ -z "$OPENAI_API_KEY" ]; then
+  echo ""
+  echo "  ⚠ OPENAI_API_KEY not set. GPT reviews won't work until you export it."
+fi
+
+echo ""
+echo "TAT v$TAT_VERSION installed successfully."
