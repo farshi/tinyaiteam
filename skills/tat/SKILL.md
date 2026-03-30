@@ -274,6 +274,7 @@ At every task transition, print this map and check off each step as you complete
 **PLAN checkpoint:**
 ```
 [TAT] ▶ PLAN checkpoint:
+  [ ] 0. Update state: tat-state.sh transition PLAN (+ set epic, task, branch)
   [ ] 1. Show task + epic from plan.md
   [ ] 2. Offer GPT plan review (tat-plan-review.sh)
   [ ] 3. User approves plan
@@ -282,6 +283,7 @@ At every task transition, print this map and check off each step as you complete
 **CODE checkpoint:**
 ```
 [TAT] ▶ CODE checkpoint:
+  [ ] 0. Update state: tat-state.sh transition CODE
   [ ] 1. Create branch: tat/<epic>/<task-name>
   [ ] 2. Show scope: files to change + guardrails
   [ ] 3. User confirms scope
@@ -291,6 +293,7 @@ At every task transition, print this map and check off each step as you complete
 **REVIEW checkpoint (after coding, before PR):**
 ```
 [TAT] ▶ REVIEW checkpoint:
+  [ ] 0. Update state: tat-state.sh transition REVIEW
   [ ] 1. SELF-REVIEW: read full diff (git diff main...HEAD)
   [ ] 2. SELF-REVIEW: check scope — any files that shouldn't be here?
   [ ] 3. SELF-REVIEW: check for bugs, edge cases, incomplete work
@@ -304,6 +307,7 @@ At every task transition, print this map and check off each step as you complete
 **SHIP checkpoint (after review, before merge):**
 ```
 [TAT] ▶ SHIP checkpoint:
+  [ ] 0. Update state: tat-state.sh transition SHIP
   [ ] 1. Rebase on latest main
   [ ] 2. Verify diff scope (git diff origin/main --name-only)
   [ ] 3. No untracked files (git ls-files --others --exclude-standard)
@@ -317,16 +321,31 @@ At every task transition, print this map and check off each step as you complete
 **POST-MERGE checkpoint:**
 ```
 [TAT] ▶ POST-MERGE checkpoint:
+  [ ] 0. Update state: tat-state.sh transition POST-MERGE
   [ ] 1. git checkout main && git pull origin main
   [ ] 2. Update plan.md — mark task [x]
   [ ] 3. Run install.sh if skills/config changed
   [ ] 4. Commit plan update, push to main
   [ ] 5. Show next task + model routing
+  [ ] 6. Update state: tat-state.sh transition IDLE (reset for next task)
 ```
 
 ---
 
 **Rule: print the checkpoint map at each transition.** Seeing the checklist prevents skipping steps. Check off each item as you complete it. If you catch yourself about to skip ahead, stop and go back to the map.
+
+**State update protocol (step 0 in each checkpoint):**
+```bash
+# Transition phase
+./scripts/tat-state.sh transition <PHASE>
+
+# Set context fields (at PLAN checkpoint — these persist through the task lifecycle)
+./scripts/tat-state.sh set epic "<epic name>"
+./scripts/tat-state.sh set task "<task description>"
+./scripts/tat-state.sh set branch "$(git branch --show-current)"
+./scripts/tat-state.sh set session.model "<model name>"
+```
+Context fields are set once at PLAN and carry through CODE → REVIEW → SHIP. Reset to IDLE at POST-MERGE.
 
 ---
 
