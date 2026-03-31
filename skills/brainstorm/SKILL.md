@@ -1,6 +1,6 @@
 ---
 name: brainstorm
-version: 0.1.0
+version: 0.2.0
 description: |
   Brainstorming skill for TAT projects. Three-phase ideation: GPT thinks
   independently first (no bias), then Opus critiques, then user decides.

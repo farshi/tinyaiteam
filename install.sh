@@ -3,7 +3,7 @@
 
 set -e
 
-TAT_VERSION="0.1.0"
+TAT_VERSION="0.2.0"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 echo "Installing TAT v$TAT_VERSION..."
