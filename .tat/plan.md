@@ -94,11 +94,11 @@ Goal: complete the state machine (task IDs, resume, recap) and add review enforc
 |----|------|------|--------|
 | TAT-069 | /tat sprint-start — readiness gate (goal, scope, risks, DoD → sprint.md) | E12 | [x] |
 | TAT-070 | /tat sprint-end — retro gate (shipped, slipped, lessons, drift check → retro.md) | E12 | [x] |
-| TAT-060 | Add retry/fallback for GPT API failures | E10 | [ ] |
-| TAT-061 | Support parallel Sonnet subagents | E10 | [ ] |
-| TAT-062 | Add CONTRIBUTING.md with setup + issue templates | E11 | [ ] |
-| TAT-063 | Clean up repo structure (naming, dead files) | E11 | [ ] |
-| TAT-064 | Record architecture decisions as ADRs | E11 | [ ] |
+| TAT-060 | Add retry/fallback for GPT API failures | E10 | [x] |
+| TAT-061 | Support parallel Sonnet subagents | E10 | [x] |
+| TAT-062 | Add CONTRIBUTING.md with setup + issue templates | E11 | [x] |
+| TAT-063 | Clean up repo structure — assessed, already clean | E11 | [x] |
+| TAT-064 | Record architecture decisions as ADRs | E11 | [x] |
 
 ---
 
