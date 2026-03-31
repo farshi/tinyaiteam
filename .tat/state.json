@@ -2,19 +2,19 @@
   "version": 1,
   "project": "TAT — Tiny AI Team",
   "phase": "PLAN",
-  "epic": "Epic 8: State Machine + Task IDs",
-  "task": "TAT-055 Add /tat recap",
-  "task_id": "TAT-055",
-  "branch": "tat/8/recap",
+  "epic": "Epic 9: Review Gates",
+  "task": "TAT-056+057 Review gates + artifact storage",
+  "task_id": "TAT-056",
+  "branch": "tat/9/review-gates",
   "last_action": {
     "type": "PLAN",
     "model": null,
-    "timestamp": "2026-03-30T09:51:57Z"
+    "timestamp": "2026-03-30T10:47:40Z"
   },
   "session": {
     "model": "claude-opus-4-6",
     "started_at": null,
-    "updated_at": "2026-03-30T09:51:57Z"
+    "updated_at": "2026-03-30T10:47:40Z"
   },
-  "next_task_id": 68
+  "next_task_id": 71
 }
