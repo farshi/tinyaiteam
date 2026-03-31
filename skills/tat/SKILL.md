@@ -236,11 +236,75 @@ After approval, enter TAT mode and begin the first task.
 
 ## Sprint End Command
 
-When the user says `/tat sprint-end`, run the sprint retro gate. Placeholder — will be implemented in TAT-070.
+When the user says `/tat sprint-end`, run the sprint retro gate. This captures what happened, what was learned, and feeds lessons back into the next sprint-start.
+
+**This is also auto-prompted** at POST-MERGE when all tasks in the current sprint are complete (step 7).
+
+### Sprint End Checkpoint
 
 ```
-[TAT] /tat sprint-end is not yet implemented. Coming in TAT-070.
+[TAT] ▶ SPRINT END checkpoint:
+  [ ] 1. Outcome: list what shipped this sprint (PRs, tasks marked [x])
+  [ ] 2. Slipped: what didn't ship, and why?
+  [ ] 3. Quality: any bugs, review misses, or regressions?
+  [ ] 4. Spec drift: did implementation diverge from spec? Update spec if needed.
+  [ ] 5. Lessons: capture 1-3 lessons → append to .tat/lessons.md
+  [ ] 6. Process: any workflow changes needed? Note for next sprint.
+  [ ] 7. Write retro summary → append to .tat/retro.md
+  [ ] 8. User confirms retro complete
 ```
+
+**Step-by-step:**
+
+1. **Outcome** — Read plan.md, list all tasks that moved to `[x]` this sprint. Cross-reference with merged PRs:
+   ```bash
+   gh pr list --state merged --limit 20 --json number,title,mergedAt
+   ```
+
+2. **Slipped** — Any tasks still `[ ]` in the current sprint? Why didn't they ship? Should they carry over or be dropped?
+
+3. **Quality** — Review the sprint's review artifacts (`.tat/reviews/`). Did GPT flag anything that was ignored? Any post-merge issues?
+
+4. **Spec drift** — Re-read spec.md. Does what we built still match what we said we'd build? If not:
+   - Minor drift: note it
+   - Major drift: update spec.md to match reality, or flag for course correction
+
+5. **Lessons** — The most important step. Capture 1-3 lessons in `.tat/lessons.md`:
+   ```markdown
+   ### L<N>. <Title>
+   **When:** Sprint <N> retro
+   **Source:** <user | GPT | self-review | bug>
+   **Lesson:** <what we learned>
+   **Rule:** <concrete rule for future sprints>
+   ```
+   Good lessons become constraints that sprint-start loads. Bad sprints produce the best lessons.
+
+6. **Process** — Did any TAT workflow steps slow things down? Were checkpoints too strict or too loose? Note changes but don't implement them during retro — that's a task for the next sprint.
+
+7. **Write retro** — Append to `.tat/retro.md`:
+   ```markdown
+   ## Sprint N — <name>
+   **Date:** <today>
+   **Goal:** <was it met? yes/no>
+
+   ### Shipped
+   - TAT-069: /tat sprint-start (#28)
+   - TAT-071: pre-push tag fix (#29)
+
+   ### Slipped
+   - <none, or list with reasons>
+
+   ### Lessons
+   - L1: <title>
+   - L2: <title>
+
+   ### Process Notes
+   - <any workflow observations>
+   ```
+
+8. **User confirms** — Show the retro summary. User approves. Sprint is officially closed.
+
+After sprint-end, prompt `/tat sprint-start` for the next sprint.
 
 ---
 
