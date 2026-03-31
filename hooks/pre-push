@@ -2,6 +2,19 @@
 # TAT pre-push hook — warns if pushing directly to main without a plan update
 # Install: cp hooks/pre-push .git/hooks/pre-push && chmod +x .git/hooks/pre-push
 
+# Pre-push hook receives refs on stdin: <local ref> <local sha> <remote ref> <remote sha>
+# Allow tag pushes — tags are releases, not branch pushes to main
+IS_TAG_PUSH=false
+while read -r LOCAL_REF _LOCAL_SHA _REMOTE_REF _REMOTE_SHA; do
+  case "$LOCAL_REF" in
+    refs/tags/*) IS_TAG_PUSH=true ;;
+  esac
+done
+
+if [ "$IS_TAG_PUSH" = true ]; then
+  exit 0
+fi
+
 BRANCH=$(git branch --show-current)
 
 if [ "$BRANCH" = "main" ]; then

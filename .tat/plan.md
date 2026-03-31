@@ -110,3 +110,4 @@ Goal: complete the state machine (task IDs, resume, recap) and add review enforc
 | TAT-066 | /tat sprint command (show current sprint backlog) | PatchPilot lessons |
 | TAT-067 | /tat replan (GPT reprioritizes remaining tasks into sprints) | PatchPilot lessons |
 | TAT-068 | Optional skill adapter hooks — detect/use external skills as plugins (v2) | E9 dropped |
+| TAT-071 | Bug: pre-push hook blocks tag pushes (tags aren't branch pushes to main) | PatchPilot bug |
