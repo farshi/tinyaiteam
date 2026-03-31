@@ -518,6 +518,35 @@ When Opus identifies a coding task, delegate it using the Agent tool with `model
 
 This keeps Opus as the orchestrator and Sonnet as the executor. The user stays in one session.
 
+### Parallel Delegation (multiple independent tasks)
+
+When Opus identifies **2+ tasks that are independent** (no shared files, no dependency between them), it can spawn parallel Sonnet subagents using multiple Agent tool calls in a single message.
+
+**When to parallelize:**
+- Tasks touch different files/directories with no overlap
+- Neither task depends on the other's output
+- Both are standard coding tasks (not architectural)
+
+**When NOT to parallelize:**
+- Tasks modify the same files
+- One task's output is the other's input
+- Either task needs architectural decisions
+
+**Parallel delegation flow:**
+1. **Identify independent tasks** — check file overlap and dependencies
+2. **Create separate branches** for each task (e.g., `tat/11/task-a`, `tat/11/task-b`)
+3. **Spawn subagents in parallel** — use `isolation: "worktree"` so each gets its own copy:
+   ```
+   [TAT] Parallel delegation →
+   [TAT] Agent 1: TAT-062 — CONTRIBUTING.md (branch: tat/11/contributing)
+   [TAT] Agent 2: TAT-063 — Repo cleanup (branch: tat/11/cleanup)
+   [TAT] Both agents running in parallel...
+   ```
+4. **Review each result independently** — self-review + GPT review per task
+5. **Ship as separate PRs** — one branch = one PR rule still applies
+
+**Key constraint:** Each parallel subagent works in a git worktree (`isolation: "worktree"`), so they can't conflict. Opus reviews and ships each result sequentially after all agents return.
+
 ## Step 6: Enter the SSD loop
 
 From here, follow the SSD loop from TAT.md. At each transition, print and follow the checkpoint map below. Do NOT skip steps or combine them.
