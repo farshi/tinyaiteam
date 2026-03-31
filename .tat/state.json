@@ -3,18 +3,18 @@
   "project": "TAT — Tiny AI Team",
   "phase": "PLAN",
   "epic": "Epic 10: Hardening",
-  "task": "TAT-060 GPT API retry/fallback",
-  "task_id": "TAT-060",
-  "branch": "tat/10/gpt-retry",
+  "task": "TAT-061 Parallel Sonnet subagents",
+  "task_id": "TAT-061",
+  "branch": "tat/10/parallel-subagents",
   "last_action": {
     "type": "PLAN",
     "model": null,
-    "timestamp": "2026-03-31T02:04:11Z"
+    "timestamp": "2026-03-31T02:11:50Z"
   },
   "session": {
     "model": "claude-opus-4-6",
     "started_at": null,
-    "updated_at": "2026-03-31T02:04:11Z"
+    "updated_at": "2026-03-31T02:11:50Z"
   },
   "next_task_id": 71
 }
