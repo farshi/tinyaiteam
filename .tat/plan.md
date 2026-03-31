@@ -92,8 +92,8 @@ Goal: complete the state machine (task IDs, resume, recap) and add review enforc
 
 | ID | Task | Epic | Status |
 |----|------|------|--------|
-| TAT-069 | /tat sprint-start — readiness gate (goal, scope, risks, DoD → sprint.md) | E12 | [ ] |
-| TAT-070 | /tat sprint-end — retro gate (shipped, slipped, lessons, drift check → retro.md) | E12 | [ ] |
+| TAT-069 | /tat sprint-start — readiness gate (goal, scope, risks, DoD → sprint.md) | E12 | [x] |
+| TAT-070 | /tat sprint-end — retro gate (shipped, slipped, lessons, drift check → retro.md) | E12 | [x] |
 | TAT-060 | Add retry/fallback for GPT API failures | E10 | [ ] |
 | TAT-061 | Support parallel Sonnet subagents | E10 | [ ] |
 | TAT-062 | Add CONTRIBUTING.md with setup + issue templates | E11 | [ ] |
@@ -110,4 +110,4 @@ Goal: complete the state machine (task IDs, resume, recap) and add review enforc
 | TAT-066 | /tat sprint command (show current sprint backlog) | PatchPilot lessons |
 | TAT-067 | /tat replan (GPT reprioritizes remaining tasks into sprints) | PatchPilot lessons |
 | TAT-068 | Optional skill adapter hooks — detect/use external skills as plugins (v2) | E9 dropped |
-| TAT-071 | Bug: pre-push hook blocks tag pushes (tags aren't branch pushes to main) | PatchPilot bug |
+| ~~TAT-071~~ | ~~Bug: pre-push hook blocks tag pushes~~ — FIXED in v0.2.0 (#29) | PatchPilot bug |
