@@ -1,6 +1,6 @@
 ---
 name: tat
-version: 0.2.0
+version: 0.3.0
 description: |
   Tiny AI Team — structured multi-model workflow. Enters TAT mode: reads project
   state, enforces SSD loop (Spec → Subtask → Do), routes by model role, triggers
