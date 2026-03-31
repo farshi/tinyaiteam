@@ -219,7 +219,7 @@ TAT was built using TAT. Every epic, task, review, and PR in this repo went thro
 
 ## Contributing
 
-This is v0.2.0 — actively used across multiple projects. If you're experimenting with AI coding workflows, I'd love to hear what's working for you and what isn't.
+This is v0.3.0 — complete SDLC loop with sprint ceremonies, review gates, and lessons feedback. If you're experimenting with AI coding workflows, I'd love to hear what's working for you and what isn't.
 
 - Open an [issue](https://github.com/farshi/tinyaiteam/issues) with feedback or ideas
 - Check `.tat/plan.md` for the current roadmap
