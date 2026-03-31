@@ -2,19 +2,19 @@
   "version": 1,
   "project": "TAT — Tiny AI Team",
   "phase": "PLAN",
-  "epic": "Epic 9: Review Gates",
-  "task": "TAT-056+057 Review gates + artifact storage",
-  "task_id": "TAT-056",
-  "branch": "tat/9/review-gates",
+  "epic": "Epic 12: Sprint Ceremonies",
+  "task": "TAT-069 /tat sprint-start",
+  "task_id": "TAT-069",
+  "branch": "tat/12/sprint-start",
   "last_action": {
     "type": "PLAN",
     "model": null,
-    "timestamp": "2026-03-30T10:47:40Z"
+    "timestamp": "2026-03-31T00:30:50Z"
   },
   "session": {
     "model": "claude-opus-4-6",
     "started_at": null,
-    "updated_at": "2026-03-30T10:47:40Z"
+    "updated_at": "2026-03-31T00:30:50Z"
   },
   "next_task_id": 71
 }

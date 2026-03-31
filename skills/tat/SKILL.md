@@ -27,6 +27,8 @@ Parse the user's input:
 - `/tat init` → Jump to **Init Flow** below (explicit project setup)
 - `/tat resume` → Jump to **Resume Command** below (pick up where you left off)
 - `/tat recap` → Jump to **Recap Command** below (summarize last session)
+- `/tat sprint-start` → Jump to **Sprint Start Command** below (readiness gate for new sprint)
+- `/tat sprint-end` → Jump to **Sprint End Command** below (retro gate after sprint)
 
 ---
 
@@ -147,6 +149,98 @@ When the user says `/tat recap`, show a summary of the last session's work. Read
    ```
 
 Then stop. Do not enter TAT mode or start the SSD loop.
+
+---
+
+## Sprint Start Command
+
+When the user says `/tat sprint-start`, run the sprint readiness gate. This ensures decisions, lessons, and spec alignment are loaded before any coding begins.
+
+**This is also auto-prompted** at POST-MERGE when all tasks in the current sprint are complete.
+
+### Sprint Start Checkpoint
+
+```
+[TAT] ▶ SPRINT START checkpoint:
+  [ ] 1. Read spec.md — confirm sprint aligns with project goals
+  [ ] 2. Read .tat/decisions/ — load all ADRs
+  [ ] 3. Read .tat/lessons.md — load all lessons learned (if exists)
+  [ ] 4. Identify relevant constraints for this sprint's tasks
+  [ ] 5. Write sprint.md with relevant constraints section
+  [ ] 6. ACKNOWLEDGE GATE: list constraints, confirm before proceeding
+  [ ] 7. Define sprint goal, scope, risks, definition of done
+  [ ] 8. User approves sprint plan
+```
+
+**Step-by-step:**
+
+1. **Read spec.md** — Remind yourself what the project IS. Check: does this sprint serve the spec's goals?
+
+2. **Read decisions/** — Load every ADR. These are durable constraints.
+   ```bash
+   for f in .tat/decisions/*.md; do cat "$f"; done
+   ```
+
+3. **Read lessons.md** — Load lessons learned from prior sprints. These are process rules earned from experience.
+   ```bash
+   cat .tat/lessons.md 2>/dev/null || echo "NO_LESSONS"
+   ```
+   If `NO_LESSONS`: skip — lessons will be created by the first sprint-end.
+
+4. **Identify relevant constraints** — For each sprint task, check which ADRs and lessons apply. Don't list everything — only what's relevant to THIS sprint's work.
+
+5. **Write sprint.md** — Create/overwrite `.tat/sprint.md`:
+   ```markdown
+   # Sprint N — <name>
+
+   **Goal:** <one sentence>
+   **Date:** <today>
+
+   ## Relevant Constraints
+   - ADR-001: <title> — <why it matters this sprint>
+   - Lesson 3: <title> — <why it matters this sprint>
+
+   ## Scope
+   | ID | Task | Epic |
+   |----|------|------|
+   | TAT-069 | ... | E12 |
+
+   ## Out of Scope
+   - <what we're NOT doing>
+
+   ## Risks
+   1. <risk and mitigation>
+
+   ## Definition of Done
+   - All tasks shipped with review artifacts
+   - install.sh works after all changes
+   - <sprint-specific criteria>
+   ```
+
+6. **ACKNOWLEDGE GATE** — Print relevant constraints and confirm:
+   ```
+   [TAT] ▶ Constraints for Sprint N:
+     - ADR-001: <constraint>
+     - Lesson 3: <constraint>
+   [TAT] Acknowledged. These constraints will be followed throughout this sprint.
+   ```
+   **This is mandatory.** Do not skip the acknowledgment.
+
+7. **Define sprint goal, scope, risks, DoD** — Fill in the sprint.md template.
+
+8. **User approves** — Show the sprint.md summary, get user confirmation.
+
+After approval, enter TAT mode and begin the first task.
+
+---
+
+## Sprint End Command
+
+When the user says `/tat sprint-end`, run the sprint retro gate. Placeholder — will be implemented in TAT-070.
+
+```
+[TAT] /tat sprint-end is not yet implemented. Coming in TAT-070.
+```
 
 ---
 
@@ -429,6 +523,7 @@ At every task transition, print this map and check off each step as you complete
   [ ] 4. Commit plan update, push to main
   [ ] 5. Show next task + model routing
   [ ] 6. Update state: tat-state.sh transition IDLE (reset for next task)
+  [ ] 7. If current sprint is complete → prompt: "[TAT] Sprint complete! Run /tat sprint-end for retro, then /tat sprint-start for next sprint."
 ```
 
 ---
