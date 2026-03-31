@@ -16,6 +16,35 @@ USER says what they want
   → Merge PR, update plan, pick next subtask
 ```
 
+## Sprint Ceremonies
+
+Sprints have two ceremonies that bookend the task loop:
+
+```
+Sprint Start (readiness) → Task Loop (PLAN→CODE→REVIEW→SHIP) → Sprint End (retro)
+       ↑                                                              ↓
+       └──────────────── lessons feed back into constraints ──────────┘
+```
+
+**Sprint Start** — readiness gate before coding begins:
+- Load spec, ADRs, and lessons learned
+- Identify constraints relevant to this sprint
+- Define goal, scope, risks, definition of done
+- Acknowledge constraints (hard gate)
+
+**Sprint End** — retro gate after all tasks ship:
+- What shipped, what slipped, why
+- Spec drift check
+- Capture 1-3 lessons → `.tat/lessons.md`
+- Lessons become constraints for the next sprint-start
+
+**Auto-prompted:** POST-MERGE detects when a sprint is complete and suggests running sprint-end then sprint-start.
+
+**Files:**
+- `.tat/sprint.md` — current sprint (overwritten each sprint)
+- `.tat/lessons.md` — append-only log of lessons learned
+- `.tat/retro.md` — append-only log of sprint retros
+
 ## Model Routing
 
 | Task | Model | Reason |
