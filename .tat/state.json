@@ -2,19 +2,19 @@
   "version": 1,
   "project": "TAT — Tiny AI Team",
   "phase": "PLAN",
-  "epic": "Epic 12: Sprint Ceremonies",
-  "task": "TAT-070 /tat sprint-end",
-  "task_id": "TAT-070",
-  "branch": "tat/12/sprint-end",
+  "epic": "Epic 10: Hardening",
+  "task": "TAT-060 GPT API retry/fallback",
+  "task_id": "TAT-060",
+  "branch": "tat/10/gpt-retry",
   "last_action": {
     "type": "PLAN",
     "model": null,
-    "timestamp": "2026-03-31T01:49:56Z"
+    "timestamp": "2026-03-31T02:04:11Z"
   },
   "session": {
     "model": "claude-opus-4-6",
     "started_at": null,
-    "updated_at": "2026-03-31T01:49:56Z"
+    "updated_at": "2026-03-31T02:04:11Z"
   },
   "next_task_id": 71
 }
