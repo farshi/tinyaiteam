@@ -12,6 +12,9 @@ TAT_PLAN_REVIEW_MODEL="${TAT_PLAN_REVIEW_MODEL:-gpt-5.3-codex}"
 TAT_CODE_REVIEW_MODEL="${TAT_CODE_REVIEW_MODEL:-gpt-5.3-codex}"
 TAT_CODE_REVIEW_SYNOPSIS_MODEL="${TAT_CODE_REVIEW_SYNOPSIS_MODEL:-gpt-4o-mini}"
 
+# Quick questions (ask-gpt.sh) — chat-compatible model for general queries
+TAT_ASK_MODEL="${TAT_ASK_MODEL:-gpt-4o-mini}"
+
 # DALL-E image generation
 TAT_IMAGE_MODEL="${TAT_IMAGE_MODEL:-dall-e-3}"
 TAT_IMAGE_SIZE="${TAT_IMAGE_SIZE:-1792x1024}"

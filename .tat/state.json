@@ -1,20 +1,20 @@
 {
   "version": 1,
   "project": "TAT — Tiny AI Team",
-  "phase": "SHIP",
-  "epic": "Sprint 7: Lessons Library + UX Alignment",
-  "task": "Sprint 7 — all tasks",
-  "task_id": "TAT-072-078",
-  "branch": "tat/7/lessons-and-ux-check",
+  "phase": "REVIEW",
+  "epic": "Sprint 8: Workflow Fixes + Medium Publish",
+  "task": "TAT-085: tat-publish.sh",
+  "task_id": "TAT-085",
+  "branch": "tat/8/workflow-fixes-and-medium",
   "last_action": {
-    "type": "SHIP",
+    "type": "REVIEW",
     "model": null,
-    "timestamp": "2026-04-01T02:49:36Z"
+    "timestamp": "2026-04-01T04:05:13Z"
   },
   "session": {
     "model": "claude-opus-4-6",
     "started_at": null,
-    "updated_at": "2026-04-01T02:49:36Z"
+    "updated_at": "2026-04-01T04:05:13Z"
   },
   "next_task_id": 71
 }

@@ -36,7 +36,7 @@ else
   exit 1
 fi
 
-MODEL="${TAT_CODE_REVIEW_MODEL:-gpt-5.4-mini}"
+MODEL="${TAT_ASK_MODEL:-gpt-4o-mini}"
 
 # --- Build context ---
 

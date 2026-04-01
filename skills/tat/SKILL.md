@@ -43,16 +43,14 @@ Read `.tat/plan.md` and `.tat/spec.md`, then display:
 [TAT] Model: <current model> (Role: <Planner|Coder>)
 [TAT] Branch: <current git branch>
 ──────────────────────────────
-[TAT] Current epic: <epic heading>
+[TAT] Sprint: <current sprint name>
 [TAT] Current task: <first [~] or [ ] task>
 [TAT] Next up: <the task after current>
 ──────────────────────────────
-[TAT] Progress:
-  Epic 1: ████████████ 8/8 done
-  Epic 2: ████████░░░░ 7/7 done
-  Epic 2b: ██████░░░░ 6/8 done  ← you are here
-  Epic 4: ░░░░░░░░░░ 0/4 done
+[TAT] Sprint progress:
+  Sprint N: ██████░░░░ 5/8 done  ← current
 ──────────────────────────────
+[TAT] Completed sprints: <N>
 [TAT] Backlog: <N items>
 [TAT] Open PRs: <list or "none">
 ```
@@ -354,7 +352,6 @@ If on `main`: **STOP. Do not proceed.** Print:
 ```
 
 The ONLY allowed actions on main are:
-- `docs(plan):` commits (updating plan.md after merge)
 - Running `/tat status` (read-only)
 - Running `/tat init` (project setup)
 
@@ -420,11 +417,19 @@ If `NO_TAT_DIR`:
      ```
      # Plan
 
-     ## Epic 1: Foundation
-     - [ ] Define project scope and spec
-     - [ ] Set up project structure
+     ## Current Sprint: Sprint 1 — Foundation
+
+     Goal: Set up project structure and define scope.
+
+     | ID | Task | Epic | Status |
+     |----|------|------|--------|
+     | TAT-001 | Define project scope and spec | E1 | [ ] |
+     | TAT-002 | Set up project structure | E1 | [ ] |
 
      ## Backlog
+
+     | ID | Idea | Noted during |
+     |----|------|--------------|
      ```
   4. Install git hooks (automatic — best practices by default):
      ```bash
@@ -607,11 +612,10 @@ At every task transition, print this map and check off each step as you complete
   [ ] 2. Rebase on latest main
   [ ] 3. Verify diff scope (git diff origin/main --name-only)
   [ ] 4. No untracked files (git ls-files --others --exclude-standard)
-  [ ] 5. Confirm REVIEW checkpoint completed (review artifact exists)
+  [ ] 5. Update plan.md — mark task(s) [x] (include in this branch, not on main)
   [ ] 6. Push branch
   [ ] 7. Create PR with GPT review response
-  [ ] 8. GPT reviews the PR (run tat-code-review.sh on final state)
-  [ ] 9. User approves merge
+  [ ] 8. User approves merge
 ```
 
 **POST-MERGE checkpoint:**
@@ -619,12 +623,11 @@ At every task transition, print this map and check off each step as you complete
 [TAT] ▶ POST-MERGE checkpoint:
   [ ] 0. Update state: tat-state.sh transition POST-MERGE
   [ ] 1. git checkout main && git pull origin main
-  [ ] 2. Update plan.md — mark task [x]
+  [ ] 2. Verify plan.md shows task [x] (was updated in SHIP step 5)
   [ ] 3. Run install.sh if skills/config changed
-  [ ] 4. Commit plan update, push to main
-  [ ] 5. Show next task + model routing
-  [ ] 6. Update state: tat-state.sh transition IDLE (reset for next task)
-  [ ] 7. If current sprint is complete → prompt: "[TAT] Sprint complete! Run /tat sprint-end for retro, then /tat sprint-start for next sprint."
+  [ ] 4. Show next task + model routing
+  [ ] 5. Update state: tat-state.sh transition IDLE (reset for next task)
+  [ ] 6. If current sprint is complete → prompt: "[TAT] Sprint complete! Run /tat sprint-end for retro, then /tat sprint-start for next sprint."
 ```
 
 ---
@@ -725,28 +728,10 @@ Never silently dismiss an idea. Always confirm capture.
 - One subtask = one branch = one PR
 - Branch naming: `tat/<epic-number>/<task-name>`
 - Always work on a branch, never directly on main
-- After merge, update plan.md on main and run `install.sh` if skills/config changed
+- Plan updates (marking tasks [x]) go in the feature branch before merge — never on main
+- After merge, sync local main and run `install.sh` if skills/config changed
 
-### Pre-PR Checklist
-
-Before creating a PR, TAT must complete this checklist:
-
-```
-[TAT] Pre-PR checklist:
-  1. Rebase on latest main
-     git fetch origin && git rebase origin/main
-  2. Verify diff scope — only files related to the current task
-     git diff origin/main --name-only
-  3. No untracked files left behind
-     git ls-files --others --exclude-standard
-  4. GPT code review completed
-     ./scripts/tat-code-review.sh main
-  5. GPT review response summary written
-```
-
-Run each step. If step 1 has conflicts, resolve them before continuing. If step 2 shows unexpected files, flag scope creep to the user. If step 4 has blockers, address them before creating the PR.
-
-Then create the PR with this structure:
+### PR Template
 
 ```
 Title: <short description>
@@ -764,26 +749,8 @@ Title: <short description>
 - [x] <what was tested>
 ```
 
-### Post-Merge Checklist
-
-After a PR is merged:
-
-1. Sync local main:
-   ```bash
-   git checkout main && git pull origin main
-   ```
-2. Update plan.md — mark completed tasks `[x]`, pick next `[~]` task
-3. If skills or config files changed, run `install.sh`
-4. Commit plan update to main:
-   ```
-   git add .tat/plan.md && git commit -m "Update plan: mark <task> complete"
-   git push origin main
-   ```
-5. Show next task:
-   ```
-   [TAT] Merged. Next task: <next [ ] task>
-   [TAT] Model routing: <Opus or Sonnet recommendation for next task>
-   ```
+Note: Pre-PR checks (rebase, diff scope, untracked files) are handled by the SHIP checkpoint.
+Post-merge steps (sync main, install.sh, next task) are handled by the POST-MERGE checkpoint.
 
 ---
 

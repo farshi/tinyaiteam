@@ -19,7 +19,7 @@ tat_gpt_call() {
   trap "rm -f '$TMPFILE' '$PAYLOAD_FILE' '$SYSTEM_FILE' '$USER_FILE'" EXIT
 
   # Detect endpoint: some models only work with v1/responses
-  local RESPONSES_ONLY_MODELS="gpt-5.4-pro gpt-5.2-codex"
+  local RESPONSES_ONLY_MODELS="gpt-5.4-pro gpt-5.2-codex gpt-5.3-codex"
   local USE_RESPONSES=false
   for rm in $RESPONSES_ONLY_MODELS; do
     [ "$MODEL" = "$rm" ] && USE_RESPONSES=true
