@@ -1,20 +1,20 @@
 {
   "version": 1,
   "project": "TAT — Tiny AI Team",
-  "phase": "PLAN",
-  "epic": "Epic 10: Hardening",
-  "task": "TAT-061 Parallel Sonnet subagents",
-  "task_id": "TAT-061",
-  "branch": "tat/10/parallel-subagents",
+  "phase": "SHIP",
+  "epic": "Sprint 7: Lessons Library + UX Alignment",
+  "task": "Sprint 7 — all tasks",
+  "task_id": "TAT-072-078",
+  "branch": "tat/7/lessons-and-ux-check",
   "last_action": {
-    "type": "PLAN",
+    "type": "SHIP",
     "model": null,
-    "timestamp": "2026-03-31T02:11:50Z"
+    "timestamp": "2026-04-01T02:49:36Z"
   },
   "session": {
     "model": "claude-opus-4-6",
     "started_at": null,
-    "updated_at": "2026-03-31T02:11:50Z"
+    "updated_at": "2026-04-01T02:49:36Z"
   },
   "next_task_id": 71
 }

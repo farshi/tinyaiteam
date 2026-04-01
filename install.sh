@@ -26,6 +26,15 @@ if [ -d "$SCRIPT_DIR/scripts" ]; then
   echo "  ✓ scripts → ~/.tinyaiteam/scripts/"
 fi
 
+# Lessons library (global lessons loaded by sprint-start)
+if [ -d "$SCRIPT_DIR/lessons" ]; then
+  mkdir -p ~/.tinyaiteam/lessons
+  for lesson_file in "$SCRIPT_DIR/lessons/"*.md; do
+    [ -f "$lesson_file" ] && cp "$lesson_file" ~/.tinyaiteam/lessons/
+  done
+  echo "  ✓ lessons → ~/.tinyaiteam/lessons/"
+fi
+
 # Git hooks (available for project setup via /tat init)
 if [ -d "$SCRIPT_DIR/hooks" ]; then
   mkdir -p ~/.tinyaiteam/hooks
