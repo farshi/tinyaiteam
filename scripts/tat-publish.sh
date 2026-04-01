@@ -63,8 +63,13 @@ if head -1 "$ARTICLE_FILE" | grep -q '^---$'; then
   # Extract canonical URL if present
   CANONICAL_URL=$(echo "$FRONTMATTER" | grep -E '^canonical_url:' | sed 's/^canonical_url:[[:space:]]*//' | sed 's/^"//;s/"$//' || true)
 
-  # Content is everything after the second ---
-  CONTENT=$(sed '1,/^---$/{ /^---$/,/^---$/d }' "$ARTICLE_FILE")
+  # Content is everything after the closing --- of frontmatter
+  FRONTMATTER_END=$(awk '/^---$/{n++; if(n==2){print NR; exit}}' "$ARTICLE_FILE")
+  if [ -n "$FRONTMATTER_END" ]; then
+    CONTENT=$(tail -n +"$((FRONTMATTER_END + 1))" "$ARTICLE_FILE")
+  else
+    CONTENT=$(cat "$ARTICLE_FILE")
+  fi
 else
   CONTENT=$(cat "$ARTICLE_FILE")
 fi
@@ -86,9 +91,19 @@ echo "[TAT] Status: $PUBLISH_STATUS"
 # --- Get author ID ---
 
 echo "[TAT] Fetching user info..."
-USER_RESPONSE=$(curl -s -H "Authorization: Bearer $MEDIUM_TOKEN" \
+RESP_FILE=$(mktemp)
+HTTP_STATUS=$(curl -s -o "$RESP_FILE" -w '%{http_code}' \
+  -H "Authorization: Bearer $MEDIUM_TOKEN" \
   -H "Content-Type: application/json" \
-  "https://api.medium.com/v1/me")
+  "https://api.medium.com/v1/me") || true
+USER_RESPONSE=$(cat "$RESP_FILE")
+rm -f "$RESP_FILE"
+
+if [ "$HTTP_STATUS" -lt 200 ] || [ "$HTTP_STATUS" -ge 300 ] 2>/dev/null; then
+  echo "[TAT] ERROR: Medium API returned HTTP $HTTP_STATUS" >&2
+  echo "[TAT] Response: $USER_RESPONSE" >&2
+  exit 1
+fi
 
 # Check for errors
 if echo "$USER_RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin); sys.exit(0 if 'data' in d else 1)" 2>/dev/null; then
@@ -147,11 +162,20 @@ with open(sys.argv[6], "w") as f:
 # --- Publish ---
 
 echo "[TAT] Creating post..."
-RESPONSE=$(curl -s -X POST \
+RESP_FILE=$(mktemp)
+HTTP_STATUS=$(curl -s -o "$RESP_FILE" -w '%{http_code}' -X POST \
   -H "Authorization: Bearer $MEDIUM_TOKEN" \
   -H "Content-Type: application/json" \
   -d @"$PAYLOAD_FILE" \
-  "https://api.medium.com/v1/users/$AUTHOR_ID/posts")
+  "https://api.medium.com/v1/users/$AUTHOR_ID/posts") || true
+RESPONSE=$(cat "$RESP_FILE")
+rm -f "$RESP_FILE"
+
+if [ "$HTTP_STATUS" -lt 200 ] || [ "$HTTP_STATUS" -ge 300 ] 2>/dev/null; then
+  echo "[TAT] ERROR: Medium API returned HTTP $HTTP_STATUS" >&2
+  echo "[TAT] Response: $RESPONSE" >&2
+  exit 1
+fi
 
 # --- Handle response ---
 
