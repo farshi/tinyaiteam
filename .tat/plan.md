@@ -131,3 +131,4 @@ Goal: Consolidate cross-project lessons into TAT, build automated UI-to-spec che
 | TAT-082 | /tat vision — capture strategic input as ADR + backlog without disrupting sprint | devsecops T6 |
 | TAT-083 | Show what was built before asking for approval — deliverable summary in SHIP checkpoint | devsecops T7 |
 | TAT-084 | Auto-mode periodic self-check — every 3 tasks, verify checkpoints are being followed | devsecops T8 |
+| TAT-085 | tat-publish.sh — auto-publish articles to Medium via REST API after user approval | Sprint 7 article |
