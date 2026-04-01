@@ -164,7 +164,8 @@ When the user says `/tat sprint-start`, run the sprint readiness gate. This ensu
 [TAT] ▶ SPRINT START checkpoint:
   [ ] 1. Read spec.md — confirm sprint aligns with project goals
   [ ] 2. Read .tat/decisions/ — load all ADRs
-  [ ] 3. Read .tat/lessons.md — load all lessons learned (if exists)
+  [ ] 3. Read .tat/lessons.md — load project lessons (if exists)
+  [ ] 3b. Read global lessons library — load ~/.tinyaiteam/lessons/library.md
   [ ] 4. Identify relevant constraints for this sprint's tasks
   [ ] 5. Write sprint.md with relevant constraints section
   [ ] 6. ACKNOWLEDGE GATE: list constraints, confirm before proceeding
@@ -181,11 +182,18 @@ When the user says `/tat sprint-start`, run the sprint readiness gate. This ensu
    for f in .tat/decisions/*.md; do cat "$f"; done
    ```
 
-3. **Read lessons.md** — Load lessons learned from prior sprints. These are process rules earned from experience.
+3. **Read project lessons** — Load lessons learned from prior sprints. These are process rules earned from experience.
    ```bash
    cat .tat/lessons.md 2>/dev/null || echo "NO_LESSONS"
    ```
    If `NO_LESSONS`: skip — lessons will be created by the first sprint-end.
+
+3b. **Read global lessons library** — Load universal lessons earned across all TAT-managed projects.
+   ```bash
+   cat ~/.tinyaiteam/lessons/library.md 2>/dev/null || echo "NO_GLOBAL_LESSONS"
+   ```
+   If `NO_GLOBAL_LESSONS`: skip — run `install.sh` from the tinyaiteam repo to install the library.
+   Global lessons (GL-01 through GL-XX) complement project-local lessons. Both are loaded as constraints.
 
 4. **Identify relevant constraints** — For each sprint task, check which ADRs and lessons apply. Don't list everything — only what's relevant to THIS sprint's work.
 

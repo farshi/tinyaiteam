@@ -76,9 +76,7 @@
 
 ---
 
-## Current Sprint: Sprint 5 — State IDs + Resume + Review Gates
-
-Goal: complete the state machine (task IDs, resume, recap) and add review enforcement.
+### Sprint 5 — State IDs + Resume + Review Gates
 
 | ID | Task | Epic | Status |
 |----|------|------|--------|
@@ -102,6 +100,22 @@ Goal: complete the state machine (task IDs, resume, recap) and add review enforc
 
 ---
 
+## Current Sprint: Sprint 7 — Lessons Library + UX Alignment Skill
+
+Goal: Consolidate cross-project lessons into TAT, build automated UI-to-spec checking.
+
+| ID | Task | Epic | Status |
+|----|------|------|--------|
+| TAT-072 | Extract universal lessons → lessons/library.md | E13 | [~] |
+| TAT-073 | Update install.sh to deploy lessons library | E13 | [ ] |
+| TAT-074 | Update sprint-start to load global lessons library | E13 | [ ] |
+| TAT-075 | Add T-series backlog items to plan.md | E13 | [~] |
+| TAT-076 | Brainstorm UX alignment approach with GPT | E14 | [~] |
+| TAT-077 | Build /ux-check skill based on brainstorm | E14 | [ ] |
+| TAT-078 | Wire /ux-check into install.sh + test | E14 | [ ] |
+
+---
+
 ## Backlog
 
 | ID | Idea | Noted during |
@@ -111,3 +125,9 @@ Goal: complete the state machine (task IDs, resume, recap) and add review enforc
 | TAT-067 | /tat replan (GPT reprioritizes remaining tasks into sprints) | PatchPilot lessons |
 | TAT-068 | Optional skill adapter hooks — detect/use external skills as plugins (v2) | E9 dropped |
 | ~~TAT-071~~ | ~~Bug: pre-push hook blocks tag pushes~~ — FIXED in v0.2.0 (#29) | PatchPilot bug |
+| TAT-079 | Docs follow context, not calendar — auto-detect new concepts, prompt for glossary | devsecops T2 |
+| TAT-080 | Split large tasks by value layer — suggest core/enhancement splits during planning | devsecops T4 |
+| TAT-081 | Alignment checks at milestones — GPT drift check (spec vs built) after epic completion | devsecops T5 |
+| TAT-082 | /tat vision — capture strategic input as ADR + backlog without disrupting sprint | devsecops T6 |
+| TAT-083 | Show what was built before asking for approval — deliverable summary in SHIP checkpoint | devsecops T7 |
+| TAT-084 | Auto-mode periodic self-check — every 3 tasks, verify checkpoints are being followed | devsecops T8 |
