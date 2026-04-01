@@ -100,19 +100,17 @@
 
 ---
 
-## Current Sprint: Sprint 7 — Lessons Library + UX Alignment Skill
-
-Goal: Consolidate cross-project lessons into TAT, build automated UI-to-spec checking.
+### Sprint 7 — Lessons Library + UX Alignment Skill
 
 | ID | Task | Epic | Status |
 |----|------|------|--------|
-| TAT-072 | Extract universal lessons → lessons/library.md | E13 | [~] |
-| TAT-073 | Update install.sh to deploy lessons library | E13 | [ ] |
-| TAT-074 | Update sprint-start to load global lessons library | E13 | [ ] |
-| TAT-075 | Add T-series backlog items to plan.md | E13 | [~] |
-| TAT-076 | Brainstorm UX alignment approach with GPT | E14 | [~] |
-| TAT-077 | Build /ux-check skill based on brainstorm | E14 | [ ] |
-| TAT-078 | Wire /ux-check into install.sh + test | E14 | [ ] |
+| TAT-072 | Extract universal lessons → lessons/library.md | E13 | [x] |
+| TAT-073 | Update install.sh to deploy lessons library | E13 | [x] |
+| TAT-074 | Update sprint-start to load global lessons library | E13 | [x] |
+| TAT-075 | Add T-series backlog items to plan.md | E13 | [x] |
+| TAT-076 | Brainstorm UX alignment approach with GPT | E14 | [x] |
+| TAT-077 | Build /ux-check skill based on brainstorm | E14 | [x] |
+| TAT-078 | Wire /ux-check into install.sh + test | E14 | [x] |
 
 ---
 
