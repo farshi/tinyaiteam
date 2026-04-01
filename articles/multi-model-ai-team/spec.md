@@ -21,7 +21,7 @@
 11. Close: it's open source, try it
 
 ## Assets
-- mutlti-agent-backgorin-running.png — Claude Code task list showing parallel agents running
+- multi-agent-background-running.png — Claude Code task list showing parallel agents running
 - selfreview.png — TAT self-review checkpoint with all checks passing
 
 ## Image Direction
