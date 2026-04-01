@@ -44,9 +44,9 @@ Loaded by `/tat sprint-start` alongside project-local `.tat/lessons.md`. Sprint-
 
 ## Git & Branch Discipline
 
-### GL-08. Separate docs from code on branches
-**Source:** devsecops Task 2.0
-**Rule:** When possible, commit docs changes to main directly (plan updates are allowed) and keep feature branches code-only. Mixed branches bloat diffs, confuse GPT reviews, and cause cherry-pick conflicts.
+### GL-08. Include plan updates in the feature branch
+**Source:** TAT Sprint 7 (POST-MERGE tried to push to protected main — blocked by branch protection)
+**Rule:** Never commit directly to main — not even plan.md updates. Include plan status updates ([x] marks) in the feature branch before creating the PR. This avoids branch protection conflicts and eliminates throwaway PRs for housekeeping.
 
 ### GL-09. Never chain gh pr merge commands
 **Source:** TAT Sprint 6 (happened twice — TAT and PatchPilot)
@@ -87,3 +87,11 @@ Loaded by `/tat sprint-start` alongside project-local `.tat/lessons.md`. Sprint-
 ### GL-15. Verify worktree agent commits before creating PRs
 **Source:** TAT Sprint 6 (parallel delegation of TAT-062 + TAT-064)
 **Rule:** After parallel worktree agents return, verify each branch has the expected commits (`git log branch -1`) before creating PRs. Commits may land on wrong branches silently.
+
+---
+
+## Branch Protection
+
+### GL-16. Never push directly to protected main
+**Source:** TAT Sprint 7 (POST-MERGE checkpoint failed — GitHub branch protection blocked `git push origin main`)
+**Rule:** If a project uses `/tat init` (which enables branch protection), all changes — including plan.md updates — must go through PRs. The POST-MERGE checkpoint should NOT try to commit and push to main. Instead, include plan updates in the feature branch before merge.
