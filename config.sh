@@ -8,8 +8,8 @@
 # Plan review — rare, high-stakes, use the deep thinker
 TAT_PLAN_REVIEW_MODEL="${TAT_PLAN_REVIEW_MODEL:-gpt-5.2-codex}"
 
-# Code review — frequent, use the fast one
-TAT_CODE_REVIEW_MODEL="${TAT_CODE_REVIEW_MODEL:-gpt-5.4-mini}"
+# Code review — Codex outperforms gpt-5.4-mini (caught real security bugs, fewer false positives)
+TAT_CODE_REVIEW_MODEL="${TAT_CODE_REVIEW_MODEL:-gpt-5.2-codex}"
 TAT_CODE_REVIEW_SYNOPSIS_MODEL="${TAT_CODE_REVIEW_SYNOPSIS_MODEL:-gpt-4o-mini}"
 
 # DALL-E image generation
