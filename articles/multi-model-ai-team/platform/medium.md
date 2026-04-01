@@ -82,12 +82,12 @@ But models alone aren't enough. You need process.
 
 TAT runs sprint ceremonies — a sprint-start gate that loads your spec, decisions, and lessons before you write a line of code. A sprint-end retro that captures what shipped, what slipped, and why. Between them, every task goes through a checkpoint sequence: **Plan, Code, Review, Ship.**
 
-![Claude Code showing multiple agents running in parallel](../assets/multi-agent-background-running.png)
+![Claude Code showing multiple agents running in parallel](https://raw.githubusercontent.com/farshi/tinyaiteam/main/articles/multi-model-ai-team/assets/multi-agent-background-running.png)
 *Multiple agents running in parallel — Opus orchestrating while Sonnet subagents code*
 
 The Review checkpoint is strict. Claude self-reviews the diff first — checks scope, looks for bugs, fixes what it finds. Then GPT reviews independently. Both results go to the user.
 
-![TAT self-review checkpoint with all checks passing](../assets/selfreview.png)
+![TAT self-review checkpoint with all checks passing](https://raw.githubusercontent.com/farshi/tinyaiteam/main/articles/multi-model-ai-team/assets/selfreview.png)
 *The self-review gate: scope check, bug check, no untracked files — all before GPT even looks at it*
 
 Git hooks enforce the rest. Conventional commit format. No direct pushes to main. Branch protection requiring PRs. These aren't suggestions — the hooks will reject your commit if you try to skip them.
