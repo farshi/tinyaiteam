@@ -53,7 +53,7 @@ Sprint Start (readiness) → Task Loop (PLAN→CODE→REVIEW→SHIP) → Sprint 
 | Complex coding (multi-file, new systems) | Opus | Must hold the full architectural picture |
 | Simple coding (fix, single file, small feature) | Sonnet | Fast, efficient, good enough |
 | Which model to use | Opus decides | Self-routing based on task complexity |
-| GPT review | gpt-5.4-mini | Cheap, fast second opinion |
+| GPT review | gpt-5.3-codex | Deep code analysis, fewer false positives (see GL-02) |
 | PR review before merge | Opus | Final technical authority (user is final authority) |
 
 When `/tat` runs, it should suggest the right model: "This task is straightforward — switch to Sonnet" or "This is architectural — stay on Opus."
@@ -65,7 +65,7 @@ When `/tat` runs, it should suggest the right model: "This task is straightforwa
 - Work on branch, push, create PR
 - GPT reviews PR diff (auto-tiered)
 - Opus or user evaluates review
-- Merge PR, update plan.md on main
+- Merge PR (plan.md updates included in the feature branch, not committed on main)
 
 ## Commit and PR Conventions
 
