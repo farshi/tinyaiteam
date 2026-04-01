@@ -14,7 +14,7 @@ Loaded by `/tat sprint-start` alongside project-local `.tat/lessons.md`. Sprint-
 
 ### GL-02. Use the right GPT model for the right job
 **Source:** oneminuta Sprint 2-3, devsecops Sprint 1
-**Rule:** Code review = gpt-5.2-codex. Plan review = gpt-5.2-codex. Brainstorming = gpt-4o-mini. Never use the cheapest model for critical reviews. Always respect `config.sh` model settings — don't hardcode.
+**Rule:** Code review = gpt-5.3-codex. Plan review = gpt-5.3-codex. Brainstorming = gpt-4o-mini. Never use the cheapest model for critical reviews. Always respect `config.sh` model settings — don't hardcode.
 
 ### GL-03. Schema and infrastructure changes need GPT review before applying
 **Source:** oneminuta Sprint 3
