@@ -114,6 +114,23 @@
 
 ---
 
+## Current Sprint: Sprint 8 — Workflow Fixes + Medium Publish
+
+Goal: Fix workflow inconsistencies found during Sprint 7 ship + build Medium auto-publish.
+
+| ID | Task | Epic | Status |
+|----|------|------|--------|
+| TAT-085 | tat-publish.sh — auto-publish articles to Medium via REST API | E15 | [ ] |
+| TAT-086 | Fix POST-MERGE — plan updates in feature branch, not main | E10 | [ ] |
+| TAT-087 | Fix GL-08 + Branch Guard — remove "docs on main" advice | E10 | [ ] |
+| TAT-088 | Add GL-16 — never push to protected main | E13 | [ ] |
+| TAT-089 | Fix tat-gpt.sh — add gpt-5.3-codex to RESPONSES_ONLY_MODELS | E10 | [ ] |
+| TAT-090 | Deduplicate SKILL.md — remove redundant checklists and double GPT review | E10 | [ ] |
+| TAT-091 | Fix TAT.md model routing table (gpt-5.4-mini → gpt-5.3-codex) | E11 | [ ] |
+| TAT-092 | Fix init template + status command to use sprint format | E10 | [ ] |
+
+---
+
 ## Backlog
 
 | ID | Idea | Noted during |
@@ -129,4 +146,4 @@
 | TAT-082 | /tat vision — capture strategic input as ADR + backlog without disrupting sprint | devsecops T6 |
 | TAT-083 | Show what was built before asking for approval — deliverable summary in SHIP checkpoint | devsecops T7 |
 | TAT-084 | Auto-mode periodic self-check — every 3 tasks, verify checkpoints are being followed | devsecops T8 |
-| TAT-085 | tat-publish.sh — auto-publish articles to Medium via REST API after user approval | Sprint 7 article |
+| ~~TAT-085~~ | ~~tat-publish.sh — auto-publish articles to Medium via REST API~~ — moved to Sprint 8 | Sprint 7 article |
