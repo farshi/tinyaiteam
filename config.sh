@@ -3,13 +3,13 @@
 # Environment variables take precedence over these defaults
 
 # Chat models (v1/chat/completions): gpt-4o-mini, gpt-3.5-turbo, gpt-5.4-mini
-# Responses-only models (v1/responses): gpt-5.4-pro, gpt-5.2-codex
+# Responses-only models (v1/responses): gpt-5.4-pro, gpt-5.3-codex
 
 # Plan review — rare, high-stakes, use the deep thinker
-TAT_PLAN_REVIEW_MODEL="${TAT_PLAN_REVIEW_MODEL:-gpt-5.2-codex}"
+TAT_PLAN_REVIEW_MODEL="${TAT_PLAN_REVIEW_MODEL:-gpt-5.3-codex}"
 
 # Code review — Codex outperforms gpt-5.4-mini (caught real security bugs, fewer false positives)
-TAT_CODE_REVIEW_MODEL="${TAT_CODE_REVIEW_MODEL:-gpt-5.2-codex}"
+TAT_CODE_REVIEW_MODEL="${TAT_CODE_REVIEW_MODEL:-gpt-5.3-codex}"
 TAT_CODE_REVIEW_SYNOPSIS_MODEL="${TAT_CODE_REVIEW_SYNOPSIS_MODEL:-gpt-4o-mini}"
 
 # DALL-E image generation
