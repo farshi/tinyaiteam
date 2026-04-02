@@ -23,3 +23,21 @@ Format: `### L<N>. <Title>` with When, Source, Lesson, and Rule fields.
 **Source:** User feedback
 **Lesson:** gpt-5.4-mini takes 5-8 minutes for full reviews. Faster models (gpt-4o-mini) are available but lower quality. User explicitly chose to keep the better model.
 **Rule:** Keep gpt-5.4-mini for code reviews. Don't optimize for speed at the cost of quality. Warn user about expected wait time.
+
+### L4. Use absolute URLs for images in published articles
+**When:** Sprint 8 — Dev.to article publish
+**Source:** Bug (user reported broken images)
+**Lesson:** Dev.to rewrites image src through its CDN proxy. Relative paths (`../assets/foo.png`) become unresolvable. Only absolute GitHub raw URLs work.
+**Rule:** All images in platform article files (devto.md, medium.md) must use `https://raw.githubusercontent.com/...` URLs. Never relative paths.
+
+### L5. Avoid em dashes in AI-generated content
+**When:** Sprint 8 — article cleanup
+**Source:** User feedback
+**Lesson:** Heavy em dash usage is widely recognized as "AI slop." Readers notice and it hurts credibility.
+**Rule:** Replace em dashes with periods, colons, or commas. Use short declarative sentences instead.
+
+### L6. Create platform-specific article files
+**When:** Sprint 8 — Dev.to publish
+**Source:** Self-review
+**Lesson:** Medium and Dev.to have different frontmatter formats (Medium: `tags: [AI, Tools]`, Dev.to: `tags: ai, tools` + `published: false`). A single file can't serve both.
+**Rule:** Create separate `platform/devto.md` and `platform/medium.md` files with platform-appropriate frontmatter.

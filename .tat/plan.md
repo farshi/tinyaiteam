@@ -114,9 +114,7 @@
 
 ---
 
-## Current Sprint: Sprint 8 — Workflow Fixes + Medium Publish
-
-Goal: Fix workflow inconsistencies found during Sprint 7 ship + build Medium auto-publish.
+### Sprint 8 — Workflow Fixes + Medium Publish
 
 | ID | Task | Epic | Status |
 |----|------|------|--------|
@@ -131,11 +129,27 @@ Goal: Fix workflow inconsistencies found during Sprint 7 ship + build Medium aut
 
 ---
 
+## Current Sprint: Sprint 9 — Version Awareness + Lesson Lifecycle
+
+Goal: Make TAT version-aware across projects and reduce lesson noise at sprint-start.
+
+| ID | Task | Epic | Status |
+|----|------|------|--------|
+| TAT-093 | Add VERSION file + CHANGELOG.md | E16 | [ ] |
+| TAT-094 | install.sh deploys VERSION | E16 | [ ] |
+| TAT-095 | /tat activation shows version | E16 | [ ] |
+| TAT-096 | Tag v0.4.0 release | E16 | [ ] |
+| TAT-097 | Add [active]/[applied] markers to lessons | E17 | [ ] |
+| TAT-098 | Sprint-start loads only [active] lessons | E17 | [ ] |
+| TAT-099 | /tat graduate command | E17 | [ ] |
+
+---
+
 ## Backlog
 
 | ID | Idea | Noted during |
 |----|------|--------------|
-| TAT-065 | Tagged releases / versioning for install.sh | E8 |
+| ~~TAT-065~~ | ~~Tagged releases / versioning for install.sh~~ — moved to Sprint 9 (E16) | E8 |
 | TAT-066 | /tat sprint command (show current sprint backlog) | PatchPilot lessons |
 | TAT-067 | /tat replan (GPT reprioritizes remaining tasks into sprints) | PatchPilot lessons |
 | TAT-068 | Optional skill adapter hooks — detect/use external skills as plugins (v2) | E9 dropped |

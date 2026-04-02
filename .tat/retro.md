@@ -32,3 +32,31 @@ Append-only log of sprint retrospectives. Each sprint-end appends a section here
 - Review gate enforced on all PRs, artifact trail useful
 - Parallel delegation partially worked (worktree branch issue)
 - Plan update PRs add friction with branch protection
+
+## Sprint 8 — Workflow Fixes + Medium Publish
+**Date:** 2026-04-01
+**Goal met?** Yes — all 8 tasks shipped + article published to Dev.to
+
+### Shipped
+- TAT-085: tat-publish.sh for Medium + Dev.to (#42)
+- TAT-086: POST-MERGE plan updates in feature branch (#42)
+- TAT-087: GL-08 + Branch Guard fix (#42)
+- TAT-088: GL-16 never push to protected main (#42)
+- TAT-089: tat-gpt.sh RESPONSES_ONLY_MODELS fix (#42)
+- TAT-090: SKILL.md deduplication (#42)
+- TAT-091: TAT.md model routing table fix (#42)
+- TAT-092: Init template + status sprint format (#42)
+- Bonus: Dev.to image URL fix (#43)
+
+### Slipped
+- None
+
+### Lessons
+- L4: Use absolute URLs for images in published articles
+- L5: Avoid em dashes in AI-generated content
+- L6: Create platform-specific article files
+
+### Process Notes
+- Bundled 8 fixes into one PR — acceptable for fix sprints, not for feature work
+- Article publish workflow needs platform-specific file generation in /article skill
+- Consider a pre-publish image URL validator

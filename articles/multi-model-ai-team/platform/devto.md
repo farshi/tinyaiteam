@@ -1,9 +1,8 @@
 ---
 title: "My AI Team Has Four Models and One Human in the Loop"
-date: 2026-04-01
+published: false
 description: "How using Claude, GPT, Codex, and GPT-mini as an engineering team catches bugs no single model would find alone."
-tags: [AI, Software Engineering, Developer Tools, Claude, GPT, Open Source]
-cover: ../cover/cover.png
+tags: ai, softwareengineering, devtools, opensource
 ---
 
 # My AI Team Has Four Models and One Human in the Loop
