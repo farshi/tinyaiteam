@@ -760,9 +760,10 @@ When the user mentions an idea or feature that is NOT related to the current tas
 2. Acknowledge it: `[TAT] Noted — added to backlog.`
 3. Append a row to `plan.md` under the `## Backlog` table:
    ```
-   | TAT-XXX | <idea> | <current sprint> |
+   | TAT-XXX | <idea>. Ref: <related ADR/GL/GPT consultation if any> | <current sprint> |
    ```
    Use the next available TAT-XXX ID (check the last ID in plan.md and increment).
+   Always include `Ref:` if there's a related ADR, lesson (GL-XX/L-XX), or GPT consultation that informed the idea. This ensures context travels with the task.
 4. Continue with the current task
 
 Never silently dismiss an idea. Always confirm capture.
