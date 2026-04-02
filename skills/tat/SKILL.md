@@ -1,6 +1,6 @@
 ---
 name: tat
-version: 0.3.0
+version: 0.4.0
 description: |
   Tiny AI Team — structured multi-model workflow. Enters TAT mode: reads project
   state, enforces SSD loop (Spec → Subtask → Do), routes by model role, triggers
@@ -365,6 +365,11 @@ cat ~/.tinyaiteam/TAT.md 2>/dev/null || echo "TAT_NOT_INSTALLED"
 
 If `TAT_NOT_INSTALLED`: tell the user "TAT is not installed. Run `install.sh` from the tinyaiteam repo first." and stop.
 
+Read the installed version:
+```bash
+cat ~/.tinyaiteam/VERSION 2>/dev/null || echo "unknown"
+```
+
 ## Step 2: Detect current model
 
 You know which model you are from your system prompt (it states your model ID). Use that directly:
@@ -374,7 +379,7 @@ You know which model you are from your system prompt (it states your model ID). 
 
 Announce your role:
 ```
-[TAT] Active. Role: <Orchestrator|Coder> (<model name>)
+[TAT] Active v<version>. Role: <Orchestrator|Coder> (<model name>)
 ```
 
 ## Step 3: Read project state
