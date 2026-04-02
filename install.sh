@@ -3,8 +3,8 @@
 
 set -e
 
-TAT_VERSION="0.3.0"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+TAT_VERSION=$(cat "$SCRIPT_DIR/VERSION")
 
 echo "Installing TAT v$TAT_VERSION..."
 
@@ -12,6 +12,8 @@ echo "Installing TAT v$TAT_VERSION..."
 mkdir -p ~/.tinyaiteam
 cp "$SCRIPT_DIR/TAT.md" ~/.tinyaiteam/TAT.md
 echo "  ✓ TAT.md → ~/.tinyaiteam/"
+cp "$SCRIPT_DIR/VERSION" ~/.tinyaiteam/VERSION
+echo "  ✓ VERSION → ~/.tinyaiteam/"
 
 # Config
 cp "$SCRIPT_DIR/config.sh" ~/.tinyaiteam/config.sh
