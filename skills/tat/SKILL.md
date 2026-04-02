@@ -1,6 +1,6 @@
 ---
 name: tat
-version: 0.4.0
+version: 0.5.0
 description: |
   Tiny AI Team — structured multi-model workflow. Enters TAT mode: reads project
   state, enforces SSD loop (Spec → Subtask → Do), routes by model role, triggers
@@ -30,6 +30,8 @@ Parse the user's input:
 - `/tat sprint-start` → Jump to **Sprint Start Command** below (readiness gate for new sprint)
 - `/tat sprint-end` → Jump to **Sprint End Command** below (retro gate after sprint)
 - `/tat graduate` → Jump to **Graduate Command** below
+- `/tat wrapup` → Jump to **Wrapup Command** below
+- `/tat replan` → Jump to **Replan Command** below
 
 ---
 
@@ -161,6 +163,7 @@ When the user says `/tat sprint-start`, run the sprint readiness gate. This ensu
 
 ```
 [TAT] ▶ SPRINT START checkpoint:
+  [ ] 0. Replan check: warn if backlog not replanned since last sprint
   [ ] 1. Read spec.md — confirm sprint aligns with project goals
   [ ] 2. Read .tat/decisions/ — load all ADRs
   [ ] 3. Read .tat/lessons.md — load project lessons (if exists)
@@ -173,6 +176,17 @@ When the user says `/tat sprint-start`, run the sprint readiness gate. This ensu
 ```
 
 **Step-by-step:**
+
+0. **Replan check** — Check if the backlog has been replanned since the last sprint:
+   ```bash
+   # Check last replan timestamp from state.json or .tat/replan-log.md
+   cat .tat/replan-log.md 2>/dev/null | tail -1 || echo "NEVER_REPLANNED"
+   ```
+   If `NEVER_REPLANNED` or last replan was before the previous sprint:
+   ```
+   [TAT] ⚠ Backlog not replanned since last sprint. Run /tat replan first? (y/skip)
+   ```
+   If user says skip, proceed. If user says y, run `/tat replan` then return here.
 
 1. **Read spec.md** — Remind yourself what the project IS. Check: does this sprint serve the spec's goals?
 
@@ -348,6 +362,177 @@ When the user says `/tat graduate` or `/tat graduate L3` or `/tat graduate GL-05
 - The lesson is no longer relevant (project changed)
 
 **Guard:** Don't graduate a lesson that's been violated in the current sprint. Check `.tat/retro.md` for recent mentions.
+
+Then stop. Do not enter TAT mode.
+
+---
+
+## Wrapup Command
+
+When the user says `/tat wrapup`, run the session hygiene gate. This ensures no loose ends before ending the session.
+
+```
+[TAT] ▶ SESSION WRAPUP:
+  [ ] 1. Loose ends: unstaged changes, open branches, unmerged PRs
+  [ ] 2. Session summary: PRs merged, tasks completed
+  [ ] 3. State check: state.json → IDLE, timestamp updated
+  [ ] 4. Install check: run install.sh if skills/scripts changed
+  [ ] 5. Next session: show next task + model routing
+  [ ] 6. Lesson prompt: anything worth capturing?
+```
+
+**Step-by-step:**
+
+1. **Loose ends** — Check for anything that'll bite next session:
+   ```bash
+   git status --short
+   git branch --list 'tat/*' 'fix/*' 'docs/*'
+   gh pr list --state open --json number,title --jq '.[] | "#\(.number) \(.title)"'
+   git log origin/main..HEAD --oneline 2>/dev/null
+   ```
+   Flag: unstaged changes, unpushed commits, open PRs, stale branches.
+   ```
+   [TAT] Loose ends:
+     ✓ Working tree clean (or ⚠ unstaged changes in <files>)
+     ✓ No open PRs (or ⚠ open: #45 <title>)
+     ✓ No unpushed commits (or ⚠ 2 unpushed commits on <branch>)
+     ✓ No stale branches (or ⚠ branches: tat/16/version-awareness)
+   ```
+
+2. **Session summary** — One-line count only (use `/tat recap` next session for details):
+   ```bash
+   MERGED=$(git log --oneline --since="8 hours ago" main | wc -l | tr -d ' ')
+   ```
+   ```
+   [TAT] Session: <N> commits landed on main
+   ```
+
+3. **State check** — Ensure state.json is clean:
+   ```bash
+   ~/.tinyaiteam/scripts/tat-state.sh transition IDLE 2>/dev/null
+   ```
+   If phase was not IDLE, warn: `[TAT] ⚠ Session ended mid-task (<phase>). Use /tat resume next time.`
+
+4. **Install check** — If any skills, scripts, or config changed this session:
+   ```bash
+   git diff --name-only $(git log --format=%H --since="8 hours ago" main | tail -1)..HEAD -- skills/ scripts/ config.sh install.sh 2>/dev/null
+   ```
+   If files changed: `[TAT] Skills/scripts changed. Running install.sh...` then run it.
+   If nothing changed: skip silently.
+
+5. **Next session** — Show what's coming:
+   ```
+   [TAT] Next task: <first [ ] task from plan.md>
+   [TAT] Model routing: <Opus or Sonnet recommendation>
+   ```
+
+6. **Lesson prompt** — Only if something notable happened:
+   ```
+   [TAT] Anything worth capturing as a lesson? (skip if nothing notable)
+   ```
+   If user provides one, append to `.tat/lessons.md` with `[active]` status.
+   If user says skip, proceed.
+
+Print final summary:
+```
+[TAT] ✓ Session wrapped up cleanly.
+[TAT] Next time: /tat or /tat resume
+```
+
+Then stop.
+
+---
+
+## Replan Command
+
+When the user says `/tat replan`, run backlog hygiene. This deduplicates, clusters, and reprioritizes backlog tasks with GPT advisory.
+
+```
+[TAT] ▶ REPLAN checkpoint:
+  [ ] 1. Load backlog + current sprint from plan.md
+  [ ] 2. Load ADRs and lessons for context
+  [ ] 3. Detect duplicates and overlapping tasks
+  [ ] 4. Cluster related items and suggest merges
+  [ ] 5. Validate stale items
+  [ ] 6. GPT advisory: reprioritize with context
+  [ ] 7. Present changes to user
+  [ ] 8. Apply approved changes to plan.md
+  [ ] 9. Log replan to .tat/replan-log.md
+```
+
+**Step-by-step:**
+
+1. **Load backlog** — Read plan.md, extract all backlog items and current sprint tasks:
+   ```bash
+   cat .tat/plan.md
+   ```
+
+2. **Load context** — Read ADRs and active lessons for constraint awareness:
+   ```bash
+   for f in .tat/decisions/*.md; do cat "$f"; done
+   cat .tat/lessons.md
+   ```
+
+3. **Detect duplicates** — Check for tasks with overlapping scope by comparing:
+   - Task descriptions (similar wording)
+   - Ref: links (same ADR/GL referenced)
+   - File scope (would touch same files)
+   Flag duplicates:
+   ```
+   [TAT] Potential duplicates:
+     TAT-081 (alignment checks) ↔ TAT-084 (periodic self-check) — both are drift detection
+   ```
+
+4. **Cluster related items** — Group tasks that form a natural unit:
+   ```
+   [TAT] Clusters:
+     Workflow commands: TAT-066 (/tat sprint), TAT-067 (/tat replan), TAT-104 (/tat wrapup)
+     Quality gates: TAT-081, TAT-083, TAT-084
+   ```
+   Suggest merging clusters into single tasks where appropriate. Keep the lowest TAT-ID.
+
+5. **Validate staleness** — For each backlog item:
+   - Is the Ref: still valid? (ADR/GL still exists and active?)
+   - Has the problem already been solved by another task?
+   - Is the item still relevant given recent changes?
+   Flag stale items:
+   ```
+   [TAT] Stale items:
+     TAT-068: skill adapter hooks — deferred to v2, no demand signal since E9
+   ```
+
+6. **GPT advisory** — Send the cleaned backlog + context to GPT for reprioritization:
+   ```bash
+   ~/.tinyaiteam/scripts/ask-gpt.sh "Here is the TAT backlog after dedup and clustering: <backlog>. Current constraints: <ADRs/lessons summary>. Suggest priority order for the next sprint. Consider: value to users, foundation dependencies, effort. Be opinionated."
+   ```
+   Present GPT's prioritization with `[GPT]` tag.
+   Opus adds its own opinion with `[OPUS]` tag.
+
+7. **Present changes** — Show the user:
+   ```
+   [TAT] Replan proposal:
+     Merged: TAT-081 + TAT-084 → TAT-081 (alignment + self-check)
+     Stale: TAT-068 (recommend drop or defer)
+     Priority order for next sprint:
+       1. TAT-101 — spec update (foundation)
+       2. TAT-102 — missing ADRs (traceability)
+       ...
+   ```
+
+8. **Apply changes** — After user approval, update plan.md:
+   - Merge duplicates (strike through the merged one, update the kept one)
+   - Mark stale items
+   - Reorder backlog by priority
+
+9. **Log replan** — Append to `.tat/replan-log.md`:
+   ```markdown
+   ## Replan — <date>
+   - Merged: <list>
+   - Dropped: <list>
+   - Priority: <ordered list>
+   - GPT model: <model used>
+   ```
+   This file is checked by sprint-start to verify replan freshness.
 
 Then stop. Do not enter TAT mode.
 
