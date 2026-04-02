@@ -151,7 +151,7 @@ Goal: Make TAT version-aware across projects and reduce lesson noise at sprint-s
 |----|------|--------------|
 | ~~TAT-065~~ | ~~Tagged releases / versioning for install.sh~~ — moved to Sprint 9 (E16) | E8 |
 | TAT-066 | /tat sprint command (show current sprint backlog) | PatchPilot lessons |
-| TAT-067 | /tat replan (GPT reprioritizes remaining tasks into sprints) | PatchPilot lessons |
+| TAT-067 | /tat replan — backlog hygiene: deduplicate, cluster related tasks, validate staleness, reprioritize with GPT advisory, annotate Refs. Sprint-start warns if replan not fresh. Ref: GPT 5.2-codex consultation (Sprint 9), ADR-009 | PatchPilot lessons |
 | TAT-068 | Optional skill adapter hooks — detect/use external skills as plugins (v2) | E9 dropped |
 | ~~TAT-071~~ | ~~Bug: pre-push hook blocks tag pushes~~ — FIXED in v0.2.0 (#29) | PatchPilot bug |
 | TAT-079 | Docs follow context, not calendar — auto-detect new concepts, prompt for glossary | devsecops T2 |
