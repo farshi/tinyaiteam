@@ -49,3 +49,24 @@ Format: `### L<N>. <Title>` with Status, When, Source, Lesson, and Rule fields.
 **Source:** Self-review
 **Lesson:** Medium and Dev.to have different frontmatter formats (Medium: `tags: [AI, Tools]`, Dev.to: `tags: ai, tools` + `published: false`). A single file can't serve both.
 **Rule:** Create separate `platform/devto.md` and `platform/medium.md` files with platform-appropriate frontmatter.
+
+### L7. Never sweep unexpected review results under the carpet
+**Status:** [active]
+**When:** Sprint 9 — GPT returned "LOW CONFIDENCE — no stated task"
+**Source:** User correction
+**Lesson:** GPT review returned low confidence because it had no task context. I dismissed it as "expected since we skipped checkpoints." User caught this and pushed back. The root cause was a format mismatch in the review script that had been broken since Sprint 5.
+**Rule:** When any check, review, or gate returns unexpected results, STOP and investigate the root cause. Never rationalize away warnings. The system is telling you something is broken.
+
+### L8. Backlog tasks must carry context via Ref: links
+**Status:** [active]
+**When:** Sprint 9 — backlog tasks had no traceability
+**Source:** User feedback
+**Lesson:** Backlog tasks like "add /tat wrapup" had no link to the ADR, lesson, or GPT consultation that informed them. When sprint-start picks them up, the planning context is lost.
+**Rule:** Every backlog task must include `Ref:` pointing to related ADRs, GLs, or GPT consultations. Context travels with the task.
+
+### L9. Format changes must update all downstream consumers
+**Status:** [active]
+**When:** Sprint 9 — plan.md format change broke 3 scripts
+**Source:** Self-review (drift audit)
+**Lesson:** ADR-005 changed plan.md from checkbox to table format in Sprint 5, but tat-code-review.sh, tat-pr-description.sh, and ask-gpt.sh were never updated. The scripts silently returned empty results for ~40 PRs.
+**Rule:** When changing a data format (plan.md, lessons.md, state.json), grep the entire codebase for consumers of that format and update them in the same PR.
