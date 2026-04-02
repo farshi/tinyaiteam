@@ -6,6 +6,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.5.1] — 2026-04-02
+
+### Fixed
+- IDE project mismatch guard: detect when IDE has a file open from a different repo than the shell working directory and hard-stop instead of silently loading the wrong project's `.tat/` state (TAT-106)
+
+---
+
 ## [0.5.0] — 2026-04-02
 
 ### Added
