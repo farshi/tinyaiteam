@@ -161,7 +161,8 @@ Goal: Make TAT version-aware across projects and reduce lesson noise at sprint-s
 | TAT-083 | Show what was built before asking for approval — deliverable summary in SHIP checkpoint | devsecops T7 |
 | TAT-084 | Auto-mode periodic self-check — every 3 tasks, verify checkpoints are being followed | devsecops T8 |
 | ~~TAT-085~~ | ~~tat-publish.sh — auto-publish articles to Medium via REST API~~ — moved to Sprint 8 | Sprint 7 article |
-| TAT-100 | Project-specific task ID prefixes (max 4 chars, e.g. OMT-, DESA-) instead of always TAT- | Sprint 9 |
-| TAT-101 | Update spec.md to match current reality (sprint ceremonies, state machine, lessons, etc.) | Sprint 9 drift audit |
-| TAT-102 | Capture missing ADRs (lessons architecture, self-review gate, worktree isolation, script paths, plan-in-branch) | Sprint 9 drift audit |
-| TAT-103 | ADR-009: task granularity — one task = one PR unless shared acceptance criterion | Sprint 9 drift audit |
+| TAT-100 | Project-specific task ID prefixes (max 4 chars, e.g. OMT-, DESA-) instead of always TAT-. Ref: ADR-005 | Sprint 9 |
+| TAT-101 | Update spec.md to match current reality. Ref: Sprint 9 drift audit (6 gaps found) | Sprint 9 drift audit |
+| TAT-102 | Capture missing ADRs (lessons arch, self-review gate, worktree isolation, script paths, plan-in-branch). Ref: Sprint 9 drift audit | Sprint 9 drift audit |
+| TAT-103 | Task granularity decision. Ref: ADR-009, GPT consultation (one task = one PR unless shared acceptance criterion) | Sprint 9 drift audit |
+| TAT-104 | /tat wrapup command — session hygiene gate. Ref: GPT 5.2-codex consultation (session close gap), GL-19 | Sprint 9 |
