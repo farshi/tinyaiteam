@@ -579,18 +579,19 @@ This keeps Opus as the orchestrator and Sonnet as the executor. The user stays i
 
 When Opus identifies **2+ tasks that are independent** (no shared files, no dependency between them), it can spawn parallel Sonnet subagents using multiple Agent tool calls in a single message.
 
-**When to parallelize:**
-- Tasks touch different files/directories with no overlap
-- Neither task depends on the other's output
-- Both are standard coding tasks (not architectural)
+**FILE-OVERLAP GATE (mandatory — ADR-009):**
+Before deciding to parallelize, list every file each task will modify. If ANY file appears in both lists, STOP — run sequentially. This is a hard gate, not a suggestion. Shared files like SKILL.md, plan.md, lessons.md, and install.sh are red flags.
 
-**When NOT to parallelize:**
-- Tasks modify the same files
-- One task's output is the other's input
-- Either task needs architectural decisions
+**Pre-flight checklist:**
+1. [ ] List files per task — no overlap
+2. [ ] Merge all pending PRs that affect shared state (GL-18)
+3. [ ] Neither task depends on the other's output
+4. [ ] Both are standard coding tasks (not architectural)
+
+If all pass → parallelize. If any fail → sequential.
 
 **Parallel delegation flow:**
-1. **Identify independent tasks** — check file overlap and dependencies
+1. **Confirm file-overlap gate passes** — print the file lists and confirm no overlap
 2. **Create separate branches** for each task (e.g., `tat/11/task-a`, `tat/11/task-b`)
 3. **Spawn subagents in parallel** — use `isolation: "worktree"` so each gets its own copy:
    ```

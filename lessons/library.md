@@ -113,3 +113,22 @@ Loaded by `/tat sprint-start` alongside project-local `.tat/lessons.md`. Sprint-
 **Status:** [active]
 **Source:** TAT Sprint 7 (POST-MERGE checkpoint failed — GitHub branch protection blocked `git push origin main`)
 **Rule:** If a project uses `/tat init` (which enables branch protection), all changes — including plan.md updates — must go through PRs. The POST-MERGE checkpoint should NOT try to commit and push to main. Instead, include plan updates in the feature branch before merge.
+
+---
+
+## Git Hygiene
+
+### GL-17. Hard file-overlap gate before parallel agents
+**Status:** [active]
+**Source:** TAT Sprint 9 (parallel agents both modified SKILL.md, causing rebase conflicts and manual fixups)
+**Rule:** Before parallel delegation, list all files each task will touch. If ANY file appears in both lists, run sequentially. Shared files (SKILL.md, plan.md, lessons.md, install.sh) are red flags. The cost of a conflict is always higher than the cost of waiting.
+
+### GL-18. Sync main before spawning worktree agents
+**Status:** [active]
+**Source:** TAT Sprint 9 (worktree agent based on stale main missed L4-L6 lessons, required manual fix)
+**Rule:** Merge all pending PRs that affect shared state before spawning worktree agents. A worktree snapshots main at spawn time — stale main means stale work that needs manual reconciliation.
+
+### GL-19. Never leave unstaged edits on a feature branch
+**Status:** [active]
+**Source:** TAT Sprint 9 (ad-hoc plan.md backlog edits blocked rebase with "cannot rebase: unstaged changes")
+**Rule:** Any edit on a feature branch must be committed or stashed immediately. Never leave unstaged changes — they block rebases, checkouts, and create confusion about what's intentional vs accidental.
