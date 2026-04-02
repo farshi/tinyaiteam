@@ -29,6 +29,7 @@ Parse the user's input:
 - `/tat recap` → Jump to **Recap Command** below (summarize last session)
 - `/tat sprint-start` → Jump to **Sprint Start Command** below (readiness gate for new sprint)
 - `/tat sprint-end` → Jump to **Sprint End Command** below (retro gate after sprint)
+- `/tat graduate` → Jump to **Graduate Command** below
 
 ---
 
@@ -180,20 +181,22 @@ When the user says `/tat sprint-start`, run the sprint readiness gate. This ensu
    for f in .tat/decisions/*.md; do cat "$f"; done
    ```
 
-3. **Read project lessons** — Load lessons learned from prior sprints. These are process rules earned from experience.
+3. **Read project lessons** — Load ACTIVE lessons only. Skip [applied] lessons (they've been graduated into code/config).
    ```bash
    cat .tat/lessons.md 2>/dev/null || echo "NO_LESSONS"
    ```
    If `NO_LESSONS`: skip — lessons will be created by the first sprint-end.
+   When processing: only include lessons with `**Status:** [active]` in the constraints list. Lessons marked `[applied]` are acknowledged but not loaded as active constraints.
 
-3b. **Read global lessons library** — Load universal lessons earned across all TAT-managed projects.
+3b. **Read global lessons library** — Load ACTIVE global lessons only.
    ```bash
    cat ~/.tinyaiteam/lessons/library.md 2>/dev/null || echo "NO_GLOBAL_LESSONS"
    ```
    If `NO_GLOBAL_LESSONS`: skip — run `install.sh` from the tinyaiteam repo to install the library.
-   Global lessons (GL-01 through GL-XX) complement project-local lessons. Both are loaded as constraints.
+   Same filtering: only `[active]` lessons become sprint constraints. Global lessons (GL-01 through GL-XX) complement project-local lessons. Both are loaded as constraints.
 
 4. **Identify relevant constraints** — For each sprint task, check which ADRs and lessons apply. Don't list everything — only what's relevant to THIS sprint's work.
+   Filter: only [active] lessons are considered. [applied] lessons have been graduated and don't need enforcement.
 
 5. **Write sprint.md** — Create/overwrite `.tat/sprint.md`:
    ```markdown
@@ -278,12 +281,14 @@ When the user says `/tat sprint-end`, run the sprint retro gate. This captures w
 5. **Lessons** — The most important step. Capture 1-3 lessons in `.tat/lessons.md`:
    ```markdown
    ### L<N>. <Title>
+   **Status:** [active]
    **When:** Sprint <N> retro
    **Source:** <user | GPT | self-review | bug>
    **Lesson:** <what we learned>
    **Rule:** <concrete rule for future sprints>
    ```
    Good lessons become constraints that sprint-start loads. Bad sprints produce the best lessons.
+   New lessons always start as `[active]`. Use `/tat graduate` when a lesson has been encoded in code or become habit.
 
 6. **Process** — Did any TAT workflow steps slow things down? Were checkpoints too strict or too loose? Note changes but don't implement them during retro — that's a task for the next sprint.
 
@@ -311,6 +316,40 @@ When the user says `/tat sprint-end`, run the sprint retro gate. This captures w
 8. **User confirms** — Show the retro summary. User approves. Sprint is officially closed.
 
 After sprint-end, prompt `/tat sprint-start` for the next sprint.
+
+---
+
+## Graduate Command
+
+When the user says `/tat graduate` or `/tat graduate L3` or `/tat graduate GL-05`:
+
+1. If a specific lesson ID is given (e.g., `L3` or `GL-05`), graduate that lesson directly.
+2. If no ID given, show all [active] lessons and ask which to graduate.
+
+**Graduation process:**
+1. Find the lesson in the appropriate file (`.tat/lessons.md` for L-series, `lessons/library.md` for GL-series)
+2. Change `**Status:** [active]` to `**Status:** [applied]`
+3. Add a `**Graduated:** <date> — <reason>` field after Status
+4. Commit the change:
+   ```
+   docs(lessons): graduate <ID> — <title>
+   ```
+5. Print:
+   ```
+   [TAT] ✓ Graduated <ID>: <title>
+   [TAT] Status: [active] → [applied]
+   [TAT] This lesson will no longer be loaded as a sprint constraint.
+   [TAT] The rule lives on in: <where it's encoded — code, hook, habit, etc.>
+   ```
+
+**When to graduate a lesson:**
+- The rule has been encoded in code (hook, script, config)
+- The rule has become team habit (no violations in 3+ sprints)
+- The lesson is no longer relevant (project changed)
+
+**Guard:** Don't graduate a lesson that's been violated in the current sprint. Check `.tat/retro.md` for recent mentions.
+
+Then stop. Do not enter TAT mode.
 
 ---
 
@@ -530,7 +569,7 @@ When Opus identifies a coding task, delegate it using the Agent tool with `model
 
 3. **Review the result** — when Sonnet returns, Opus:
    - Self-review first: read the diff, check scope, check for bugs, fix anything found
-   - Then run GPT review (`tat-code-review.sh`) as second opinion
+   - Then run GPT review (`~/.tinyaiteam/scripts/tat-code-review.sh`) as second opinion
    - Present both self-review and GPT feedback to the user
    - Proceeds with PR flow if approved
 
@@ -540,18 +579,19 @@ This keeps Opus as the orchestrator and Sonnet as the executor. The user stays i
 
 When Opus identifies **2+ tasks that are independent** (no shared files, no dependency between them), it can spawn parallel Sonnet subagents using multiple Agent tool calls in a single message.
 
-**When to parallelize:**
-- Tasks touch different files/directories with no overlap
-- Neither task depends on the other's output
-- Both are standard coding tasks (not architectural)
+**FILE-OVERLAP GATE (mandatory — ADR-009):**
+Before deciding to parallelize, list every file each task will modify. If ANY file appears in both lists, STOP — run sequentially. This is a hard gate, not a suggestion. Shared files like SKILL.md, plan.md, lessons.md, and install.sh are red flags.
 
-**When NOT to parallelize:**
-- Tasks modify the same files
-- One task's output is the other's input
-- Either task needs architectural decisions
+**Pre-flight checklist:**
+1. [ ] List files per task — no overlap
+2. [ ] Merge all pending PRs that affect shared state (GL-18)
+3. [ ] Neither task depends on the other's output
+4. [ ] Both are standard coding tasks (not architectural)
+
+If all pass → parallelize. If any fail → sequential.
 
 **Parallel delegation flow:**
-1. **Identify independent tasks** — check file overlap and dependencies
+1. **Confirm file-overlap gate passes** — print the file lists and confirm no overlap
 2. **Create separate branches** for each task (e.g., `tat/11/task-a`, `tat/11/task-b`)
 3. **Spawn subagents in parallel** — use `isolation: "worktree"` so each gets its own copy:
    ```
@@ -643,20 +683,20 @@ At every task transition, print this map and check off each step as you complete
 Step 0 is **graceful** — if `.tat/state.json` doesn't exist, the script prints a skip message and continues. Projects without state.json are unaffected.
 ```bash
 # Transition phase (no-op if state.json missing)
-./scripts/tat-state.sh transition <PHASE>
+~/.tinyaiteam/scripts/tat-state.sh transition <PHASE>
 
 # Set context fields (at PLAN checkpoint — these persist through the task lifecycle)
-./scripts/tat-state.sh set epic "<epic name>"
-./scripts/tat-state.sh set task "<task description>"
-./scripts/tat-state.sh set branch "$(git branch --show-current)"
-./scripts/tat-state.sh set session.model "<model name>"
+~/.tinyaiteam/scripts/tat-state.sh set epic "<epic name>"
+~/.tinyaiteam/scripts/tat-state.sh set task "<task description>"
+~/.tinyaiteam/scripts/tat-state.sh set branch "$(git branch --show-current)"
+~/.tinyaiteam/scripts/tat-state.sh set session.model "<model name>"
 ```
 Context fields are set once at PLAN and carry through CODE → REVIEW → SHIP. Reset to IDLE at POST-MERGE.
 
 **Review artifact protocol (step 9 in REVIEW checkpoint):**
 ```bash
 # Save review artifact after self-review + GPT review are complete
-./scripts/tat-save-review.sh <task-id> "<self-review summary>"
+~/.tinyaiteam/scripts/tat-save-review.sh <task-id> "<self-review summary>"
 ```
 This creates `.tat/reviews/<task-id>-review.md`. The SHIP checkpoint gate checks for this file.
 
@@ -680,7 +720,7 @@ When the user asks for a quick GPT opinion during work (e.g., "ask GPT about thi
 
 1. Run `ask-gpt.sh` with the question:
    ```bash
-   $PROJECT_ROOT/scripts/ask-gpt.sh "<question>"
+   ~/.tinyaiteam/scripts/ask-gpt.sh "<question>"
    ```
    Or call `tat_gpt_call` directly if you need custom context.
 
@@ -762,7 +802,7 @@ Post-merge steps (sync main, install.sh, next task) are handled by the POST-MERG
 
 ## Project State Schema
 
-TAT maintains machine-readable state in `.tat/state.json`. Managed by `scripts/tat-state.sh`.
+TAT maintains machine-readable state in `.tat/state.json`. Managed by `~/.tinyaiteam/scripts/tat-state.sh`.
 
 ```json
 {
@@ -789,7 +829,7 @@ TAT maintains machine-readable state in `.tat/state.json`. Managed by `scripts/t
 
 **Valid phases:** `IDLE` | `PLAN` | `CODE` | `REVIEW` | `SHIP` | `POST-MERGE`
 
-Use `scripts/tat-state.sh <subcommand>` to read and update state:
+Use `~/.tinyaiteam/scripts/tat-state.sh <subcommand>` to read and update state:
 - `init` — create state.json with IDLE defaults
 - `get <field>` — read a field (dot notation)
 - `set <field> <value>` — write a field
@@ -821,7 +861,7 @@ Goal: <one-line sprint goal>
 
 **Task IDs:**
 - Format: `TAT-XXX` (zero-padded to 3 digits)
-- Generated via `tat-state.sh new-task-id` (auto-increments counter in state.json)
+- Generated via `~/.tinyaiteam/scripts/tat-state.sh new-task-id` (auto-increments counter in state.json)
 - Assigned when a task is created, never reused
 - Used in branch names, review artifacts, and state.json tracking
 
