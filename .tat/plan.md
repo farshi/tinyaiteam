@@ -129,19 +129,17 @@
 
 ---
 
-## Current Sprint: Sprint 9 — Version Awareness + Lesson Lifecycle
-
-Goal: Make TAT version-aware across projects and reduce lesson noise at sprint-start.
+### Sprint 9 — Version Awareness + Lesson Lifecycle
 
 | ID | Task | Epic | Status |
 |----|------|------|--------|
-| TAT-093 | Add VERSION file + CHANGELOG.md | E16 | [ ] |
-| TAT-094 | install.sh deploys VERSION | E16 | [ ] |
-| TAT-095 | /tat activation shows version | E16 | [ ] |
-| TAT-096 | Tag v0.4.0 release | E16 | [ ] |
-| TAT-097 | Add [active]/[applied] markers to lessons | E17 | [ ] |
-| TAT-098 | Sprint-start loads only [active] lessons | E17 | [ ] |
-| TAT-099 | /tat graduate command | E17 | [ ] |
+| TAT-093 | Add VERSION file + CHANGELOG.md | E16 | [x] |
+| TAT-094 | install.sh deploys VERSION | E16 | [x] |
+| TAT-095 | /tat activation shows version | E16 | [x] |
+| TAT-096 | Tag v0.4.0 release | E16 | [x] |
+| TAT-097 | Add [active]/[applied] markers to lessons | E17 | [x] |
+| TAT-098 | Sprint-start loads only [active] lessons | E17 | [x] |
+| TAT-099 | /tat graduate command | E17 | [x] |
 
 ---
 

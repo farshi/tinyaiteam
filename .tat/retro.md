@@ -60,3 +60,39 @@ Append-only log of sprint retrospectives. Each sprint-end appends a section here
 - Bundled 8 fixes into one PR — acceptable for fix sprints, not for feature work
 - Article publish workflow needs platform-specific file generation in /article skill
 - Consider a pre-publish image URL validator
+
+## Sprint 9 — Version Awareness + Lesson Lifecycle
+**Date:** 2026-04-02
+**Goal met?** Yes — all 7 planned tasks shipped + 4 bonus fixes + 3 process improvements
+
+### Shipped
+- TAT-093: VERSION file + CHANGELOG.md (#45)
+- TAT-094: install.sh deploys VERSION (#45)
+- TAT-095: /tat activation shows version (#45)
+- TAT-096: Tag v0.4.0 (tag pushed)
+- TAT-097: [active]/[applied] lesson markers (#46)
+- TAT-098: Sprint-start filters [active] lessons (#46)
+- TAT-099: /tat graduate command (#46)
+- Bonus: Fix plan.md parsing — GPT reviews blind since Sprint 5 (#47)
+- Bonus: Revert GPT models to gpt-5.2-codex (#48)
+- Bonus: Backlog Ref: links pattern (#49)
+- Bonus: TAT-067 replan design spec (#50)
+- ADR-009: hard file-overlap gate for parallel agents
+- GL-17/18/19: parallel agent safeguards
+- Script paths fixed (./scripts/ → ~/.tinyaiteam/scripts/)
+
+### Slipped
+- None
+
+### Lessons
+- L7: Never sweep unexpected review results under the carpet
+- L8: Backlog tasks must carry context via Ref: links
+- L9: Format changes must update all downstream consumers
+
+### Process Notes
+- Combining 7 tasks into 2 PRs broke review context (GPT couldn't identify which task). ADR-009 now gates this.
+- Drift audit found major spec divergence — spec.md hasn't been updated in months (TAT-101)
+- Parallel agents touching shared files (SKILL.md) caused rebase conflicts. Now a hard gate.
+- Sprint was reactive — found crooked brick, fixed it, found more. Good for quality but sprint-start should catch format mismatches earlier.
+- New commands designed: /tat wrapup (TAT-104), /tat replan (TAT-067 updated)
+- ask-gpt.sh upgraded from gpt-4o-mini to gpt-5.2-codex for better advisory quality
