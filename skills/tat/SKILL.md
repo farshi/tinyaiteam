@@ -561,6 +561,26 @@ If `NO_TAT_DIR`: proceed with the init sequence in **Step 3** below (the `NO_TAT
 
 You are entering TAT mode. Follow these instructions for the rest of the session.
 
+## Pre-Step: IDE Project Mismatch Guard (MANDATORY)
+
+Before anything else, check if the IDE context points to a different project than the working directory.
+
+Look at the system-reminder for any "user opened the file <path>" hint. If present, compare:
+- **Shell root:** `git rev-parse --show-toplevel` (the working directory's repo)
+- **IDE root:** derive the git root from the IDE file path (walk up to find `.git`)
+
+If these are **different repos**:
+```
+[TAT] ⚠ Project mismatch detected:
+[TAT]   Shell: <shell root>
+[TAT]   IDE:   <ide root>
+[TAT] You appear to be working in <ide project>, but this session is in <shell project>.
+[TAT] cd to the right project and re-run /tat.
+```
+**This is a hard stop.** Do not proceed with the wrong project's `.tat/` state.
+
+If no IDE hint is present, or both roots match → continue normally.
+
 ## Step 0: Branch Guard (MANDATORY)
 
 Before doing ANYTHING else, check the current branch:
