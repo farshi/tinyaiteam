@@ -32,6 +32,7 @@ Parse the user's input:
 - `/tat graduate` → Jump to **Graduate Command** below
 - `/tat wrapup` → Jump to **Wrapup Command** below
 - `/tat replan` → Jump to **Replan Command** below
+- `/tat version` → Jump to **Version Command** below
 
 ---
 
@@ -59,6 +60,24 @@ Read `.tat/plan.md` and `.tat/spec.md`, then display:
 ```
 
 Then stop. Do not enter TAT mode or start the SSD loop.
+
+---
+
+## Version Command
+
+When the user says `/tat version`, show the installed version. No activation, no mode change.
+
+```bash
+cat ~/.tinyaiteam/VERSION 2>/dev/null || echo "unknown"
+```
+
+Display:
+```
+[TAT] v<version>
+[TAT] Working directory: <pwd>
+```
+
+Then stop.
 
 ---
 
