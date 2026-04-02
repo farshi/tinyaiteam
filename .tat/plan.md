@@ -178,3 +178,4 @@ Goal: Fix spec drift, capture missing ADRs, and build /tat wrapup + /tat replan 
 | ~~TAT-103~~ | ~~Task granularity decision~~ — DONE: captured in ADR-009 | Sprint 9 drift audit |
 | TAT-104 | /tat wrapup command — session hygiene gate. Ref: GPT 5.2-codex consultation (session close gap), GL-19 | Sprint 9 |
 | TAT-105 | Optimize GPT review payloads — send acceptance criteria + relevant ADR snippets instead of raw context. Skip spec in ask-gpt follow-ups. Ref: GPT 5.2-codex self-review (Sprint 9), GL-05 | Sprint 10 |
+| TAT-106 | IDE project mismatch guard — detect when IDE file is in a different repo than shell working directory, warn and stop. Ref: GPT 5.2-codex consultation (Sprint 10) | Sprint 10 |
