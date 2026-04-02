@@ -28,17 +28,26 @@ fi
 CURRENT_TASK=""
 CURRENT_EPIC=""
 if [ -f "$TAT_DIR/plan.md" ]; then
-  # In-progress [~] tasks: search the whole file (could be epic or backlog)
-  CURRENT_TASK=$(grep -m1 '\- \[~\]' "$TAT_DIR/plan.md" || true)
+  # Try table format first (Sprint 5+): | TAT-XXX | desc | epic | [~] |
+  CURRENT_TASK=$(grep -m1 '|.*\[~\]' "$TAT_DIR/plan.md" || true)
   if [ -z "$CURRENT_TASK" ]; then
-    # Next [ ] task: only from epics (skip backlog to avoid false matches)
+    # Next unchecked table task (skip Backlog section)
+    EPIC_SECTION=$(sed '/^## Backlog/,$d' "$TAT_DIR/plan.md")
+    CURRENT_TASK=$(echo "$EPIC_SECTION" | grep -m1 '|.*\[ \]' || true)
+  fi
+  # Fallback: old checkbox format (pre-Sprint 5)
+  if [ -z "$CURRENT_TASK" ]; then
+    CURRENT_TASK=$(grep -m1 '\- \[~\]' "$TAT_DIR/plan.md" || true)
+  fi
+  if [ -z "$CURRENT_TASK" ]; then
     EPIC_SECTION=$(sed '/^## Backlog/,$d' "$TAT_DIR/plan.md")
     CURRENT_TASK=$(echo "$EPIC_SECTION" | grep -m1 '\- \[ \]' || echo "No active task found")
   fi
+  # Find the enclosing sprint/epic heading
   if [ -n "$CURRENT_TASK" ]; then
     TASK_LINE=$(grep -n -m1 -F -- "$CURRENT_TASK" "$TAT_DIR/plan.md" | cut -d: -f1 || true)
     if [ -n "$TASK_LINE" ]; then
-      CURRENT_EPIC=$(head -n "$TASK_LINE" "$TAT_DIR/plan.md" | grep -E '^## ' | tail -1 || true)
+      CURRENT_EPIC=$(head -n "$TASK_LINE" "$TAT_DIR/plan.md" | grep -E '^##+ ' | tail -1 || true)
     fi
   fi
 fi

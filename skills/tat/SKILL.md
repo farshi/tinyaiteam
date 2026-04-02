@@ -713,10 +713,11 @@ When the user mentions an idea or feature that is NOT related to the current tas
 
 1. Do NOT act on it
 2. Acknowledge it: `[TAT] Noted — added to backlog.`
-3. Append it to `plan.md` under the `## Backlog` section:
+3. Append a row to `plan.md` under the `## Backlog` table:
    ```
-   - [ ] <idea> (noted during <current epic>)
+   | TAT-XXX | <idea> | <current sprint> |
    ```
+   Use the next available TAT-XXX ID (check the last ID in plan.md and increment).
 4. Continue with the current task
 
 Never silently dismiss an idea. Always confirm capture.

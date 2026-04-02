@@ -45,8 +45,8 @@ SPEC_CONTENT=""
 
 PLAN_EXCERPT=""
 if [ -f "$TAT_DIR/plan.md" ]; then
-  # Current epic + active tasks only (skip completed and backlog)
-  PLAN_EXCERPT=$(sed '/^## Backlog/,$d' "$TAT_DIR/plan.md" | grep -E '(^## |^\- \[ \]|^\- \[~\])' || true)
+  # Current sprint headings + active tasks (table or checkbox format, skip backlog)
+  PLAN_EXCERPT=$(sed '/^## Backlog/,$d' "$TAT_DIR/plan.md" | grep -E '(^##+ |.*\[ \].*\||.*\[~\].*\||^\- \[ \]|^\- \[~\])' || true)
 fi
 
 # --- Prompts ---
