@@ -143,6 +143,19 @@
 
 ---
 
+## Current Sprint: Sprint 10 — Foundation Repair + New Commands
+
+Goal: Fix spec drift, capture missing ADRs, and build /tat wrapup + /tat replan commands.
+
+| ID | Task | Epic | Status |
+|----|------|------|--------|
+| TAT-101 | Update spec.md to match current reality | E18 | [ ] |
+| TAT-102 | Capture missing ADRs (6 decisions) | E18 | [ ] |
+| TAT-104 | /tat wrapup command | E19 | [ ] |
+| TAT-067 | /tat replan command | E19 | [ ] |
+
+---
+
 ## Backlog
 
 | ID | Idea | Noted during |
@@ -162,5 +175,6 @@
 | TAT-100 | Project-specific task ID prefixes (max 4 chars, e.g. OMT-, DESA-) instead of always TAT-. Ref: ADR-005 | Sprint 9 |
 | TAT-101 | Update spec.md to match current reality. Ref: Sprint 9 drift audit (6 gaps found) | Sprint 9 drift audit |
 | TAT-102 | Capture missing ADRs (lessons arch, self-review gate, worktree isolation, script paths, plan-in-branch). Ref: Sprint 9 drift audit | Sprint 9 drift audit |
-| TAT-103 | Task granularity decision. Ref: ADR-009, GPT consultation (one task = one PR unless shared acceptance criterion) | Sprint 9 drift audit |
+| ~~TAT-103~~ | ~~Task granularity decision~~ — DONE: captured in ADR-009 | Sprint 9 drift audit |
 | TAT-104 | /tat wrapup command — session hygiene gate. Ref: GPT 5.2-codex consultation (session close gap), GL-19 | Sprint 9 |
+| TAT-105 | Optimize GPT review payloads — send acceptance criteria + relevant ADR snippets instead of raw context. Skip spec in ask-gpt follow-ups. Ref: GPT 5.2-codex self-review (Sprint 9), GL-05 | Sprint 10 |

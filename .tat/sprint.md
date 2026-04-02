@@ -1,35 +1,38 @@
-# Sprint 9 — Version Awareness + Lesson Lifecycle
+# Sprint 10 — Foundation Repair + New Commands
 
-**Goal:** Make TAT version-aware across projects and reduce lesson noise at sprint-start.
-**Date:** 2026-04-01
+**Goal:** Fix spec drift, capture missing ADRs, and build /tat wrapup + /tat replan commands.
+**Date:** 2026-04-02
 
 ## Relevant Constraints
-- GL-08: Separate docs from code on branches
-- GL-10: Don't force-override hooks — fix the root cause
-- L5: Avoid em dashes in AI-generated content (applies to CHANGELOG writing)
-- ADR-006: Graceful degradation — VERSION file may not exist in older installs
+- L9: Format changes must update all downstream consumers — spec.md update may require downstream checks
+- L8: Backlog tasks must carry Ref: links — /tat replan must enforce this
+- ADR-005: Sprint table format — replan must parse tables correctly
+- ADR-009: File-overlap gate — if parallelizing, check shared files
+- GL-04: Self-review before GPT — always
+- GL-08/GL-16: Plan updates in feature branch — always
 
 ## Scope
 | ID | Task | Epic |
 |----|------|------|
-| TAT-093 | Add VERSION file + CHANGELOG.md | E16 |
-| TAT-094 | install.sh deploys VERSION | E16 |
-| TAT-095 | /tat activation shows version | E16 |
-| TAT-096 | Tag v0.4.0 release | E16 |
-| TAT-097 | Add [active]/[applied] markers to lessons | E17 |
-| TAT-098 | Sprint-start loads only [active] lessons | E17 |
-| TAT-099 | /tat graduate command | E17 |
+| TAT-101 | Update spec.md to match current reality | E18 |
+| TAT-102 | Capture missing ADRs (6 decisions) | E18 |
+| TAT-104 | /tat wrapup command | E19 |
+| TAT-067 | /tat replan command | E19 |
 
 ## Out of Scope
-- Network-based version checking
-- Auto-graduation of lessons
-- Auto-upgrade functionality
+- TAT-100: project-specific task ID prefixes (defer to Sprint 11)
+- TAT-103: already captured in ADR-009
+- New feature development — this sprint is about fixing foundations
 
 ## Risks
-1. CHANGELOG retroactive entries may be incomplete — best-effort from git history
-2. Lesson markers change the file format — simple string prefix, backwards compatible
+1. Spec update is subjective — risk of over/under-documenting. Mitigation: GPT reviews the spec draft.
+2. /tat replan touches plan.md parsing — same format drift risk as Sprint 9. Mitigation: L9 constraint, test against current plan.md.
+3. 6 ADRs is a lot of writing. Mitigation: keep them concise, one paragraph each.
 
 ## Definition of Done
-- install.sh deploys VERSION, /tat shows it
-- Sprint-start only prints [active] lessons
-- v0.4.0 tagged and pushed
+- spec.md accurately describes TAT as it exists today
+- All 6 missing ADRs captured in .tat/decisions/
+- /tat wrapup command works in SKILL.md
+- /tat replan command works in SKILL.md with GPT advisory
+- install.sh works after all changes
+- GL-02 updated to reflect gpt-5.2-codex
