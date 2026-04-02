@@ -6,6 +6,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.5.0] — 2026-04-02
+
+### Added
+- `/tat wrapup` command: session hygiene gate (loose ends, summary, state, install check, next task)
+- `/tat replan` command: backlog hygiene with GPT advisory (deduplicate, cluster, validate staleness, reprioritize)
+- Sprint-start warns if backlog not replanned since last sprint
+- Replan log (`.tat/replan-log.md`) tracks when backlog was last triaged
+
+---
+
 ## [0.4.0] — 2026-04-02
 
 ### Added

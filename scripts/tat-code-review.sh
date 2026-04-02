@@ -1,14 +1,24 @@
 #!/bin/bash
 # tat-code-review.sh — Send code diff to GPT for structured review
-# Usage: tat-code-review.sh [base-branch]
+# Usage: tat-code-review.sh [base-branch] [--task TAT-XXX]
 #   base-branch  Branch to diff against (default: main)
+#   --task       Explicit task ID to review against (most reliable)
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 TAT_DIR=".tat"
 CONFIG="$HOME/.tinyaiteam/config.sh"
-BASE_BRANCH="${1:-main}"
+BASE_BRANCH="main"
+EXPLICIT_TASK=""
+
+# Parse args: positional base-branch and --task flag
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --task) EXPLICIT_TASK="$2"; shift 2 ;;
+    *) BASE_BRANCH="$1"; shift ;;
+  esac
+done
 
 # --- Validation ---
 
@@ -30,26 +40,63 @@ source "$SCRIPT_DIR/tat-gpt.sh"
 CODE_REVIEW_MODEL="${TAT_CODE_REVIEW_MODEL:-gpt-5.4-mini}"
 SYNOPSIS_MODEL="${TAT_CODE_REVIEW_SYNOPSIS_MODEL:-gpt-4o-mini}"
 
-# --- Read current task + epic (skip Backlog section) ---
+# --- Read current task + epic ---
+# Priority: --task arg → state.json → branch name match → first [ ] in plan
 
 CURRENT_TASK=""
 CURRENT_EPIC=""
+TASK_SOURCE=""
+
 if [ -f "$TAT_DIR/plan.md" ]; then
-  # Try table format first (Sprint 5+): | TAT-XXX | desc | epic | [~] |
-  CURRENT_TASK=$(grep -m1 '|.*\[~\]' "$TAT_DIR/plan.md" || true)
+  # 1. Explicit --task arg (most reliable)
+  if [ -n "$EXPLICIT_TASK" ]; then
+    CURRENT_TASK=$(grep -m1 "| *$EXPLICIT_TASK *|" "$TAT_DIR/plan.md" || true)
+    [ -n "$CURRENT_TASK" ] && TASK_SOURCE="--task arg"
+  fi
+
+  # 2. state.json task_id
+  if [ -z "$CURRENT_TASK" ] && [ -f "$TAT_DIR/state.json" ]; then
+    STATE_TASK_ID=$(python3 -c "import json; d=json.load(open('$TAT_DIR/state.json')); print(d.get('task_id',''))" 2>/dev/null || true)
+    if [ -n "$STATE_TASK_ID" ]; then
+      CURRENT_TASK=$(grep -m1 "| *$STATE_TASK_ID *|" "$TAT_DIR/plan.md" || true)
+      [ -n "$CURRENT_TASK" ] && TASK_SOURCE="state.json"
+    fi
+  fi
+
+  # 3. Branch name match (e.g., tat/19/wrapup → search plan for matching task)
   if [ -z "$CURRENT_TASK" ]; then
-    # Next unchecked table task (skip Backlog section)
+    BRANCH_NAME=$(git branch --show-current 2>/dev/null || true)
+    if [ -n "$BRANCH_NAME" ] && [ "$BRANCH_NAME" != "$BASE_BRANCH" ]; then
+      # Extract last segment of branch name as keyword
+      BRANCH_KEYWORD=$(echo "$BRANCH_NAME" | sed 's|.*/||' | tr '-' ' ')
+      if [ -n "$BRANCH_KEYWORD" ]; then
+        BRANCH_MATCH=$(grep -i -m1 "|.*$BRANCH_KEYWORD" "$TAT_DIR/plan.md" || true)
+        [ -n "$BRANCH_MATCH" ] && CURRENT_TASK="$BRANCH_MATCH" && TASK_SOURCE="branch name"
+      fi
+    fi
+  fi
+
+  # 4. Fallback: first in-progress or unchecked task (skip Backlog)
+  if [ -z "$CURRENT_TASK" ]; then
+    CURRENT_TASK=$(grep -m1 '|.*\[~\]' "$TAT_DIR/plan.md" || true)
+    [ -n "$CURRENT_TASK" ] && TASK_SOURCE="first [~]"
+  fi
+  if [ -z "$CURRENT_TASK" ]; then
     EPIC_SECTION=$(sed '/^## Backlog/,$d' "$TAT_DIR/plan.md")
     CURRENT_TASK=$(echo "$EPIC_SECTION" | grep -m1 '|.*\[ \]' || true)
+    [ -n "$CURRENT_TASK" ] && TASK_SOURCE="first [ ]"
   fi
-  # Fallback: old checkbox format (pre-Sprint 5)
+  # Checkbox fallback (pre-Sprint 5)
   if [ -z "$CURRENT_TASK" ]; then
     CURRENT_TASK=$(grep -m1 '\- \[~\]' "$TAT_DIR/plan.md" || true)
+    [ -n "$CURRENT_TASK" ] && TASK_SOURCE="checkbox [~]"
   fi
   if [ -z "$CURRENT_TASK" ]; then
     EPIC_SECTION=$(sed '/^## Backlog/,$d' "$TAT_DIR/plan.md")
     CURRENT_TASK=$(echo "$EPIC_SECTION" | grep -m1 '\- \[ \]' || echo "No active task found")
+    TASK_SOURCE="checkbox [ ]"
   fi
+
   # Find the enclosing sprint/epic heading
   if [ -n "$CURRENT_TASK" ]; then
     TASK_LINE=$(grep -n -m1 -F -- "$CURRENT_TASK" "$TAT_DIR/plan.md" | cut -d: -f1 || true)
@@ -58,6 +105,8 @@ if [ -f "$TAT_DIR/plan.md" ]; then
     fi
   fi
 fi
+
+[ -n "$TASK_SOURCE" ] && echo "[TAT] Task detected via: $TASK_SOURCE"
 
 # --- Gather diff ---
 
