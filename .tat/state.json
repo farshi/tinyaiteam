@@ -1,20 +1,5 @@
 {
-  "version": 1,
-  "project": "TAT — Tiny AI Team",
-  "phase": "IDLE",
-  "epic": "",
-  "task": "",
-  "task_id": "TAT-085",
-  "branch": "",
-  "last_action": {
-    "type": "IDLE",
-    "model": null,
-    "timestamp": "2026-04-01T04:39:11Z"
-  },
-  "session": {
-    "model": "claude-opus-4-6",
-    "started_at": null,
-    "updated_at": "2026-04-01T04:39:11Z"
-  },
-  "next_task_id": "93"
+  "version": 2,
+  "project": "TAT \u2014 Tiny AI Team",
+  "next_task_id": 93
 }

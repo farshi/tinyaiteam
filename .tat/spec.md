@@ -29,13 +29,9 @@ AI coding tools write code but lack long-term planning, decision memory, and mul
 - Sprint ceremonies or checkpoint maps
 - Multiple lesson files with lifecycle management
 
-## Key Decisions
-- **Git is source of truth** — no state.json phase tracking, derive state from branches/PRs
-- **GPT watches in background** — PostToolUse hook triggers auto-review, not manual ceremony
-- **One lessons file globally** — `~/.tinyaiteam/lessons.md`, append-only, no lifecycle
-- **Decisions inline** — key decisions live here in spec.md, not separate ADR files
-- **Self-review before GPT** — Claude reads its own diff first, GPT is second opinion
-- **Plan is a flat task list** — prioritized top-down, no sprints or epics
-- **Graceful degradation** — missing files = feature inactive, not an error
-- **One task = one branch = one PR** — clean git history
-- **File-overlap gate for parallel agents** — if tasks touch same files, run sequentially
+## Key Principles
+- Git is source of truth — no phase tracking, derive state from branches/PRs
+- GPT watches in background — auto-review, not manual ceremony
+- Self-review before GPT — Claude reads its own diff first
+- User is product owner — final authority on everything
+- Decisions tracked in `.tat/decisions.md` (single file, append-only)

@@ -27,8 +27,9 @@ Opus delegates coding to Sonnet subagents. GPT watches in background. User is pr
 
 ```
 <project>/.tat/
-  spec.md         # What + why + constraints + key decisions
+  spec.md         # What + why + constraints
   plan.md         # Prioritized task list (top = next)
+  decisions.md    # Key decisions with rationale (append-only)
   gpt.md          # GPT's latest review (auto-updated)
 
 ~/.tinyaiteam/

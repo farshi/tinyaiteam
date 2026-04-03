@@ -139,8 +139,15 @@ If `NO_TAT_DIR`:
    ## Constraints
    <any constraints>
 
-   ## Decisions
-   <key decisions, inline — no separate ADR files>
+   ## Constraints
+   <any constraints>
+   ```
+
+3. Create `.tat/decisions.md`:
+   ```markdown
+   # Decisions
+
+   Key decisions with rationale. Append-only.
    ```
 
 2. Create `.tat/plan.md`:
@@ -212,6 +219,7 @@ Also load:
 ```bash
 cat .tat/spec.md
 cat .tat/plan.md
+cat .tat/decisions.md 2>/dev/null
 cat ~/.tinyaiteam/lessons.md 2>/dev/null
 cat .tat/gpt.md 2>/dev/null
 ```
