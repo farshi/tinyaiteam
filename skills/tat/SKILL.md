@@ -109,6 +109,10 @@ When the user says `/tat replan`:
 4. Opus adds opinion with `[OPUS]` tag
 5. User approves changes
 6. Update plan.md with new order
+7. Log replan timestamp:
+   ```bash
+   echo "$(date -u +%Y-%m-%d) — replanned" >> ~/.tinyaiteam/replan.log
+   ```
 
 Then stop.
 
@@ -226,8 +230,21 @@ cat .tat/gpt.md 2>/dev/null
 
 ```
 [TAT] Active v<version>. Role: <Orchestrator|Coder> (<model>)
-[TAT] Loaded spec + plan + <N> lessons.
+[TAT] Loaded spec + plan + decisions + <N> lessons.
 ```
+
+Check replan freshness:
+```bash
+# Count completed tasks since last replan
+DONE_COUNT=$(grep -c '\[x\]' .tat/plan.md 2>/dev/null || echo "0")
+LAST_REPLAN=$(tail -1 ~/.tinyaiteam/replan.log 2>/dev/null | cut -d' ' -f1 || echo "never")
+```
+
+If 10+ tasks completed and no replan in the last 10 tasks, nudge:
+```
+[TAT] ⚠ <N> tasks done since last replan (<date>). Consider /tat replan to reprioritize.
+```
+This is a nudge, not a gate. User can ignore it.
 
 ### Step 2: Detect model role
 
