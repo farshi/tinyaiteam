@@ -1,11 +1,11 @@
 #!/bin/bash
 # tat-gpt-watch.sh — Background GPT reviewer for TAT v2
-# Triggered by Claude Code PostToolUse hook after significant changes.
-# Sends spec + plan + diff to GPT (fast model), writes to .tat/gpt.md.
+# Triggered by Claude Code PostToolUse hook after commits.
+# Sends spec + plan + diff to GPT (code review model), writes to .tat/gpt.md.
 #
 # Usage: tat-gpt-watch.sh [project-root]
 #
-# Rate-limited: max once per 10 minutes.
+# No rate limit — runs on every commit. Uses the configured code review model.
 # Filtered: only runs if diff > 30 lines or risky files touched.
 
 set -u  # No -e or pipefail: background script must not die on pipe breaks or GPT failures
@@ -14,27 +14,15 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CONFIG="$HOME/.tinyaiteam/config.sh"
 PROJECT_ROOT="${1:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 TAT_DIR="$PROJECT_ROOT/.tat"
-RATE_FILE="/tmp/tat-gpt-watch-last"
 
 # --- Validation ---
 
 if [ -z "${OPENAI_API_KEY:-}" ]; then
-  exit 0  # Silent — background script shouldn't spam errors
+  exit 0
 fi
 
 if [ ! -d "$TAT_DIR" ]; then
   exit 0  # Not a TAT project
-fi
-
-# --- Rate limit: once per 10 minutes ---
-
-if [ -f "$RATE_FILE" ]; then
-  LAST=$(cat "$RATE_FILE")
-  NOW=$(date +%s)
-  ELAPSED=$(( NOW - LAST ))
-  if [ "$ELAPSED" -lt 600 ]; then
-    exit 0
-  fi
 fi
 
 # --- Check if diff is significant ---
@@ -60,9 +48,9 @@ fi
 [ -f "$CONFIG" ] && source "$CONFIG"
 source "$SCRIPT_DIR/tat-gpt.sh"
 
-# Use fast model for background reviews + longer timeout
-MODEL="${TAT_CODE_REVIEW_SYNOPSIS_MODEL:-gpt-4o-mini}"
-export TAT_GPT_TIMEOUT=120
+# Use the configured code review model (same quality as manual review)
+MODEL="${TAT_CODE_REVIEW_MODEL:-gpt-5.2-codex}"
+export TAT_GPT_TIMEOUT=300
 
 # --- Gather context ---
 
@@ -81,13 +69,21 @@ TRIMMED_DIFF=$(git diff main...HEAD 2>/dev/null | head -300 || true)
 
 # --- Call GPT ---
 
-SYSTEM_PROMPT="You are a background code reviewer. Quick scan only — flag real issues, not style.
+SYSTEM_PROMPT="You are a senior code reviewer. Flag real issues — security, bugs, logic errors, scope creep. Not style.
 
-Respond briefly:
-- ISSUES: (security, bugs, logic errors — or 'none')
-- NOTES: (1-2 observations)
+Respond in this format:
+BLOCKERS: (things that will cause real problems — or 'none')
+- <issue>
 
-Be terse. This runs automatically — don't waste tokens."
+SUGGESTIONS: (improvements, not requirements)
+- <suggestion>
+
+NOTES: (observations, context)
+- <note>
+
+CONFIDENCE: HIGH / MEDIUM / LOW — <one line reason>
+
+Be specific — name the file and line. No filler."
 
 USER_PROMPT="Project: $SPEC
 
@@ -106,7 +102,7 @@ tat_gpt_call "$MODEL" "$SYSTEM_PROMPT" "$USER_PROMPT" 2>/dev/null
 
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 cat > "$TAT_DIR/gpt.md" <<GPTEOF
-# GPT Background Review
+# GPT Review
 
 **Date:** $TIMESTAMP
 **Branch:** $BRANCH
@@ -115,6 +111,3 @@ cat > "$TAT_DIR/gpt.md" <<GPTEOF
 
 $REVIEW
 GPTEOF
-
-# Update rate limit
-date +%s > "$RATE_FILE"
