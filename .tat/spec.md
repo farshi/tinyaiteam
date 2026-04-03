@@ -1,27 +1,41 @@
 # TAT — Tiny AI Team
 
 ## What
-The persistent execution loop for AI-assisted projects. TAT adds structured state, checkpoint-driven workflow, and multi-model coordination to Claude Code. It's not a toolkit of specialist skills — it's the orchestration layer that ties planning, coding, review, and shipping into a repeatable loop with memory that persists across sessions.
+An orchestration layer for Claude Code. Adds planning, multi-model coordination (Opus plans, Sonnet codes, GPT reviews in background), and persistent project memory to AI-assisted development.
 
 ## What TAT Is
-- An orchestration loop: Spec → Plan → Branch → Code → Review → Ship → Repeat
-- Persistent project state via `.tat/` files (spec, plan, decisions, session state)
-- Multi-model coordination: Opus plans, Sonnet codes, GPT reviews
-- Checkpoint-driven execution with strict gates between phases
-- A system that gets smarter as you use it — every lesson becomes a rule
+- A core loop: Pick task → Branch → Code → Self-review → GPT watches → Ship → Repeat
+- Persistent project state via `.tat/` files (spec, plan, GPT notes)
+- Multi-model coordination with GPT as background third eye
+- A system that captures lessons automatically, not just at retros
 
 ## What TAT Is Not
-- Not a toolkit of independent skills (that's gstack's strength — and TAT can use gstack skills)
-- Not a fully autonomous agent — user is product owner, always in the loop
+- Not a process framework — no phases, no checkpoints, no ceremonies
+- Not a fully autonomous agent — user is product owner
 - Not replacing Claude Code — orchestrating it
-- Not a complex framework — markdown files, bash scripts, Claude Code skills
 
 ## Why
-AI coding tools are strong at writing code but weak at long-term planning, remembering decisions, coordinating multiple models, and maintaining engineering discipline. TAT adds process and memory on top of existing tools so AI works like a real engineering team — not a random code generator.
+AI coding tools write code but lack long-term planning, decision memory, and multi-model coordination. TAT adds memory and review on top of existing tools.
 
 ## Constraints
-- Built as Claude Code skills and commands — no external framework
-- GPT integration via direct API calls (curl or minimal script)
-- All state is flat files (markdown + JSON) — no database
+- Built as Claude Code skills — no external framework
+- GPT integration via API calls (bash scripts with Python for JSON)
+- All state is flat files (markdown + JSON counter)
 - User is always in the loop as product owner
-- Proper git workflow: branches, PRs, reviews
+- Git discipline: branches, PRs, conventional commits
+
+## Non-goals
+- Complex state machines or phase tracking
+- Sprint ceremonies or checkpoint maps
+- Multiple lesson files with lifecycle management
+
+## Key Decisions
+- **Git is source of truth** — no state.json phase tracking, derive state from branches/PRs
+- **GPT watches in background** — PostToolUse hook triggers auto-review, not manual ceremony
+- **One lessons file globally** — `~/.tinyaiteam/lessons.md`, append-only, no lifecycle
+- **Decisions inline** — key decisions live here in spec.md, not separate ADR files
+- **Self-review before GPT** — Claude reads its own diff first, GPT is second opinion
+- **Plan is a flat task list** — prioritized top-down, no sprints or epics
+- **Graceful degradation** — missing files = feature inactive, not an error
+- **One task = one branch = one PR** — clean git history
+- **File-overlap gate for parallel agents** — if tasks touch same files, run sequentially
