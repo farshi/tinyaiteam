@@ -24,6 +24,7 @@ Thumbs.db
 config.local.sh
 
 # TAT session state (not code)
-.tat/conversation.md
+.tat/session.md
+.tat/today.md
 .tat/gpt-cursor
 .tat/gpt.md

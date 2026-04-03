@@ -30,9 +30,10 @@ Opus delegates coding to Sonnet subagents. GPT watches in background. User is pr
   spec.md           # What + why + constraints
   plan.md           # Prioritized task list (top = next)
   decisions.md      # Key decisions with rationale (append-only)
-  conversation.md   # Session log — User + Claude + GPT voices (gitignored)
+  session.md        # Live session log — User + Opus + GPT voices (gitignored)
+  today.md          # Daily scope — goals, mode, constraints (gitignored)
   gpt.md            # GPT's latest review summary (auto-updated)
-  gpt-cursor        # Last conversation entry GPT has reviewed
+  gpt-cursor        # Last session entry GPT has reviewed
 
 ~/.tinyaiteam/
   TAT.md          # This file
@@ -73,13 +74,15 @@ Prioritized task list. No sprints, no epics. Top = next.
 
 ## GPT Integration
 
-**Background (automatic):** Claude Code PostToolUse hook triggers GPT review on commits. GPT reads unseen conversation entries + code diff. Responses written back into `conversation.md`. Summary in `gpt.md`.
+**Three-Chair Model:** User (Product Owner) + GPT (Senior Advisor) + Opus (Orchestrator). Each has a role that changes by mode (Design/Planning/Coding/Review).
 
-**On-demand:** `/tat review` forces immediate GPT review.
+**Session log:** Claude appends to `.tat/session.md` after every user turn. All three voices. GPT sees intent, approach, corrections — not just final code.
 
-**Conversation log:** Claude appends to `.tat/conversation.md` after every user turn. Three voices — User, Claude, GPT. GPT sees intent, approach, corrections — not just final code.
+**GPT briefing:** Every GPT call gets: MODE + TODAY + DECISIONS + SESSION + DIFF. GPT must ACK context before advising.
 
-**`!!` red flag:** User prefixes with `!!` for urgent GPT attention. Triggers immediate review.
+**Background (automatic):** PostToolUse hook triggers GPT review on commits. GPT reads unseen session entries + diff, writes responses back into session.md.
+
+**`!!` red flag:** User prefixes with `!!` for urgent GPT attention.
 
 **Self-review first (always).** Claude reads its own diff before GPT sees it.
 
