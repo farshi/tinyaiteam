@@ -101,3 +101,11 @@ Universal lessons earned across TAT-managed projects. Loaded at `/tat` activatio
 ### GL-19. Never leave unstaged edits on a feature branch
 **Source:** TAT Sprint 9
 **Rule:** Commit or stash immediately. Unstaged changes block rebases.
+
+---
+
+## Session Discipline
+
+### GL-20. Log [User] entries in session.md — every turn
+**Source:** oneminuta Sprint 5, 2026-04-03
+**Rule:** After every user message, append a `[User]` bullet to session.md summarizing their intent. Without these, GPT is blind during planning and the audit trail is useless.
