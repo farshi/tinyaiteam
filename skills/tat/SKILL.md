@@ -282,7 +282,7 @@ When Opus identifies a standard coding task:
    ```
    [TAT] Delegating to Sonnet →
    [TAT] Task: <description>
-   [TAT] Branch: tat/<TASK-ID>-<slug>
+   [TAT] Branch: <TASK-ID>/<slug>
    [TAT] Files: <list>
    ```
 

@@ -58,10 +58,10 @@ To start contributing:
 
 ## Conventions
 
-**Branches:** `tat/<TASK-ID>-<slug>`
+**Branches:** `<TASK-ID>/<slug>`
 ```
-tat/tat-042-status-dashboard
-tat/om-080-web-identity
+tat-042/status-dashboard
+om-080/web-identity
 ```
 Also OK: `docs/<slug>`, `fix/<slug>`, `chore/<slug>` for non-task branches.
 

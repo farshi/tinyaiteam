@@ -56,7 +56,7 @@ Universal lessons earned across TAT-managed projects. Loaded at `/tat` activatio
 
 ### GL-21. Branch names and commits must include task IDs
 **Source:** TAT cross-project drift (devsecops, TAT itself vs oneminuta)
-**Rule:** Branch: `tat/<TASK-ID>-<slug>`. Commit: `type(scope): description (TASK-ID)`. Hooks enforce both. Without task IDs, traceability degrades within 2 sprints.
+**Rule:** Branch: `<TASK-ID>/<slug>` (e.g. `om-083/history-fetch`). Commit: `type(scope): description (TASK-ID)`. Hooks enforce both. Branch names are project-namespaced, not tool-namespaced — no `tat/` prefix.
 
 ---
 

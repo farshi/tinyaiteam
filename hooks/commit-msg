@@ -35,8 +35,8 @@ fi
 # Extract task ID from branch name to suggest it
 BRANCH=$(git branch --show-current 2>/dev/null || echo "")
 BRANCH_TASK_ID=""
-if echo "$BRANCH" | grep -qiE '^tat/[a-z]+-[0-9]+'; then
-  BRANCH_TASK_ID=$(echo "$BRANCH" | sed -E 's|^tat/([a-zA-Z]+-[0-9]+).*|\1|' | tr '[:lower:]' '[:upper:]')
+if echo "$BRANCH" | grep -qiE '^[a-z]+-[0-9]+/'; then
+  BRANCH_TASK_ID=$(echo "$BRANCH" | sed -E 's|^([a-zA-Z]+-[0-9]+)/.*|\1|' | tr '[:lower:]' '[:upper:]')
 fi
 
 if ! echo "$MSG" | grep -qiE '\([a-z]+-[0-9]+\)\s*$'; then

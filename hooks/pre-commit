@@ -5,20 +5,20 @@
 BRANCH=$(git branch --show-current)
 
 # --- Branch naming check (warning only) ---
-# Valid: tat/<TASK-ID>-<slug>, docs/<slug>, fix/<slug>, chore/<slug>
+# Valid: <TASK-ID>/<slug>, docs/<slug>, fix/<slug>, chore/<slug>
 if [ "$BRANCH" != "main" ]; then
   VALID_BRANCH=false
   case "$BRANCH" in
-    tat/[a-zA-Z]*-[0-9]*) VALID_BRANCH=true ;;  # tat/tat-101-foo, tat/om-080-bar
-    docs/*|fix/*|chore/*) VALID_BRANCH=true ;;    # non-task branches
+    [a-zA-Z]*-[0-9]*/*)  VALID_BRANCH=true ;;  # om-083/history-fetch, tat-111/enforcement
+    docs/*|fix/*|chore/*) VALID_BRANCH=true ;;  # non-task branches
   esac
 
   if [ "$VALID_BRANCH" = false ]; then
     echo ""
     echo "[TAT] Warning: branch name does not follow convention."
     echo ""
-    echo "  Expected: tat/<TASK-ID>-<slug>"
-    echo "  Example:  tat/tat-101-update-spec"
+    echo "  Expected: <TASK-ID>/<slug>"
+    echo "  Example:  om-083/history-fetch, tat-111/update-spec"
     echo "  Also OK:  docs/<slug>, fix/<slug>, chore/<slug>"
     echo ""
     echo "  Got: $BRANCH"
@@ -54,7 +54,7 @@ if [ "$BRANCH" = "main" ]; then
   echo "  Staged files:"
   echo "$STAGED" | sed 's/^/    /'
   echo ""
-  echo "  Create a branch:  git checkout -b tat/<TASK-ID>-<slug>"
+  echo "  Create a branch:  git checkout -b <TASK-ID>/<slug>"
   echo "  Override:          TAT_FORCE=1 git commit ..."
   echo ""
 
