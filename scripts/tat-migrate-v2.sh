@@ -111,11 +111,23 @@ if [ -d "$ARCHIVE/decisions" ]; then
 
   for adr in "$ARCHIVE/decisions/"*.md; do
     [ -f "$adr" ] || continue
-    TITLE=$(grep -m1 '^# ' "$adr" | sed 's/^# //')
-    DECISION=$(sed -n '/^## Decision/,/^## /p' "$adr" | tail -n +2 | grep -v '^## ')
-    RATIONALE=$(sed -n '/^## Rationale/,/^## /p' "$adr" | tail -n +2 | grep -v '^## ')
+    TITLE=$(grep -m1 '^# ' "$adr" | sed 's/^# //' || true)
     if [ -n "$TITLE" ]; then
       echo "### $TITLE" >> "$DECISIONS_FILE"
+      # Extract Decision section (try common heading variants)
+      DECISION=$(sed -n '/^## Decision/,/^## /p' "$adr" | tail -n +2 | grep -v '^## ' || true)
+      if [ -z "$DECISION" ]; then
+        DECISION=$(sed -n '/^## Decided/,/^## /p' "$adr" | tail -n +2 | grep -v '^## ' || true)
+      fi
+      # Extract Rationale/Why section
+      RATIONALE=$(sed -n '/^## Rationale/,/^## /p' "$adr" | tail -n +2 | grep -v '^## ' || true)
+      if [ -z "$RATIONALE" ]; then
+        RATIONALE=$(sed -n '/^## Why/,/^## /p' "$adr" | tail -n +2 | grep -v '^## ' || true)
+      fi
+      # If no structured sections found, just grab the Context
+      if [ -z "$DECISION" ] && [ -z "$RATIONALE" ]; then
+        DECISION=$(sed -n '/^## Context/,/^## /p' "$adr" | tail -n +2 | grep -v '^## ' || true)
+      fi
       [ -n "$DECISION" ] && echo "$DECISION" >> "$DECISIONS_FILE"
       [ -n "$RATIONALE" ] && echo "**Why:** $RATIONALE" >> "$DECISIONS_FILE"
       echo "" >> "$DECISIONS_FILE"
