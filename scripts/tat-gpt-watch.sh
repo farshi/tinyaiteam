@@ -8,7 +8,7 @@
 # Rate-limited: max once per 10 minutes.
 # Filtered: only runs if diff > 30 lines or risky files touched.
 
-set -euo pipefail
+set -u  # No -e or pipefail: background script must not die on pipe breaks or GPT failures
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CONFIG="$HOME/.tinyaiteam/config.sh"
@@ -46,8 +46,7 @@ if [ -z "$BRANCH" ] || [ "$BRANCH" = "main" ]; then
   exit 0
 fi
 
-DIFF=$(git diff main...HEAD 2>/dev/null || git diff HEAD 2>/dev/null || true)
-DIFF_LINES=$(echo "$DIFF" | wc -l | tr -d ' ')
+DIFF_LINES=$(git diff main...HEAD 2>/dev/null | wc -l | tr -d ' ' || echo "0")
 
 # Check for risky files
 RISKY_FILES=$(git diff --name-only main...HEAD 2>/dev/null | grep -E '(auth|security|schema|migration|hook|deploy|\.env|config)' || true)
@@ -61,8 +60,9 @@ fi
 [ -f "$CONFIG" ] && source "$CONFIG"
 source "$SCRIPT_DIR/tat-gpt.sh"
 
-# Use fast model for background reviews
+# Use fast model for background reviews + longer timeout
 MODEL="${TAT_CODE_REVIEW_SYNOPSIS_MODEL:-gpt-4o-mini}"
+export TAT_GPT_TIMEOUT=120
 
 # --- Gather context ---
 
@@ -76,8 +76,8 @@ RECENT_COMMITS=$(git log --oneline -3 2>/dev/null || true)
 
 FILES_CHANGED=$(git diff --name-only main...HEAD 2>/dev/null || true)
 
-# Trim diff to 300 lines max
-TRIMMED_DIFF=$(echo "$DIFF" | head -300)
+# Get first 300 lines of diff directly (no pipe break)
+TRIMMED_DIFF=$(git diff main...HEAD 2>/dev/null | head -300 || true)
 
 # --- Call GPT ---
 
