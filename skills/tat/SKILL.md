@@ -396,15 +396,14 @@ This forces GPT to prove it understands the context before advising.
 [TAT] Noted — added to backlog.
 ```
 
-**After coding, before committing:**
+**After coding:**
 1. Self-review your diff (`git diff`). Check scope, bugs, completeness.
-2. Run GPT review: `~/.tinyaiteam/scripts/tat-gpt-watch.sh` — **mandatory, not optional.**
-3. Read GPT's response in `.tat/session.md` or `.tat/gpt.md`.
-4. Fix any blockers GPT flagged.
-5. **Then** commit, mark task `[x]` in plan.md (on the branch).
-6. Push, create PR, merge.
-
-**Never commit without GPT review.** The watcher also runs automatically after commit, but the pre-commit review catches issues before they're in git history.
+2. Commit.
+3. GPT reviews automatically (PostToolUse hook fires after commit).
+4. Read GPT's response in `.tat/session.md` or `.tat/gpt.md`.
+5. If GPT flagged issues → fix and commit again.
+6. Mark task `[x]` in plan.md (on the branch).
+7. Push, create PR, merge.
 
 **After merge:**
 ```bash
