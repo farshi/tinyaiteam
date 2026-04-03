@@ -55,7 +55,7 @@ if [ -f "$SESSION_FILE" ]; then
     # Get last N entries (unseen ones)
     UNSEEN_ENTRIES=$(grep '^\- \[' "$SESSION_FILE" | tail -"$ENTRY_COUNT")
     # Check for urgent (!!)
-    echo "$UNSEEN_ENTRIES" | grep -q '!!' && HAS_URGENT=true
+    echo "$UNSEEN_ENTRIES" | grep -q '@@' && HAS_URGENT=true
   fi
 fi
 
@@ -114,7 +114,7 @@ Then respond based on mode:
 - Coding: review diff for bugs, security, scope creep
 - Review: deep analysis of changes
 
-If you see !! entries, address those FIRST.
+If you see @@ entries, address those FIRST — they are urgent flags from the user.
 If current work contradicts a decision in DECISIONS, flag it.
 If you see user corrections, note the pattern.
 

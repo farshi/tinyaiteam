@@ -82,7 +82,7 @@ Prioritized task list. No sprints, no epics. Top = next.
 
 **Background (automatic):** PostToolUse hook triggers GPT review on commits. GPT reads unseen session entries + diff, writes responses back into session.md.
 
-**`!!` red flag:** User prefixes with `!!` for urgent GPT attention.
+**`@@` red flag:** User prefixes with `@@` for urgent GPT attention.
 
 **Self-review first (always).** Claude reads its own diff before GPT sees it.
 
