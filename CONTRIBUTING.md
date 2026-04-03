@@ -58,11 +58,12 @@ To start contributing:
 
 ## Conventions
 
-**Branches:** `tat/<epic-number>/<short-task-name>`
+**Branches:** `<TASK-ID>/<slug>`
 ```
-tat/3/password-reset
-tat/11/contributing
+tat-042/status-dashboard
+om-080/web-identity
 ```
+Also OK: `docs/<slug>`, `fix/<slug>`, `chore/<slug>` for non-task branches.
 
 **Commits:** [Conventional Commits](https://www.conventionalcommits.org/) with TAT task ID
 ```

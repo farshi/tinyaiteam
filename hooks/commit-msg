@@ -1,5 +1,5 @@
 #!/bin/bash
-# TAT commit-msg hook — validates conventional commit format
+# TAT commit-msg hook — validates conventional commit format + task ID
 # Install: cp hooks/commit-msg .git/hooks/commit-msg && chmod +x .git/hooks/commit-msg
 
 MSG=$(head -1 "$1")
@@ -24,8 +24,35 @@ if ! echo "$MSG" | grep -qE '^(feat|fix|docs|refactor|chore|test|style)\([a-z]+\
   echo "  Types:  feat, fix, docs, refactor, chore, test, style"
   echo "  Scopes: skill, review, plan, config, workflow, install, hooks"
   echo ""
-  echo "  Example: feat(skill): add /tat status command"
+  echo "  Example: feat(skill): add /tat status command (TAT-101)"
   echo "  Got:     $MSG"
   echo ""
   exit 1
+fi
+
+# --- Task ID check ---
+# Require (PREFIX-NNN) suffix e.g. (TAT-101), (OM-080), (DSA-027)
+# Extract task ID from branch name to suggest it
+BRANCH=$(git branch --show-current 2>/dev/null || echo "")
+BRANCH_TASK_ID=""
+if echo "$BRANCH" | grep -qiE '^[a-z]+-[0-9]+/'; then
+  BRANCH_TASK_ID=$(echo "$BRANCH" | sed -E 's|^([a-zA-Z]+-[0-9]+)/.*|\1|' | tr '[:lower:]' '[:upper:]')
+fi
+
+if ! echo "$MSG" | grep -qiE '\([a-z]+-[0-9]+\)\s*$'; then
+  echo ""
+  echo "[TAT] Commit message missing task ID suffix."
+  echo ""
+  echo "  Expected: type(scope): description (TASK-ID)"
+  echo "  Example:  feat(skill): add status command (TAT-101)"
+  if [ -n "$BRANCH_TASK_ID" ]; then
+    echo "  Detected: $BRANCH_TASK_ID from branch name"
+    echo "  Try:      $MSG ($BRANCH_TASK_ID)"
+  fi
+  echo ""
+  echo "  Override: TAT_NO_TASK_ID=1 git commit ..."
+  echo ""
+  if [ "${TAT_NO_TASK_ID:-0}" != "1" ]; then
+    exit 1
+  fi
 fi

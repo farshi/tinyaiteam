@@ -68,8 +68,8 @@ Prioritized task list. No sprints, no epics. Top = next.
 ## Git Workflow
 
 - One task = one branch = one PR
-- Branch naming: `tat/<task-name>`
-- Conventional commits: `feat(scope): description`
+- Branch naming: `<TASK-ID>/<slug>` (e.g. `tat-101/update-spec`, `om-083/history-fetch`)
+- Conventional commits: `feat(scope): description (TASK-ID)` — hooks enforce both
 - Never commit directly to main
 
 ## GPT Integration

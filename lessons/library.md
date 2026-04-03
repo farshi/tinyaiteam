@@ -54,6 +54,10 @@ Universal lessons earned across TAT-managed projects. Loaded at `/tat` activatio
 **Source:** devsecops
 **Rule:** When a hook blocks a commit, investigate WHY. Don't use `TAT_FORCE=1`.
 
+### GL-21. Branch names and commits must include task IDs
+**Source:** TAT cross-project drift (devsecops, TAT itself vs oneminuta)
+**Rule:** Branch: `<TASK-ID>/<slug>` (e.g. `om-083/history-fetch`). Commit: `type(scope): description (TASK-ID)`. Hooks enforce both. Branch names are project-namespaced, not tool-namespaced — no `tat/` prefix.
+
 ---
 
 ## Workflow
