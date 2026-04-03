@@ -301,6 +301,22 @@ echo "$REVIEW"
 echo ""
 echo "---"
 
+# Auto-save GPT review to .tat/gpt.md
+GPT_FILE="$TAT_DIR/gpt.md"
+TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+cat > "$GPT_FILE" <<GPTEOF
+# GPT Review
+
+**Date:** $TIMESTAMP
+**Branch:** $CURRENT_BRANCH
+**Model:** $MODEL
+**Task:** ${CURRENT_TASK:-unknown}
+**Diff:** $DIFF_LINES lines
+
+$REVIEW
+GPTEOF
+echo "[TAT] GPT review saved to $GPT_FILE"
+
 if echo "$REVIEW" | grep -A5 -iE '^BLOCKERS:' | grep -qi 'none'; then
   echo "[TAT] No blockers. Proceed at your discretion."
 else

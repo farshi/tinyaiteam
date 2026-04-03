@@ -1,134 +1,103 @@
-# TAT Global Lessons Library
+# TAT Lessons
 
-Universal lessons earned across TAT-managed projects. These apply to ANY project using TAT, not just the project where they were discovered.
-
-Loaded by `/tat sprint-start` alongside project-local `.tat/lessons.md`. Sprint-start identifies which lessons are relevant to the current sprint's tasks.
-
-<!-- Lesson lifecycle: [active] = enforced at sprint-start, [applied] = graduated into code/config/habit, no longer loaded -->
+Universal lessons earned across TAT-managed projects. Loaded at `/tat` activation.
 
 ---
 
 ## Reviews & Quality
 
 ### GL-01. Run code review after every task
-**Status:** [active]
-**Source:** oneminuta Sprint 3 (Codex caught a security bug that self-review missed)
-**Rule:** Run `tat-code-review.sh main` after each task. Address blockers before moving on. This is not optional.
+**Source:** oneminuta Sprint 3
+**Rule:** Run `tat-code-review.sh main` after each task. Address blockers before moving on.
 
 ### GL-02. Use the right GPT model for the right job
-**Status:** [active]
 **Source:** oneminuta Sprint 2-3, devsecops Sprint 1
-**Rule:** Code review = gpt-5.2-codex. Plan review = gpt-5.2-codex. Ask-gpt = gpt-5.2-codex. Brainstorming = gpt-4o-mini. Never use the cheapest model for critical reviews. Always respect `config.sh` model settings — don't hardcode.
+**Rule:** Code review = gpt-5.2-codex. Brainstorming = gpt-4o-mini. Respect `config.sh` settings.
 
 ### GL-03. Schema and infrastructure changes need GPT review before applying
-**Status:** [active]
 **Source:** oneminuta Sprint 3
-**Rule:** All schema changes, infra config, and deployment changes must go through GPT review before being applied. Copy to clipboard, but don't tell user to run until review is done.
+**Rule:** All schema/infra/deployment changes must go through GPT review first.
 
 ### GL-04. Self-review before GPT review — always
-**Status:** [active]
 **Source:** TAT Sprint 6, devsecops Sprint 2
-**Rule:** Read the diff, check scope, fix issues — THEN send to GPT. GPT is a second opinion, not a substitute for your own QA.
+**Rule:** Read the diff, check scope, fix issues — THEN send to GPT.
 
 ---
 
 ## Scripts & Shell Safety
 
 ### GL-05. GPT review payloads must be small
-**Status:** [active]
 **Source:** devsecops Task 2.0+
-**Rule:** Trim context to spec summary (~7 lines) + current task description. Large payloads break GPT calls or produce garbage.
+**Rule:** Trim context to spec summary + task description. Large payloads break GPT calls.
 
 ### GL-06. Shell escaping breaks GPT calls silently
-**Status:** [active]
-**Source:** devsecops (every code review with special chars)
-**Rule:** Never use shell string interpolation for JSON payloads. Use Python + temp files for JSON construction. All GPT scripts must handle any content safely.
+**Source:** devsecops
+**Rule:** Use Python + temp files for JSON construction. Never shell string interpolation.
 
 ### GL-07. grep + set -e = silent death
-**Status:** [active]
-**Source:** devsecops `tat-code-review.sh`
-**Rule:** Any grep in TAT scripts that might not match needs `|| true`. `set -euo pipefail` kills the script silently when grep returns exit 1.
+**Source:** devsecops
+**Rule:** Any grep in TAT scripts that might not match needs `|| true`.
 
 ---
 
 ## Git & Branch Discipline
 
 ### GL-08. Include plan updates in the feature branch
-**Status:** [active]
-**Source:** TAT Sprint 7 (POST-MERGE tried to push to protected main — blocked by branch protection)
-**Rule:** Never commit directly to main — not even plan.md updates. Include plan status updates ([x] marks) in the feature branch before creating the PR. This avoids branch protection conflicts and eliminates throwaway PRs for housekeeping.
+**Source:** TAT Sprint 7
+**Rule:** Never commit directly to main. Include plan [x] marks in the feature branch before PR.
 
 ### GL-09. Never chain gh pr merge commands
-**Status:** [active]
-**Source:** TAT Sprint 6 (happened twice — TAT and PatchPilot)
-**Rule:** Always run `gh pr merge` one at a time. Never chain with `&&`. Chaining hides the success of the first if the second fails.
+**Source:** TAT Sprint 6
+**Rule:** Always run `gh pr merge` one at a time. Never chain with `&&`.
 
 ### GL-10. Don't force-override hooks — fix the root cause
-**Status:** [active]
-**Source:** devsecops post-Epic 2
-**Rule:** When a TAT hook blocks a commit, don't use `TAT_FORCE=1` to bypass it. Investigate WHY it blocked. Learn from failures, don't mask them.
+**Source:** devsecops
+**Rule:** When a hook blocks a commit, investigate WHY. Don't use `TAT_FORCE=1`.
 
 ---
 
-## Workflow & Process
+## Workflow
 
 ### GL-11. In auto-mode, announce what you're doing
-**Status:** [active]
-**Source:** devsecops Task 2.3b (user couldn't see what was being coded)
-**Rule:** After creating a branch, always print 2-3 lines saying what task is being implemented and what it does. Silence for minutes is bad UX.
+**Source:** devsecops Task 2.3b
+**Rule:** After creating a branch, print 2-3 lines about the task. Silence is bad UX.
 
 ### GL-12. Lessons come from everywhere — capture all of them
-**Status:** [active]
 **Source:** devsecops Task 2.3b
-**Rule:** Lessons can come from Opus (self-review insights), GPT (review feedback), or the user (corrections/preferences). All should be captured. This library exists because of this lesson.
+**Rule:** Opus, GPT, or user corrections — all worth capturing via `/tat report`.
 
 ### GL-13. Don't build without a plan — even for docs
-**Status:** [active]
-**Source:** devsecops user feedback
-**Rule:** Any request — including documentation — should go through the plan first. No ADR = no decision captured = no traceability.
+**Source:** devsecops
+**Rule:** Any request should go through the plan first.
 
 ---
 
 ## Security
 
 ### GL-14. Never expose secrets — rotate immediately
-**Status:** [active]
-**Source:** oneminuta Sprint 3 (accidental `export` without args dumped all env vars)
-**Rule:** Never run bare `export` command. Always use `! export VAR=value` with the specific variable. If secrets are exposed, rotate ALL affected keys immediately — don't wait.
+**Source:** oneminuta Sprint 3
+**Rule:** Never run bare `export`. If secrets are exposed, rotate immediately.
 
 ---
 
-## Worktree & Parallel Agents
+## Parallel Agents
 
 ### GL-15. Verify worktree agent commits before creating PRs
-**Status:** [active]
-**Source:** TAT Sprint 6 (parallel delegation of TAT-062 + TAT-064)
-**Rule:** After parallel worktree agents return, verify each branch has the expected commits (`git log branch -1`) before creating PRs. Commits may land on wrong branches silently.
-
----
-
-## Branch Protection
+**Source:** TAT Sprint 6
+**Rule:** After parallel agents return, verify each branch has expected commits.
 
 ### GL-16. Never push directly to protected main
-**Status:** [active]
-**Source:** TAT Sprint 7 (POST-MERGE checkpoint failed — GitHub branch protection blocked `git push origin main`)
-**Rule:** If a project uses `/tat init` (which enables branch protection), all changes — including plan.md updates — must go through PRs. The POST-MERGE checkpoint should NOT try to commit and push to main. Instead, include plan updates in the feature branch before merge.
-
----
-
-## Git Hygiene
+**Source:** TAT Sprint 7
+**Rule:** All changes go through PRs. Include plan updates in feature branch.
 
 ### GL-17. Hard file-overlap gate before parallel agents
-**Status:** [active]
-**Source:** TAT Sprint 9 (parallel agents both modified SKILL.md, causing rebase conflicts and manual fixups)
-**Rule:** Before parallel delegation, list all files each task will touch. If ANY file appears in both lists, run sequentially. Shared files (SKILL.md, plan.md, lessons.md, install.sh) are red flags. The cost of a conflict is always higher than the cost of waiting.
+**Source:** TAT Sprint 9
+**Rule:** List files per task. Any overlap = run sequentially. Shared files are red flags.
 
 ### GL-18. Sync main before spawning worktree agents
-**Status:** [active]
-**Source:** TAT Sprint 9 (worktree agent based on stale main missed L4-L6 lessons, required manual fix)
-**Rule:** Merge all pending PRs that affect shared state before spawning worktree agents. A worktree snapshots main at spawn time — stale main means stale work that needs manual reconciliation.
+**Source:** TAT Sprint 9
+**Rule:** Merge pending PRs before spawning worktree agents. Stale main = stale work.
 
 ### GL-19. Never leave unstaged edits on a feature branch
-**Status:** [active]
-**Source:** TAT Sprint 9 (ad-hoc plan.md backlog edits blocked rebase with "cannot rebase: unstaged changes")
-**Rule:** Any edit on a feature branch must be committed or stashed immediately. Never leave unstaged changes — they block rebases, checkouts, and create confusion about what's intentional vs accidental.
+**Source:** TAT Sprint 9
+**Rule:** Commit or stash immediately. Unstaged changes block rebases.

@@ -1,41 +1,30 @@
 #!/bin/bash
-# tat-state.sh — Machine-readable project state manager for TAT
+# tat-state.sh — TAT task ID counter (v2)
 # Usage:
-#   tat-state.sh init               — Create .tat/state.json with IDLE defaults
-#   tat-state.sh get <field>        — Read a field (dot notation, e.g. last_action.type)
-#   tat-state.sh set <field> <val>  — Set a field value
-#   tat-state.sh transition <phase> — Set phase + update timestamps
-#   tat-state.sh show               — Pretty-print current state
+#   tat-state.sh init           — Create .tat/state.json with counter
+#   tat-state.sh get <field>    — Read a field
+#   tat-state.sh new-task-id    — Generate next TAT-XXX ID and increment counter
+#
+# v2: Phase tracking removed. Git is the source of truth for state.
+# Only the task ID counter is managed here.
 
 set -euo pipefail
-
-# --- Constants ---
-
-VALID_PHASES="IDLE PLAN CODE REVIEW SHIP POST-MERGE"
-
-# --- Resolve project root and state file ---
 
 PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 STATE_FILE="$PROJECT_ROOT/.tat/state.json"
 
-# --- Helpers ---
-
 _require_jq() {
   if ! command -v jq &>/dev/null; then
-    echo "[TAT] ERROR: jq is required but not installed. Install it with: brew install jq" >&2
+    echo "[TAT] ERROR: jq is required. Install: brew install jq" >&2
     exit 1
   fi
 }
 
 _require_state() {
   if [ ! -f "$STATE_FILE" ]; then
-    echo "[TAT] state.json not found — skipping (run tat-state.sh init to enable)" >&2
+    echo "[TAT] state.json not found — skipping (run tat-state.sh init)" >&2
     return 1
   fi
-}
-
-_now_iso8601() {
-  date -u +"%Y-%m-%dT%H:%M:%SZ"
 }
 
 _read_project_name() {
@@ -47,8 +36,6 @@ _read_project_name() {
   fi
 }
 
-# --- Subcommands ---
-
 cmd_init() {
   _require_jq
   local project_name
@@ -56,7 +43,6 @@ cmd_init() {
 
   if [ -f "$STATE_FILE" ]; then
     echo "[TAT] state.json already exists at $STATE_FILE"
-    echo "[TAT] Delete it manually if you want to reinitialize."
     exit 0
   fi
 
@@ -65,28 +51,13 @@ cmd_init() {
   jq -n \
     --arg project "$project_name" \
     '{
-      version: 1,
+      version: 2,
       project: $project,
-      phase: "IDLE",
-      epic: null,
-      task: null,
-      task_id: null,
-      branch: null,
-      last_action: {
-        type: null,
-        model: null,
-        timestamp: null
-      },
-      session: {
-        model: null,
-        started_at: null,
-        updated_at: null
-      },
       next_task_id: 1
     }' > "$STATE_FILE"
 
   echo "[TAT] Initialized $STATE_FILE"
-  echo "[TAT] Project: $project_name | Phase: IDLE"
+  echo "[TAT] Project: $project_name"
 }
 
 cmd_get() {
@@ -95,81 +66,10 @@ cmd_get() {
 
   if [ $# -lt 1 ]; then
     echo "[TAT] Usage: tat-state.sh get <field>" >&2
-    echo "[TAT] Example: tat-state.sh get last_action.type" >&2
     exit 1
   fi
 
-  local field="$1"
-  jq -r ".$field" "$STATE_FILE"
-}
-
-cmd_set() {
-  _require_jq
-  _require_state || return 0
-
-  if [ $# -lt 2 ]; then
-    echo "[TAT] Usage: tat-state.sh set <field> <value>" >&2
-    echo "[TAT] Example: tat-state.sh set branch tat/8/state-json" >&2
-    exit 1
-  fi
-
-  local field="$1"
-  local value="$2"
-
-  local updated
-  updated=$(jq --arg val "$value" ".$field = \$val" "$STATE_FILE")
-  echo "$updated" > "$STATE_FILE"
-  echo "[TAT] Set $field = $value"
-}
-
-cmd_transition() {
-  _require_jq
-  _require_state || return 0
-
-  if [ $# -lt 1 ]; then
-    echo "[TAT] Usage: tat-state.sh transition <phase>" >&2
-    echo "[TAT] Valid phases: $VALID_PHASES" >&2
-    exit 1
-  fi
-
-  local phase="$1"
-
-  # Validate phase
-  local valid=0
-  for p in $VALID_PHASES; do
-    if [ "$phase" = "$p" ]; then
-      valid=1
-      break
-    fi
-  done
-
-  if [ "$valid" -eq 0 ]; then
-    echo "[TAT] ERROR: Invalid phase '$phase'" >&2
-    echo "[TAT] Valid phases: $VALID_PHASES" >&2
-    exit 1
-  fi
-
-  local now
-  now=$(_now_iso8601)
-
-  local updated
-  updated=$(jq \
-    --arg phase "$phase" \
-    --arg ts "$now" \
-    '.phase = $phase
-    | .last_action.type = $phase
-    | .last_action.timestamp = $ts
-    | .session.updated_at = $ts' \
-    "$STATE_FILE")
-  echo "$updated" > "$STATE_FILE"
-
-  echo "[TAT] Transitioned to $phase at $now"
-}
-
-cmd_show() {
-  _require_jq
-  _require_state || return 0
-  jq '.' "$STATE_FILE"
+  jq -r ".$1" "$STATE_FILE"
 }
 
 cmd_new_task_id() {
@@ -182,7 +82,6 @@ cmd_new_task_id() {
   local formatted
   formatted=$(printf "TAT-%03d" "$next_id")
 
-  # Increment counter
   local updated
   updated=$(jq ".next_task_id = $(( next_id + 1 ))" "$STATE_FILE")
   echo "$updated" > "$STATE_FILE"
@@ -190,27 +89,20 @@ cmd_new_task_id() {
   echo "$formatted"
 }
 
-usage() {
-  cat >&2 <<'EOF'
-[TAT] tat-state.sh — TAT project state manager
-
-Usage:
-  tat-state.sh init               Create .tat/state.json with IDLE defaults
-  tat-state.sh get <field>        Read a field (dot notation: last_action.type)
-  tat-state.sh set <field> <val>  Set a field value
-  tat-state.sh transition <phase> Set phase + update timestamps
-  tat-state.sh show               Pretty-print current state
-  tat-state.sh new-task-id        Generate next TAT-XXX ID and increment counter
-
-Valid phases: IDLE PLAN CODE REVIEW SHIP POST-MERGE
-EOF
-  exit 1
-}
-
 # --- Dispatch ---
 
 if [ $# -lt 1 ]; then
-  usage
+  cat >&2 <<'EOF'
+[TAT] tat-state.sh — TAT task ID counter (v2)
+
+Usage:
+  tat-state.sh init           Create .tat/state.json
+  tat-state.sh get <field>    Read a field
+  tat-state.sh new-task-id    Generate next TAT-XXX ID
+
+Phase tracking removed in v2. Git is the source of truth.
+EOF
+  exit 1
 fi
 
 SUBCOMMAND="$1"
@@ -219,12 +111,13 @@ shift
 case "$SUBCOMMAND" in
   init)        cmd_init "$@" ;;
   get)         cmd_get "$@" ;;
-  set)         cmd_set "$@" ;;
-  transition)  cmd_transition "$@" ;;
-  show)        cmd_show "$@" ;;
   new-task-id) cmd_new_task_id "$@" ;;
+  # Deprecated v1 commands — graceful message
+  transition|set|show)
+    echo "[TAT] '$SUBCOMMAND' removed in v2. Phase tracking is gone — git is the source of truth." >&2
+    ;;
   *)
     echo "[TAT] ERROR: Unknown subcommand '$SUBCOMMAND'" >&2
-    usage
+    exit 1
     ;;
 esac

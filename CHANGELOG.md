@@ -6,6 +6,38 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2.0.0] — 2026-04-03
+
+### Breaking Changes
+- **Removed phase tracking** from `state.json` — git is the source of truth. Only `next_task_id` counter remains.
+- **Removed commands:** `/tat resume`, `/tat recap`, `/tat graduate`, `/tat sprint-start`, `/tat sprint-end`, `/tat wrapup`
+- **Removed files:** `tat-save-review.sh`, `tat-plan-review.sh`, `hooks/pre-push`
+- **Removed lesson lifecycle** (`[active]`/`[applied]` markers, graduation flow)
+- **Removed sprint structure** from plan format — replaced with prioritized task list
+- **Removed checkpoint maps** (33 steps per task → free-form working flow)
+
+### Added
+- **GPT background watcher** (`tat-gpt-watch.sh`): auto-reviews significant diffs, writes to `.tat/gpt.md`
+- **`/tat report`**: real-time observation capture to `~/.tinyaiteam/reports.md`
+- **`/tat review`**: on-demand deep GPT review
+- `tat-code-review.sh` now auto-saves GPT output to `.tat/gpt.md`
+- Lessons installed as single file `~/.tinyaiteam/lessons.md` (was `lessons/` directory)
+
+### Changed
+- **SKILL.md**: 1109 → ~260 lines (removed ceremony, kept value)
+- **TAT.md**: 282 → ~97 lines (core loop, model routing, file structure, rules)
+- **tat-state.sh**: 230 → ~110 lines (counter only, deprecated commands print message)
+- **lessons/library.md**: removed `**Status:**` markers from all 19 lessons
+- **install.sh**: deploys lessons.md as single file, removed pre-push hook reference
+- Plan format: no sprints/epics, just `## Tasks` and `## Done` tables
+- Decisions live inline in spec.md, not separate ADR files
+
+### Philosophy
+TAT v1 was a process framework. TAT v2 is a memory + review + coordination layer.
+Fewer steps, more signal. Git is the source of truth. GPT watches in background.
+
+---
+
 ## [0.5.1] — 2026-04-02
 
 ### Fixed
