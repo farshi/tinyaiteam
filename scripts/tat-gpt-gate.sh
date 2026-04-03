@@ -32,9 +32,17 @@ for line in reversed(lines):
 print(count)
 " "$SESSION_FILE" 2>/dev/null || echo "0")
 
-# --- Trigger GPT if threshold met ---
+# --- Trigger GPT if threshold met (with lock to prevent concurrent runs) ---
+
+LOCK_FILE="/tmp/tat-gpt-gate.lock"
 
 if [ "$TURNS_SINCE_GPT" -ge "$THRESHOLD" ]; then
+  # Prevent concurrent GPT calls from rapid hook fires
+  if [ -f "$LOCK_FILE" ]; then
+    LOCK_AGE=$(( $(date +%s) - $(cat "$LOCK_FILE") ))
+    [ "$LOCK_AGE" -lt 60 ] && exit 0  # Another call running within last minute
+  fi
+  date +%s > "$LOCK_FILE"
   SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
   "$SCRIPT_DIR/tat-gpt-watch.sh" "$PROJECT_ROOT" &
 fi
