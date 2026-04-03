@@ -68,11 +68,13 @@ Then stop.
 
 ## Review Command
 
-Force a deep GPT review of the current branch:
+Force a deep GPT review of the current branch. GPT sees both the conversation log and code diff:
 
 ```bash
-~/.tinyaiteam/scripts/tat-code-review.sh main --task <current-task-id>
+~/.tinyaiteam/scripts/tat-gpt-watch.sh
 ```
+
+This reads unseen conversation entries + diff, writes GPT responses back into `conversation.md`, and updates `.tat/gpt.md`.
 
 Show GPT output with `[GPT]` tag. Add your own opinion with `[OPUS]` tag.
 Then stop.
@@ -288,9 +290,54 @@ When Opus identifies a standard coding task:
 
 3. When Sonnet returns:
    - Self-review the diff
-   - Check `.tat/gpt.md` for background GPT notes
+   - Check `.tat/conversation.md` for GPT notes
    - Fix issues
    - Push, PR, merge
+
+---
+
+## Conversation Log (MANDATORY)
+
+Claude maintains `.tat/conversation.md` — a running log of the session with three voices: User, Claude, GPT. GPT reads this to stay aware of everything happening, not just code diffs.
+
+**After every user turn, append an entry:**
+```markdown
+### #<N> — <HH:MM>
+**User:** <what they asked — 1 line>
+**Claude:** <approach/decision taken — 1 line>
+```
+
+If the user corrected you, note it:
+```markdown
+### #<N> — <HH:MM>
+**User:** use quality model not 4o-mini
+**Claude:** Switched to gpt-5.2-codex. Previous approach was wrong.
+**Correction:** was using cheap model for background review
+```
+
+**`!!` Red flag:** If user prefixes with `!!`, mark the entry:
+```markdown
+### #<N> — <HH:MM> ⚠️
+**User:** !! why didn't GPT review fire?
+**Claude:** Rate limit was blocking. Investigating.
+```
+⚠️ entries trigger immediate GPT review (not waiting for commit).
+
+**GPT adds its line** after reviewing:
+```markdown
+### #17 — 15:30
+**User:** build the GPT watcher
+**Claude:** PostToolUse hook → bash script → writes to conversation.md
+**GPT:** Sound approach. Watch for shell escaping in diff payloads.
+```
+
+**Rules:**
+- One entry per user turn. Keep lines short (1 sentence each).
+- Use the next entry number (check last `### #` in the file).
+- GPT cursor tracked in `.tat/gpt-cursor` (just a number).
+- When file exceeds 100 entries, archive old ones to `.tat/archive/conversation-<date>.md`.
+- conversation.md is in `.gitignore` — it's session state, not code.
+- This is **mandatory**. Every user turn gets logged. No exceptions.
 
 ---
 
@@ -307,7 +354,7 @@ This is guidance, not a checkpoint map. Follow the spirit, not numbered steps.
 
 **After coding:**
 1. Self-review your diff (`git diff main...HEAD`). Check scope, bugs, completeness.
-2. Read `.tat/gpt.md` if GPT has reviewed in background.
+2. Read `.tat/conversation.md` for GPT's latest notes.
 3. For complex changes, run `/tat review` for deep GPT analysis.
 4. Mark task `[x]` in plan.md (on the branch, not main).
 5. Push, create PR, merge.
