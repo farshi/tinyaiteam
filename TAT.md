@@ -27,10 +27,13 @@ Opus delegates coding to Sonnet subagents. GPT watches in background. User is pr
 
 ```
 <project>/.tat/
-  spec.md         # What + why + constraints
-  plan.md         # Prioritized task list (top = next)
-  decisions.md    # Key decisions with rationale (append-only)
-  gpt.md          # GPT's latest review (auto-updated)
+  spec.md           # What + why + constraints
+  plan.md           # Prioritized task list (top = next)
+  decisions.md      # Key decisions with rationale (append-only)
+  session.md        # Live session log — User + Opus + GPT voices (gitignored)
+  today.md          # Daily scope — goals, mode, constraints (gitignored)
+  gpt.md            # GPT's latest review summary (auto-updated)
+  gpt-cursor        # Last session entry GPT has reviewed
 
 ~/.tinyaiteam/
   TAT.md          # This file
@@ -71,11 +74,17 @@ Prioritized task list. No sprints, no epics. Top = next.
 
 ## GPT Integration
 
-**Background (automatic):** Claude Code PostToolUse hook triggers GPT review on significant diffs. Output saved to `.tat/gpt.md`. No manual approval needed.
+**Three-Chair Model:** User (Product Owner) + GPT (Senior Advisor) + Opus (Orchestrator). Each has a role that changes by mode (Design/Planning/Coding/Review).
 
-**On-demand:** `/tat review` for deep review with gpt-5.2-codex.
+**Session log:** Claude appends to `.tat/session.md` after every user turn. All three voices. GPT sees intent, approach, corrections — not just final code.
 
-**Self-review first (always).** Claude reads its own diff before GPT sees it. This catches 80% of issues.
+**GPT briefing:** Every GPT call gets: MODE + TODAY + DECISIONS + SESSION + DIFF. GPT must ACK context before advising.
+
+**Background (automatic):** PostToolUse hook triggers GPT review on commits. GPT reads unseen session entries + diff, writes responses back into session.md.
+
+**`!!` red flag:** User prefixes with `!!` for urgent GPT attention.
+
+**Self-review first (always).** Claude reads its own diff before GPT sees it.
 
 ## Lessons
 

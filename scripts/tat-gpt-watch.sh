@@ -1,112 +1,176 @@
 #!/bin/bash
-# tat-gpt-watch.sh — Background GPT reviewer for TAT v2
-# Triggered by Claude Code PostToolUse hook after commits.
-# Sends spec + plan + diff to GPT (code review model), writes to .tat/gpt.md.
+# tat-gpt-watch.sh — GPT third-eye reviewer for TAT v2
+# Reads session.md + today.md + decisions.md + diff → sends briefing to GPT
+# GPT responses written back into session.md as [GPT] entries.
 #
 # Usage: tat-gpt-watch.sh [project-root]
-#
-# No rate limit — runs on every commit. Uses the configured code review model.
-# Filtered: only runs if diff > 30 lines or risky files touched.
 
-set -u  # No -e or pipefail: background script must not die on pipe breaks or GPT failures
+set -u
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CONFIG="$HOME/.tinyaiteam/config.sh"
 PROJECT_ROOT="${1:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 TAT_DIR="$PROJECT_ROOT/.tat"
+CURSOR_FILE="$TAT_DIR/gpt-cursor"
+SESSION_FILE="$TAT_DIR/session.md"
+TODAY_FILE="$TAT_DIR/today.md"
 
 # --- Validation ---
 
-if [ -z "${OPENAI_API_KEY:-}" ]; then
-  exit 0
-fi
-
-if [ ! -d "$TAT_DIR" ]; then
-  exit 0  # Not a TAT project
-fi
-
-# --- Check if diff is significant ---
+if [ -z "${OPENAI_API_KEY:-}" ]; then exit 0; fi
+if [ ! -d "$TAT_DIR" ]; then exit 0; fi
 
 cd "$PROJECT_ROOT"
 
 BRANCH=$(git branch --show-current 2>/dev/null || true)
-if [ -z "$BRANCH" ] || [ "$BRANCH" = "main" ]; then
-  exit 0
-fi
-
-DIFF_LINES=$(git diff main...HEAD 2>/dev/null | wc -l | tr -d ' ' || echo "0")
-
-# Check for risky files
-RISKY_FILES=$(git diff --name-only main...HEAD 2>/dev/null | grep -E '(auth|security|schema|migration|hook|deploy|\.env|config)' || true)
-
-if [ "$DIFF_LINES" -lt 30 ] && [ -z "$RISKY_FILES" ]; then
-  exit 0  # Not significant enough
-fi
+if [ -z "$BRANCH" ] || [ "$BRANCH" = "main" ]; then exit 0; fi
 
 # --- Load config + GPT caller ---
 
 [ -f "$CONFIG" ] && source "$CONFIG"
 source "$SCRIPT_DIR/tat-gpt.sh"
 
-# Use the configured code review model (same quality as manual review)
 MODEL="${TAT_CODE_REVIEW_MODEL:-gpt-5.2-codex}"
 export TAT_GPT_TIMEOUT=300
 
-# --- Gather context ---
+# --- Read cursor ---
 
+LAST_SEEN=0
+[ -f "$CURSOR_FILE" ] && LAST_SEEN=$(cat "$CURSOR_FILE" 2>/dev/null || echo "0")
+
+# --- Count unseen session entries ---
+
+UNSEEN_ENTRIES=""
+ENTRY_COUNT=0
+TOTAL_ENTRIES=0
+HAS_URGENT=false
+
+if [ -f "$SESSION_FILE" ]; then
+  # Get total line count and unseen lines (lines after cursor position)
+  TOTAL_ENTRIES=$(grep -c '^\- \[' "$SESSION_FILE" 2>/dev/null || echo "0")
+  ENTRY_COUNT=$(( TOTAL_ENTRIES - LAST_SEEN ))
+  [ "$ENTRY_COUNT" -lt 0 ] && ENTRY_COUNT=0
+
+  if [ "$ENTRY_COUNT" -gt 0 ]; then
+    # Get last N entries (unseen ones)
+    UNSEEN_ENTRIES=$(grep '^\- \[' "$SESSION_FILE" | tail -"$ENTRY_COUNT")
+    # Check for urgent (!!)
+    echo "$UNSEEN_ENTRIES" | grep -q '!!' && HAS_URGENT=true
+  fi
+fi
+
+# --- Check if there's a reason to call GPT ---
+
+DIFF_LINES=$(git diff main...HEAD 2>/dev/null | wc -l | tr -d ' ' || echo "0")
+RISKY_FILES=$(git diff --name-only main...HEAD 2>/dev/null | grep -E '(auth|security|schema|migration|hook|deploy|\.env|config)' || true)
+
+if [ "$ENTRY_COUNT" -eq 0 ] && [ "$DIFF_LINES" -lt 30 ] && [ -z "$RISKY_FILES" ]; then
+  exit 0
+fi
+
+# --- Build GPT briefing ---
+
+# Mode detection (from today.md or default)
+MODE="Coding"
+[ -f "$TODAY_FILE" ] && MODE=$(grep -m1 '^MODE:' "$TODAY_FILE" | sed 's/^MODE: *//' || echo "Coding")
+
+# Today's goals
+TODAY=""
+[ -f "$TODAY_FILE" ] && TODAY=$(cat "$TODAY_FILE")
+
+# Last 3 decisions
+DECISIONS=""
+[ -f "$TAT_DIR/decisions.md" ] && DECISIONS=$(tail -20 "$TAT_DIR/decisions.md")
+
+# Spec summary
 SPEC=""
-[ -f "$TAT_DIR/spec.md" ] && SPEC=$(head -20 "$TAT_DIR/spec.md")
+[ -f "$TAT_DIR/spec.md" ] && SPEC=$(head -15 "$TAT_DIR/spec.md")
 
-PLAN=""
-[ -f "$TAT_DIR/plan.md" ] && PLAN=$(grep -E '^\|.*\[ \]' "$TAT_DIR/plan.md" | head -5)
+# Last 10 session entries for context (even seen ones)
+SESSION_CONTEXT=""
+[ -f "$SESSION_FILE" ] && SESSION_CONTEXT=$(grep '^\- \[' "$SESSION_FILE" | tail -10)
 
-RECENT_COMMITS=$(git log --oneline -3 2>/dev/null || true)
-
-FILES_CHANGED=$(git diff --name-only main...HEAD 2>/dev/null || true)
-
-# Get first 300 lines of diff directly (no pipe break)
-TRIMMED_DIFF=$(git diff main...HEAD 2>/dev/null | head -300 || true)
+# Diff (only in Coding/Review mode)
+TRIMMED_DIFF=""
+FILES_CHANGED=""
+if [ "$MODE" = "Coding" ] || [ "$MODE" = "Review" ]; then
+  FILES_CHANGED=$(git diff --name-only main...HEAD 2>/dev/null || true)
+  TRIMMED_DIFF=$(git diff main...HEAD 2>/dev/null | head -300 || true)
+fi
 
 # --- Call GPT ---
 
-SYSTEM_PROMPT="You are a senior code reviewer. Flag real issues — security, bugs, logic errors, scope creep. Not style.
+SYSTEM_PROMPT="You are a senior engineer on a 3-person team. You are the ADVISOR.
+- User = Product Owner (intent, priorities, corrections)
+- You (GPT) = Senior Advisor (critique, alternatives, risk flags)
+- Opus = Orchestrator (decides, executes, writes code)
 
-Respond in this format:
-BLOCKERS: (things that will cause real problems — or 'none')
-- <issue>
+You are reviewing the latest session activity. Start with ACK:
+ACK: Task=<current task> | Mode=<mode> | Constraints=<key constraints>
 
-SUGGESTIONS: (improvements, not requirements)
-- <suggestion>
+Then respond based on mode:
+- Design: challenge ideas, suggest alternatives, ask clarifying questions
+- Planning: challenge estimates, flag risks, suggest priority changes
+- Coding: review diff for bugs, security, scope creep
+- Review: deep analysis of changes
 
-NOTES: (observations, context)
-- <note>
+If you see !! entries, address those FIRST.
+If current work contradicts a decision in DECISIONS, flag it.
+If you see user corrections, note the pattern.
 
-CONFIDENCE: HIGH / MEDIUM / LOW — <one line reason>
+Keep responses concise. One bullet per observation. Tag each: BLOCKER / SUGGESTION / NOTE."
 
-Be specific — name the file and line. No filler."
+USER_PROMPT="MODE: $MODE
 
-USER_PROMPT="Project: $SPEC
+PROJECT:
+$SPEC
 
-Current task: $PLAN
+TODAY:
+$TODAY
 
-Recent commits: $RECENT_COMMITS
+LAST DECISIONS:
+$DECISIONS
 
-Files changed: $FILES_CHANGED
+SESSION (last 10 entries):
+$SESSION_CONTEXT
 
-Diff ($DIFF_LINES lines, showing first 300):
+NEW ENTRIES (unseen by you):
+$UNSEEN_ENTRIES
+
+CODE CHANGES:
+Files: $FILES_CHANGED
+Diff ($DIFF_LINES lines, first 300):
 $TRIMMED_DIFF"
 
-tat_gpt_call "$MODEL" "$SYSTEM_PROMPT" "$USER_PROMPT" 2>/dev/null
+tat_gpt_call "$MODEL" "$SYSTEM_PROMPT" "$USER_PROMPT" 2>/dev/null || exit 0
 
-# --- Save output ---
+# --- Write GPT response into session.md ---
 
-TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+if [ -n "$REVIEW" ] && [ -f "$SESSION_FILE" ]; then
+  TIMESTAMP=$(date +"%H:%M")
+  # Append GPT's response as session entries
+  echo "$REVIEW" | while IFS= read -r line; do
+    [ -z "$line" ] && continue
+    # Skip the ACK line from being logged (it's metadata)
+    echo "$line" | grep -qi '^ACK:' && continue
+    echo "- [$TIMESTAMP][$MODE][GPT] $line" >> "$SESSION_FILE"
+  done
+fi
+
+# Update cursor
+echo "$TOTAL_ENTRIES" > "$CURSOR_FILE"
+
+# --- Also write gpt.md as quick-reference ---
+
+TIMESTAMP_FULL=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 cat > "$TAT_DIR/gpt.md" <<GPTEOF
 # GPT Review
 
-**Date:** $TIMESTAMP
+**Date:** $TIMESTAMP_FULL
 **Branch:** $BRANCH
 **Model:** $MODEL
+**Mode:** $MODE
+**Unseen entries:** $ENTRY_COUNT
 **Diff:** $DIFF_LINES lines
 
 $REVIEW

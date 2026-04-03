@@ -68,11 +68,13 @@ Then stop.
 
 ## Review Command
 
-Force a deep GPT review of the current branch:
+Force a deep GPT review of the current branch. GPT sees both the conversation log and code diff:
 
 ```bash
-~/.tinyaiteam/scripts/tat-code-review.sh main --task <current-task-id>
+~/.tinyaiteam/scripts/tat-gpt-watch.sh
 ```
+
+This reads unseen conversation entries + diff, writes GPT responses back into `conversation.md`, and updates `.tat/gpt.md`.
 
 Show GPT output with `[GPT]` tag. Add your own opinion with `[OPUS]` tag.
 Then stop.
@@ -288,17 +290,106 @@ When Opus identifies a standard coding task:
 
 3. When Sonnet returns:
    - Self-review the diff
-   - Check `.tat/gpt.md` for background GPT notes
+   - Check `.tat/session.md` for GPT notes
    - Fix issues
    - Push, PR, merge
 
 ---
 
+## Three-Chair Model
+
+TAT is three people working together:
+- **User** — Product Owner. Intent, priorities, corrections, final authority.
+- **GPT** — Senior Advisor. Critiques, alternatives, risk flags. Always watching.
+- **Opus** — Orchestrator. Decides, executes, manages flow, delegates to Sonnet.
+
+### Meeting Modes
+
+Opus detects the mode from context, or user declares it explicitly:
+
+| Mode | User's role | GPT's role | Opus's role |
+|------|-------------|-----------|-------------|
+| **Design** | Share vision, react | Suggest patterns, challenge | Capture decisions, ask questions |
+| **Planning** | Prioritize, scope | Challenge estimates, flag risks | Break into tasks, sequence |
+| **Coding** | Approve/correct | Review diffs, catch bugs | Write code, self-review |
+| **Review** | Final sign-off | Deep analysis | Present summary |
+
+---
+
+## Session Log (MANDATORY)
+
+Claude maintains `.tat/session.md` — a timestamped log of the session. All three voices. This is how GPT stays in the loop.
+
+**After every user turn, append a bullet:**
+```
+- [HH:MM][Mode][Speaker] what happened — 1 line
+```
+
+**Examples:**
+```
+- [14:30][Design][User] wants GPT to see conversations, not just diffs
+- [14:32][Design][Opus] proposed session.md with three voices
+- [14:35][Design][GPT] sound approach, add ack mechanism for continuity
+- [14:40][Design][User] !! what about brainstorming, don't lose that
+- [14:42][Decision] keep /brainstorm as explicit 3-round flow
+```
+
+**Rules:**
+- One bullet per significant action. Keep each line short.
+- Tag with mode and speaker: `[User]`, `[Opus]`, `[Sonnet]`, `[GPT]`, `[Decision]`
+- `[Decision]` entries also go into decisions.md.
+- `!!` marks urgent — GPT addresses these first.
+- When file exceeds 400 lines, archive older entries to `.tat/archive/session-<date>.md` and add a summary block at top.
+- session.md is in `.gitignore` — it's session state, not code.
+- **This is mandatory.** Every user turn gets logged.
+
+---
+
+## Today File
+
+At session start, Opus creates or updates `.tat/today.md`:
+
+```markdown
+DATE: 2026-04-03
+MODE: Planning
+
+GOALS:
+- TAT-111: Session log + GPT as third team member
+
+SCOPE:
+- SKILL.md, tat-gpt-watch.sh, TAT.md
+
+OUT OF SCOPE:
+- Anything not tied to today's goals
+```
+
+User confirms or adjusts. GPT sees this on every call. today.md is in `.gitignore`.
+
+---
+
+## GPT Briefing
+
+Every GPT call automatically gets this header:
+
+```
+MODE: <Design|Planning|Coding|Review>
+TODAY: <from today.md>
+LAST DECISIONS: <last 3 from decisions.md>
+SESSION: <last 10 entries from session.md>
+DIFF: <if coding/review mode>
+```
+
+GPT must start every response with an acknowledgment:
+```
+ACK: Task=<one-line> | Constraints=<key constraints>
+```
+This forces GPT to prove it understands the context before advising.
+
+---
+
 ## Working Flow
 
-This is guidance, not a checkpoint map. Follow the spirit, not numbered steps.
-
-**Before coding:** Know what task you're doing and which files you'll touch.
+**Before coding:** Know what task you're doing. Confirm today.md scope.
 
 **While coding:** Stay in scope. Off-topic ideas → append to bottom of plan.md:
 ```
@@ -306,8 +397,8 @@ This is guidance, not a checkpoint map. Follow the spirit, not numbered steps.
 ```
 
 **After coding:**
-1. Self-review your diff (`git diff main...HEAD`). Check scope, bugs, completeness.
-2. Read `.tat/gpt.md` if GPT has reviewed in background.
+1. Self-review your diff. Check scope, bugs, completeness.
+2. Read `.tat/session.md` for GPT's latest notes.
 3. For complex changes, run `/tat review` for deep GPT analysis.
 4. Mark task `[x]` in plan.md (on the branch, not main).
 5. Push, create PR, merge.
