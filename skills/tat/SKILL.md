@@ -35,17 +35,25 @@ Parse the user's input:
 
 Read `.tat/plan.md` and `.tat/spec.md`, then display:
 
+```bash
+git tag --sort=-v:refname | head -1  # current version
+```
+
 ```
 [TAT] Status: <project name from spec>
+[TAT] Version: <latest git tag> → <next version from plan.md header>
 [TAT] Model: <current model> (Role: <Orchestrator|Coder>)
 [TAT] Branch: <current git branch>
 ──────────────────────────────
-[TAT] Current task: <first [ ] task>
+[TAT] Current task: <first [ ] task from next version>
 [TAT] Next up: <the task after current>
 ──────────────────────────────
-[TAT] Progress: ██████░░░░ 5/8 done
+[TAT] Progress: ██████░░░░ 3/5 done (v2.2.0)
+[TAT] Backlog: <N tasks beyond next version>
 [TAT] Open PRs: <list or "none">
 ```
+
+Version is derived from git tags. If no tags exist, show `unversioned → v0.1.0`.
 
 Then stop.
 
@@ -256,11 +264,19 @@ From your system prompt:
 
 ### Step 3: Show current position
 
+```bash
+git tag --sort=-v:refname | head -1  # current version
+# Parse "## Next: vX.Y.Z" from plan.md for target version
+```
+
 ```
 [TAT] Project: <name from spec>
-[TAT] Current task: <first [ ] task from plan.md>
-[TAT] Progress: <X of Y done>
+[TAT] Version: <current tag> → <next from plan.md>
+[TAT] Current task: <first [ ] task from next version section>
+[TAT] Progress: <X of Y done> (vX.Y.Z)
 ```
+
+If no git tags exist, show `unversioned → v0.1.0`.
 
 ### Step 4: Start working
 
@@ -351,13 +367,14 @@ At session start, Opus creates or updates `.tat/today.md`:
 
 ```markdown
 DATE: 2026-04-03
+TARGET: v2.2.0
 MODE: Planning
 
 GOALS:
-- TAT-111: Session log + GPT as third team member
+- TAT-112: Version-based planning
 
 SCOPE:
-- SKILL.md, tat-gpt-watch.sh, TAT.md
+- SKILL.md, TAT.md, plan.md
 
 OUT OF SCOPE:
 - Anything not tied to today's goals

@@ -46,24 +46,31 @@ Opus delegates coding to Sonnet subagents. GPT watches in background. User is pr
 
 ## Plan Format
 
-Prioritized task list. No sprints, no epics. Top = next.
+Tasks grouped by version milestone. Current version = latest git tag. Next version = plan header.
 
 ```markdown
-## Tasks
+## Next: v2.2.0
 | ID | Task | Status |
 |----|------|--------|
-| TAT-110 | GPT background watcher | [ ] |
-| TAT-111 | Next thing | [ ] |
+| TAT-112 | Version-based planning | [ ] |
+| TAT-105 | Optimize GPT review payloads | [ ] |
+
+## Backlog
+| ID | Task | Status |
+|----|------|--------|
+| TAT-068 | Skill adapter hooks | [ ] |
 
 ## Done
 | ID | Task | Status |
 |----|------|--------|
-| TAT-109 | GPT review fix | [x] |
+| TAT-111 | Task-ID branch naming | [x] |
 ```
 
-- **Task IDs**: `TAT-XXX`, auto-generated via `tat-state.sh new-task-id`
+- **Versions**: derived from git tags. Plan header declares next target.
+- **Task IDs**: `<PREFIX>-XXX`, auto-generated via `tat-state.sh new-task-id`
 - **Status**: `[x]` done, `[ ]` todo
 - Mark tasks `[x]` on the feature branch before merge
+- When all tasks in a version are done → bump VERSION, update CHANGELOG, tag
 
 ## Git Workflow
 
