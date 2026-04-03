@@ -111,7 +111,7 @@ Each checkpoint is a printed checklist that must be completed before moving on. 
 
 [TAT] This is a standard coding task. Delegating to Sonnet →
 [TAT] Task: Add password reset flow
-[TAT] Branch: tat/3/password-reset
+[TAT] Branch: tat/tat-042-password-reset
 [TAT] Files to change: src/auth/reset.ts, src/routes/auth.ts
 [TAT] Guardrails: don't touch existing login flow
 
@@ -185,7 +185,7 @@ cd ~/your-project
 ## Git Workflow
 
 - One task = one branch = one PR
-- Branch naming: `tat/<epic>/<task-name>`
+- Branch naming: `tat/<TASK-ID>-<slug>` (e.g. `tat/tat-101-update-spec`)
 - Conventional commits enforced via git hooks
 - GPT reviews every PR before merge
 - Plan updates committed to main after each merge

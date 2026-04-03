@@ -1,8 +1,30 @@
 #!/bin/bash
-# TAT pre-commit hook — blocks non-plan commits on main
+# TAT pre-commit hook — blocks non-plan commits on main + branch name check
 # Install: cp hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
 
 BRANCH=$(git branch --show-current)
+
+# --- Branch naming check (warning only) ---
+# Valid: tat/<TASK-ID>-<slug>, docs/<slug>, fix/<slug>, chore/<slug>
+if [ "$BRANCH" != "main" ]; then
+  VALID_BRANCH=false
+  case "$BRANCH" in
+    tat/[a-zA-Z]*-[0-9]*) VALID_BRANCH=true ;;  # tat/tat-101-foo, tat/om-080-bar
+    docs/*|fix/*|chore/*) VALID_BRANCH=true ;;    # non-task branches
+  esac
+
+  if [ "$VALID_BRANCH" = false ]; then
+    echo ""
+    echo "[TAT] Warning: branch name does not follow convention."
+    echo ""
+    echo "  Expected: tat/<TASK-ID>-<slug>"
+    echo "  Example:  tat/tat-101-update-spec"
+    echo "  Also OK:  docs/<slug>, fix/<slug>, chore/<slug>"
+    echo ""
+    echo "  Got: $BRANCH"
+    echo ""
+  fi
+fi
 
 if [ "$BRANCH" = "main" ]; then
   # Check staged files — only .tat/ workflow metadata is allowed on main
@@ -32,7 +54,7 @@ if [ "$BRANCH" = "main" ]; then
   echo "  Staged files:"
   echo "$STAGED" | sed 's/^/    /'
   echo ""
-  echo "  Create a branch:  git checkout -b tat/<epic>/<task-name>"
+  echo "  Create a branch:  git checkout -b tat/<TASK-ID>-<slug>"
   echo "  Override:          TAT_FORCE=1 git commit ..."
   echo ""
 
