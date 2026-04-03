@@ -28,13 +28,12 @@ if [ -d "$SCRIPT_DIR/scripts" ]; then
   echo "  ✓ scripts → ~/.tinyaiteam/scripts/"
 fi
 
-# Lessons library (global lessons loaded by sprint-start)
+# Lessons library (global — loaded at /tat activation)
 if [ -d "$SCRIPT_DIR/lessons" ]; then
-  mkdir -p ~/.tinyaiteam/lessons
   for lesson_file in "$SCRIPT_DIR/lessons/"*.md; do
-    [ -f "$lesson_file" ] && cp "$lesson_file" ~/.tinyaiteam/lessons/
+    [ -f "$lesson_file" ] && cp "$lesson_file" ~/.tinyaiteam/lessons.md
   done
-  echo "  ✓ lessons → ~/.tinyaiteam/lessons/"
+  echo "  ✓ lessons → ~/.tinyaiteam/lessons.md"
 fi
 
 # Git hooks (available for project setup via /tat init)
@@ -65,11 +64,14 @@ if [ -d "$SCRIPT_DIR/commands" ]; then
   echo "  ✓ commands → ~/.claude/commands/"
 fi
 
+# Create reports file if it doesn't exist
+touch ~/.tinyaiteam/reports.md
+
 echo ""
 echo "TAT installed. Use /tat in any project to start."
 echo ""
 echo "To add git hooks to a project, run from the project root:"
-echo "  cp $SCRIPT_DIR/hooks/* .git/hooks/ && chmod +x .git/hooks/commit-msg .git/hooks/pre-push"
+echo "  cp ~/.tinyaiteam/hooks/pre-commit ~/.tinyaiteam/hooks/commit-msg .git/hooks/ && chmod +x .git/hooks/pre-commit .git/hooks/commit-msg"
 
 if [ -z "$OPENAI_API_KEY" ]; then
   echo ""

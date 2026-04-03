@@ -1,11 +1,10 @@
 ---
 name: tat
-version: 0.5.0
+version: 2.0.0
 description: |
-  Tiny AI Team — structured multi-model workflow. Enters TAT mode: reads project
-  state, enforces SSD loop (Spec → Subtask → Do), routes by model role, triggers
-  GPT reviews, tags guidance with source. Use when asked to "/tat", "start tat",
-  or "/tat status".
+  Tiny AI Team v2 — lightweight orchestration for Claude Code. Loads project
+  context, picks next task, coordinates Opus/Sonnet/GPT. GPT reviews in
+  background. Use when asked to "/tat", "/tat status", or "/tat report".
 allowed-tools:
   - Bash
   - Read
@@ -17,61 +16,47 @@ allowed-tools:
   - AskUserQuestion
 ---
 
-# /tat — Tiny AI Team
+# /tat — Tiny AI Team v2
 
 ## Subcommand Detection
 
 Parse the user's input:
-- `/tat` or `/tat` with no arguments → Full activation (Step 1 onwards)
-- `/tat status` → Jump to **Status Command** below, skip activation steps
-- `/tat init` → Jump to **Init Flow** below (explicit project setup)
-- `/tat resume` → Jump to **Resume Command** below (pick up where you left off)
-- `/tat recap` → Jump to **Recap Command** below (summarize last session)
-- `/tat sprint-start` → Jump to **Sprint Start Command** below (readiness gate for new sprint)
-- `/tat sprint-end` → Jump to **Sprint End Command** below (retro gate after sprint)
-- `/tat graduate` → Jump to **Graduate Command** below
-- `/tat wrapup` → Jump to **Wrapup Command** below
-- `/tat replan` → Jump to **Replan Command** below
-- `/tat version` → Jump to **Version Command** below
+- `/tat` or no arguments → Full activation
+- `/tat status` → **Status Command**
+- `/tat init` → **Init Flow**
+- `/tat review` → **Review Command**
+- `/tat report` → **Report Command**
+- `/tat replan` → **Replan Command**
+- `/tat version` → **Version Command**
 
 ---
 
 ## Status Command
 
-When the user says `/tat status`, show a compact project dashboard. No activation, no mode change — just info.
-
 Read `.tat/plan.md` and `.tat/spec.md`, then display:
 
 ```
 [TAT] Status: <project name from spec>
-[TAT] Model: <current model> (Role: <Planner|Coder>)
+[TAT] Model: <current model> (Role: <Orchestrator|Coder>)
 [TAT] Branch: <current git branch>
 ──────────────────────────────
-[TAT] Sprint: <current sprint name>
-[TAT] Current task: <first [~] or [ ] task>
+[TAT] Current task: <first [ ] task>
 [TAT] Next up: <the task after current>
 ──────────────────────────────
-[TAT] Sprint progress:
-  Sprint N: ██████░░░░ 5/8 done  ← current
-──────────────────────────────
-[TAT] Completed sprints: <N>
-[TAT] Backlog: <N items>
+[TAT] Progress: ██████░░░░ 5/8 done
 [TAT] Open PRs: <list or "none">
 ```
 
-Then stop. Do not enter TAT mode or start the SSD loop.
+Then stop.
 
 ---
 
 ## Version Command
 
-When the user says `/tat version`, show the installed version. No activation, no mode change.
-
 ```bash
 cat ~/.tinyaiteam/VERSION 2>/dev/null || echo "unknown"
 ```
 
-Display:
 ```
 [TAT] v<version>
 [TAT] Working directory: <pwd>
@@ -81,1029 +66,255 @@ Then stop.
 
 ---
 
-## Resume Command
+## Review Command
 
-When the user says `/tat resume`, restore the session from `.tat/state.json`. No fresh activation — jump straight back to where you were.
+Force a deep GPT review of the current branch:
 
 ```bash
-PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
-cat "$PROJECT_ROOT/.tat/state.json" 2>/dev/null || echo "NO_STATE"
+~/.tinyaiteam/scripts/tat-code-review.sh main --task <current-task-id>
 ```
 
-If `NO_STATE` or state.json doesn't exist:
-```
-[TAT] No state.json found. Use /tat to start a new session.
-```
+Show GPT output with `[GPT]` tag. Add your own opinion with `[OPUS]` tag.
 Then stop.
 
-If `phase` is `IDLE`:
-```
-[TAT] No active task. Use /tat to pick the next task.
-```
-Then stop.
-
-If `phase` is anything else, show the resume dashboard:
-```
-[TAT] ▶ Resuming session
-[TAT] Task: <task_id> — <task>
-[TAT] Epic: <epic>
-[TAT] Phase: <phase>
-[TAT] Branch: <branch>
-[TAT] Last action: <last_action.timestamp>
-[TAT] Model: <session.model>
-──────────────────────────────
-[TAT] Pick up from <phase> checkpoint?
-```
-
-Then:
-1. Load TAT rules (Step 1) and detect model (Step 2) — same as full activation
-2. Verify you're on the correct branch: `git branch --show-current` must match `state.json branch`
-   - If on wrong branch: `[TAT] ⚠ Expected branch <branch> but on <current>. Switch first: git checkout <branch>`
-3. Enter TAT mode and jump directly to the checkpoint map for the stored phase
-4. Print the checkpoint map for that phase and continue from where you left off
-
-This lets a new session pick up mid-task without re-reading the full plan or re-running earlier checkpoints.
-
 ---
 
-## Recap Command
+## Report Command
 
-When the user says `/tat recap`, show a summary of the last session's work. Read-only — no mode change.
+When the user says `/tat report <text>` or Claude spots a pattern/bug worth capturing:
 
-1. Read `.tat/state.json`:
-   ```bash
-   PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
-   cat "$PROJECT_ROOT/.tat/state.json" 2>/dev/null || echo "NO_STATE"
-   ```
-
-   If `NO_STATE`: `[TAT] No state.json found. Nothing to recap.` Then stop.
-
-2. Get recent commits using the session timestamp as anchor:
-   ```bash
-   # Use last_action.timestamp from state.json, or fall back to last 24h
-   git log --oneline --since="<last_action.timestamp or 24 hours ago>" main
-   ```
-
-3. Get recently merged PRs:
-   ```bash
-   gh pr list --state merged --limit 10 --json number,title,mergedAt --jq '.[] | select(.mergedAt > "<timestamp>") | "#\(.number) \(.title)"'
-   ```
-
-4. Read `plan.md` to find the next open task.
-
-5. Display the recap:
-   ```
-   [TAT] ▶ Session Recap
-   [TAT] Last task: <task_id> — <task>
-   [TAT] Phase: <phase>
-   [TAT] Model: <session.model>
-   [TAT] Session time: <last_action.timestamp>
-   ──────────────────────────────
-   [TAT] Recent commits on main:
-     <hash> <message>
-     <hash> <message>
-   ──────────────────────────────
-   [TAT] PRs merged: <list or "none">
-   ──────────────────────────────
-   [TAT] Next task: <next [ ] task from plan.md>
-   ```
-
-Then stop. Do not enter TAT mode or start the SSD loop.
-
----
-
-## Sprint Start Command
-
-When the user says `/tat sprint-start`, run the sprint readiness gate. This ensures decisions, lessons, and spec alignment are loaded before any coding begins.
-
-**This is also auto-prompted** at POST-MERGE when all tasks in the current sprint are complete.
-
-### Sprint Start Checkpoint
-
-```
-[TAT] ▶ SPRINT START checkpoint:
-  [ ] 0. Replan check: warn if backlog not replanned since last sprint
-  [ ] 1. Read spec.md — confirm sprint aligns with project goals
-  [ ] 2. Read .tat/decisions/ — load all ADRs
-  [ ] 3. Read .tat/lessons.md — load project lessons (if exists)
-  [ ] 3b. Read global lessons library — load ~/.tinyaiteam/lessons/library.md
-  [ ] 4. Identify relevant constraints for this sprint's tasks
-  [ ] 5. Write sprint.md with relevant constraints section
-  [ ] 6. ACKNOWLEDGE GATE: list constraints, confirm before proceeding
-  [ ] 7. Define sprint goal, scope, risks, definition of done
-  [ ] 8. User approves sprint plan
+```bash
+PROJECT_NAME=$(basename "$(git rev-parse --show-toplevel 2>/dev/null || pwd)")
+DATE=$(date -u +"%Y-%m-%d")
+echo -e "\n### $DATE — $PROJECT_NAME\n$TEXT\n" >> ~/.tinyaiteam/reports.md
 ```
 
-**Step-by-step:**
+Print: `[TAT] Noted.`
 
-0. **Replan check** — Check if the backlog has been replanned since the last sprint:
-   ```bash
-   # Check last replan timestamp from state.json or .tat/replan-log.md
-   cat .tat/replan-log.md 2>/dev/null | tail -1 || echo "NEVER_REPLANNED"
-   ```
-   If `NEVER_REPLANNED` or last replan was before the previous sprint:
-   ```
-   [TAT] ⚠ Backlog not replanned since last sprint. Run /tat replan first? (y/skip)
-   ```
-   If user says skip, proceed. If user says y, run `/tat replan` then return here.
-
-1. **Read spec.md** — Remind yourself what the project IS. Check: does this sprint serve the spec's goals?
-
-2. **Read decisions/** — Load every ADR. These are durable constraints.
-   ```bash
-   for f in .tat/decisions/*.md; do cat "$f"; done
-   ```
-
-3. **Read project lessons** — Load ACTIVE lessons only. Skip [applied] lessons (they've been graduated into code/config).
-   ```bash
-   cat .tat/lessons.md 2>/dev/null || echo "NO_LESSONS"
-   ```
-   If `NO_LESSONS`: skip — lessons will be created by the first sprint-end.
-   When processing: only include lessons with `**Status:** [active]` in the constraints list. Lessons marked `[applied]` are acknowledged but not loaded as active constraints.
-
-3b. **Read global lessons library** — Load ACTIVE global lessons only.
-   ```bash
-   cat ~/.tinyaiteam/lessons/library.md 2>/dev/null || echo "NO_GLOBAL_LESSONS"
-   ```
-   If `NO_GLOBAL_LESSONS`: skip — run `install.sh` from the tinyaiteam repo to install the library.
-   Same filtering: only `[active]` lessons become sprint constraints. Global lessons (GL-01 through GL-XX) complement project-local lessons. Both are loaded as constraints.
-
-4. **Identify relevant constraints** — For each sprint task, check which ADRs and lessons apply. Don't list everything — only what's relevant to THIS sprint's work.
-   Filter: only [active] lessons are considered. [applied] lessons have been graduated and don't need enforcement.
-
-5. **Write sprint.md** — Create/overwrite `.tat/sprint.md`:
-   ```markdown
-   # Sprint N — <name>
-
-   **Goal:** <one sentence>
-   **Date:** <today>
-
-   ## Relevant Constraints
-   - ADR-001: <title> — <why it matters this sprint>
-   - Lesson 3: <title> — <why it matters this sprint>
-
-   ## Scope
-   | ID | Task | Epic |
-   |----|------|------|
-   | TAT-069 | ... | E12 |
-
-   ## Out of Scope
-   - <what we're NOT doing>
-
-   ## Risks
-   1. <risk and mitigation>
-
-   ## Definition of Done
-   - All tasks shipped with review artifacts
-   - install.sh works after all changes
-   - <sprint-specific criteria>
-   ```
-
-6. **ACKNOWLEDGE GATE** — Print relevant constraints and confirm:
-   ```
-   [TAT] ▶ Constraints for Sprint N:
-     - ADR-001: <constraint>
-     - Lesson 3: <constraint>
-   [TAT] Acknowledged. These constraints will be followed throughout this sprint.
-   ```
-   **This is mandatory.** Do not skip the acknowledgment.
-
-7. **Define sprint goal, scope, risks, DoD** — Fill in the sprint.md template.
-
-8. **User approves** — Show the sprint.md summary, get user confirmation.
-
-After approval, enter TAT mode and begin the first task.
-
----
-
-## Sprint End Command
-
-When the user says `/tat sprint-end`, run the sprint retro gate. This captures what happened, what was learned, and feeds lessons back into the next sprint-start.
-
-**This is also auto-prompted** at POST-MERGE when all tasks in the current sprint are complete (step 7).
-
-### Sprint End Checkpoint
-
-```
-[TAT] ▶ SPRINT END checkpoint:
-  [ ] 1. Outcome: list what shipped this sprint (PRs, tasks marked [x])
-  [ ] 2. Slipped: what didn't ship, and why?
-  [ ] 3. Quality: any bugs, review misses, or regressions?
-  [ ] 4. Spec drift: did implementation diverge from spec? Update spec if needed.
-  [ ] 5. Lessons: capture 1-3 lessons → append to .tat/lessons.md
-  [ ] 6. Process: any workflow changes needed? Note for next sprint.
-  [ ] 7. Write retro summary → append to .tat/retro.md
-  [ ] 8. User confirms retro complete
-```
-
-**Step-by-step:**
-
-1. **Outcome** — Read plan.md, list all tasks that moved to `[x]` this sprint. Cross-reference with merged PRs:
-   ```bash
-   gh pr list --state merged --limit 20 --json number,title,mergedAt
-   ```
-
-2. **Slipped** — Any tasks still `[ ]` in the current sprint? Why didn't they ship? Should they carry over or be dropped?
-
-3. **Quality** — Review the sprint's review artifacts (`.tat/reviews/`). Did GPT flag anything that was ignored? Any post-merge issues?
-
-4. **Spec drift** — Re-read spec.md. Does what we built still match what we said we'd build? If not:
-   - Minor drift: note it
-   - Major drift: update spec.md to match reality, or flag for course correction
-
-5. **Lessons** — The most important step. Capture 1-3 lessons in `.tat/lessons.md`:
-   ```markdown
-   ### L<N>. <Title>
-   **Status:** [active]
-   **When:** Sprint <N> retro
-   **Source:** <user | GPT | self-review | bug>
-   **Lesson:** <what we learned>
-   **Rule:** <concrete rule for future sprints>
-   ```
-   Good lessons become constraints that sprint-start loads. Bad sprints produce the best lessons.
-   New lessons always start as `[active]`. Use `/tat graduate` when a lesson has been encoded in code or become habit.
-
-6. **Process** — Did any TAT workflow steps slow things down? Were checkpoints too strict or too loose? Note changes but don't implement them during retro — that's a task for the next sprint.
-
-7. **Write retro** — Append to `.tat/retro.md`:
-   ```markdown
-   ## Sprint N — <name>
-   **Date:** <today>
-   **Goal:** <was it met? yes/no>
-
-   ### Shipped
-   - TAT-069: /tat sprint-start (#28)
-   - TAT-071: pre-push tag fix (#29)
-
-   ### Slipped
-   - <none, or list with reasons>
-
-   ### Lessons
-   - L1: <title>
-   - L2: <title>
-
-   ### Process Notes
-   - <any workflow observations>
-   ```
-
-8. **User confirms** — Show the retro summary. User approves. Sprint is officially closed.
-
-After sprint-end, prompt `/tat sprint-start` for the next sprint.
-
----
-
-## Graduate Command
-
-When the user says `/tat graduate` or `/tat graduate L3` or `/tat graduate GL-05`:
-
-1. If a specific lesson ID is given (e.g., `L3` or `GL-05`), graduate that lesson directly.
-2. If no ID given, show all [active] lessons and ask which to graduate.
-
-**Graduation process:**
-1. Find the lesson in the appropriate file (`.tat/lessons.md` for L-series, `lessons/library.md` for GL-series)
-2. Change `**Status:** [active]` to `**Status:** [applied]`
-3. Add a `**Graduated:** <date> — <reason>` field after Status
-4. Commit the change:
-   ```
-   docs(lessons): graduate <ID> — <title>
-   ```
-5. Print:
-   ```
-   [TAT] ✓ Graduated <ID>: <title>
-   [TAT] Status: [active] → [applied]
-   [TAT] This lesson will no longer be loaded as a sprint constraint.
-   [TAT] The rule lives on in: <where it's encoded — code, hook, habit, etc.>
-   ```
-
-**When to graduate a lesson:**
-- The rule has been encoded in code (hook, script, config)
-- The rule has become team habit (no violations in 3+ sprints)
-- The lesson is no longer relevant (project changed)
-
-**Guard:** Don't graduate a lesson that's been violated in the current sprint. Check `.tat/retro.md` for recent mentions.
-
-Then stop. Do not enter TAT mode.
-
----
-
-## Wrapup Command
-
-When the user says `/tat wrapup`, run the session hygiene gate. This ensures no loose ends before ending the session.
-
-```
-[TAT] ▶ SESSION WRAPUP:
-  [ ] 1. Loose ends: unstaged changes, open branches, unmerged PRs
-  [ ] 2. Session summary: PRs merged, tasks completed
-  [ ] 3. State check: state.json → IDLE, timestamp updated
-  [ ] 4. Install check: run install.sh if skills/scripts changed
-  [ ] 5. Next session: show next task + model routing
-  [ ] 6. Lesson prompt: anything worth capturing?
-```
-
-**Step-by-step:**
-
-1. **Loose ends** — Check for anything that'll bite next session:
-   ```bash
-   git status --short
-   git branch --list 'tat/*' 'fix/*' 'docs/*'
-   gh pr list --state open --json number,title --jq '.[] | "#\(.number) \(.title)"'
-   git log origin/main..HEAD --oneline 2>/dev/null
-   ```
-   Flag: unstaged changes, unpushed commits, open PRs, stale branches.
-   ```
-   [TAT] Loose ends:
-     ✓ Working tree clean (or ⚠ unstaged changes in <files>)
-     ✓ No open PRs (or ⚠ open: #45 <title>)
-     ✓ No unpushed commits (or ⚠ 2 unpushed commits on <branch>)
-     ✓ No stale branches (or ⚠ branches: tat/16/version-awareness)
-   ```
-
-2. **Session summary** — One-line count only (use `/tat recap` next session for details):
-   ```bash
-   MERGED=$(git log --oneline --since="8 hours ago" main | wc -l | tr -d ' ')
-   ```
-   ```
-   [TAT] Session: <N> commits landed on main
-   ```
-
-3. **State check** — Ensure state.json is clean:
-   ```bash
-   ~/.tinyaiteam/scripts/tat-state.sh transition IDLE 2>/dev/null
-   ```
-   If phase was not IDLE, warn: `[TAT] ⚠ Session ended mid-task (<phase>). Use /tat resume next time.`
-
-4. **Install check** — If any skills, scripts, or config changed this session:
-   ```bash
-   git diff --name-only $(git log --format=%H --since="8 hours ago" main | tail -1)..HEAD -- skills/ scripts/ config.sh install.sh 2>/dev/null
-   ```
-   If files changed: `[TAT] Skills/scripts changed. Running install.sh...` then run it.
-   If nothing changed: skip silently.
-
-5. **Next session** — Show what's coming:
-   ```
-   [TAT] Next task: <first [ ] task from plan.md>
-   [TAT] Model routing: <Opus or Sonnet recommendation>
-   ```
-
-6. **Lesson prompt** — Only if something notable happened:
-   ```
-   [TAT] Anything worth capturing as a lesson? (skip if nothing notable)
-   ```
-   If user provides one, append to `.tat/lessons.md` with `[active]` status.
-   If user says skip, proceed.
-
-Print final summary:
-```
-[TAT] ✓ Session wrapped up cleanly.
-[TAT] Next time: /tat or /tat resume
-```
-
-Then stop.
+Then stop. No ceremony. Claude should also call this proactively when hitting errors or spotting patterns during work.
 
 ---
 
 ## Replan Command
 
-When the user says `/tat replan`, run backlog hygiene. This deduplicates, clusters, and reprioritizes backlog tasks with GPT advisory.
+When the user says `/tat replan`:
 
-```
-[TAT] ▶ REPLAN checkpoint:
-  [ ] 1. Load backlog + current sprint from plan.md
-  [ ] 2. Load ADRs and lessons for context
-  [ ] 3. Detect duplicates and overlapping tasks
-  [ ] 4. Cluster related items and suggest merges
-  [ ] 5. Validate stale items
-  [ ] 6. GPT advisory: reprioritize with context
-  [ ] 7. Present changes to user
-  [ ] 8. Apply approved changes to plan.md
-  [ ] 9. Log replan to .tat/replan-log.md
-```
+1. Read plan.md and spec.md
+2. Send to GPT via `ask-gpt.sh`:
+   ```
+   "Here's the current task list and spec. Suggest priority order.
+   Consider: value to users, dependencies, effort. Be opinionated."
+   ```
+3. Show GPT's prioritization with `[GPT]` tag
+4. Opus adds opinion with `[OPUS]` tag
+5. User approves changes
+6. Update plan.md with new order
 
-**Step-by-step:**
-
-1. **Load backlog** — Read plan.md, extract all backlog items and current sprint tasks:
-   ```bash
-   cat .tat/plan.md
-   ```
-
-2. **Load context** — Read ADRs and active lessons for constraint awareness:
-   ```bash
-   for f in .tat/decisions/*.md; do cat "$f"; done
-   cat .tat/lessons.md
-   ```
-
-3. **Detect duplicates** — Check for tasks with overlapping scope by comparing:
-   - Task descriptions (similar wording)
-   - Ref: links (same ADR/GL referenced)
-   - File scope (would touch same files)
-   Flag duplicates:
-   ```
-   [TAT] Potential duplicates:
-     TAT-081 (alignment checks) ↔ TAT-084 (periodic self-check) — both are drift detection
-   ```
-
-4. **Cluster related items** — Group tasks that form a natural unit:
-   ```
-   [TAT] Clusters:
-     Workflow commands: TAT-066 (/tat sprint), TAT-067 (/tat replan), TAT-104 (/tat wrapup)
-     Quality gates: TAT-081, TAT-083, TAT-084
-   ```
-   Suggest merging clusters into single tasks where appropriate. Keep the lowest TAT-ID.
-
-5. **Validate staleness** — For each backlog item:
-   - Is the Ref: still valid? (ADR/GL still exists and active?)
-   - Has the problem already been solved by another task?
-   - Is the item still relevant given recent changes?
-   Flag stale items:
-   ```
-   [TAT] Stale items:
-     TAT-068: skill adapter hooks — deferred to v2, no demand signal since E9
-   ```
-
-6. **GPT advisory** — Send the cleaned backlog + context to GPT for reprioritization:
-   ```bash
-   ~/.tinyaiteam/scripts/ask-gpt.sh "Here is the TAT backlog after dedup and clustering: <backlog>. Current constraints: <ADRs/lessons summary>. Suggest priority order for the next sprint. Consider: value to users, foundation dependencies, effort. Be opinionated."
-   ```
-   Present GPT's prioritization with `[GPT]` tag.
-   Opus adds its own opinion with `[OPUS]` tag.
-
-7. **Present changes** — Show the user:
-   ```
-   [TAT] Replan proposal:
-     Merged: TAT-081 + TAT-084 → TAT-081 (alignment + self-check)
-     Stale: TAT-068 (recommend drop or defer)
-     Priority order for next sprint:
-       1. TAT-101 — spec update (foundation)
-       2. TAT-102 — missing ADRs (traceability)
-       ...
-   ```
-
-8. **Apply changes** — After user approval, update plan.md:
-   - Merge duplicates (strike through the merged one, update the kept one)
-   - Mark stale items
-   - Reorder backlog by priority
-
-9. **Log replan** — Append to `.tat/replan-log.md`:
-   ```markdown
-   ## Replan — <date>
-   - Merged: <list>
-   - Dropped: <list>
-   - Priority: <ordered list>
-   - GPT model: <model used>
-   ```
-   This file is checked by sprint-start to verify replan freshness.
-
-Then stop. Do not enter TAT mode.
+Then stop.
 
 ---
 
 ## Init Flow
 
-When the user types `/tat init` explicitly:
+When the user types `/tat init`:
 
 ```bash
 PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 ls "$PROJECT_ROOT/.tat/" 2>/dev/null || echo "NO_TAT_DIR"
 ```
 
-If `.tat/` already exists:
-```
-[TAT] Project already initialized. Use /tat to continue.
-```
-Then stop.
+If `.tat/` exists: `[TAT] Already initialized. Use /tat to continue.` Stop.
 
-If `NO_TAT_DIR`: proceed with the init sequence in **Step 3** below (the `NO_TAT_DIR` branch). Skip to that block directly — do not run Steps 1–2 first.
+If `NO_TAT_DIR`:
+1. Create `.tat/spec.md`:
+   ```markdown
+   # <Project Name>
+
+   ## What
+   <describe your project>
+
+   ## Why
+   <why are you building this>
+
+   ## Constraints
+   <any constraints>
+
+   ## Decisions
+   <key decisions, inline — no separate ADR files>
+   ```
+
+2. Create `.tat/plan.md`:
+   ```markdown
+   # Plan
+
+   ## Tasks
+   | ID | Task | Status |
+   |----|------|--------|
+   | TAT-001 | Define project scope and spec | [ ] |
+   | TAT-002 | Set up project structure | [ ] |
+
+   ## Done
+   | ID | Task | Status |
+   |----|------|--------|
+   ```
+
+3. Initialize state counter:
+   ```bash
+   ~/.tinyaiteam/scripts/tat-state.sh init
+   ```
+
+4. Install git hooks:
+   ```bash
+   if [ -d ~/.tinyaiteam/hooks ]; then
+     cp ~/.tinyaiteam/hooks/pre-commit .git/hooks/ 2>/dev/null
+     cp ~/.tinyaiteam/hooks/commit-msg .git/hooks/ 2>/dev/null
+     chmod +x .git/hooks/pre-commit .git/hooks/commit-msg 2>/dev/null
+   fi
+   ```
+
+5. Print:
+   ```
+   [TAT] Project initialized:
+     ✓ .tat/ (spec + plan)
+     ✓ Git hooks (commit format, branch enforcement)
+   [TAT] What are you building?
+   ```
 
 ---
 
 ## Full Activation
 
-You are entering TAT mode. Follow these instructions for the rest of the session.
-
-## Pre-Step: IDE Project Mismatch Guard (MANDATORY)
-
-Before anything else, check if the IDE context points to a different project than the working directory.
-
-Look at the system-reminder for any "user opened the file <path>" hint. If present, compare:
-- **Shell root:** `git rev-parse --show-toplevel` (the working directory's repo)
-- **IDE root:** derive the git root from the IDE file path (walk up to find `.git`)
-
-If these are **different repos**:
-```
-[TAT] ⚠ Project mismatch detected:
-[TAT]   Shell: <shell root>
-[TAT]   IDE:   <ide root>
-[TAT] You appear to be working in <ide project>, but this session is in <shell project>.
-[TAT] cd to the right project and re-run /tat.
-```
-**This is a hard stop.** Do not proceed with the wrong project's `.tat/` state.
-
-If no IDE hint is present, or both roots match → continue normally.
-
-## Step 0: Branch Guard (MANDATORY)
-
-Before doing ANYTHING else, check the current branch:
+### Pre-Step: Branch Guard
 
 ```bash
 git branch --show-current
 ```
 
-If on `main`: **STOP. Do not proceed.** Print:
+If on `main`: **STOP.**
 ```
-[TAT] ✗ You are on main. TAT refuses to work on main.
-[TAT] Create a branch first: git checkout -b tat/<epic>/<task-name>
+[TAT] ✗ You are on main. Create a branch first.
 ```
 
-The ONLY allowed actions on main are:
-- Running `/tat status` (read-only)
-- Running `/tat init` (project setup)
+Exception: `/tat status`, `/tat init`, `/tat version` work on main.
 
-**This is a hard stop, not a suggestion.** Do not rationalize skipping this for "quick fixes" or "small changes."
+If no task is active (all tasks done or plan empty), allow main for planning.
 
-## Step 1: Load TAT rules
+### Step 1: Load context
 
 ```bash
 cat ~/.tinyaiteam/TAT.md 2>/dev/null || echo "TAT_NOT_INSTALLED"
-```
-
-If `TAT_NOT_INSTALLED`: tell the user "TAT is not installed. Run `install.sh` from the tinyaiteam repo first." and stop.
-
-Read the installed version:
-```bash
 cat ~/.tinyaiteam/VERSION 2>/dev/null || echo "unknown"
 ```
 
-## Step 2: Detect current model
+If `TAT_NOT_INSTALLED`: tell user to run `install.sh`. Stop.
 
-You know which model you are from your system prompt (it states your model ID). Use that directly:
-- If you are `claude-opus-*` → You are **Orchestrator**. Plan, spec, architect, decide, AND delegate coding to Sonnet subagents. You stay in control the entire session — the user never needs to switch models.
-- If you are `claude-sonnet-*` → You are **Coder/Implementer**. Focus on coding the current subtask. Escalate architectural questions to Opus.
-- If you are `claude-haiku-*` → You are **Quick Tasker**. Only handle simple, well-scoped tasks. Escalate anything complex.
-
-Announce your role:
-```
-[TAT] Active v<version>. Role: <Orchestrator|Coder> (<model name>)
-```
-
-## Step 3: Read project state
-
+Also load:
 ```bash
-PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
-echo "PROJECT: $PROJECT_ROOT"
-ls "$PROJECT_ROOT/.tat/" 2>/dev/null || echo "NO_TAT_DIR"
+cat .tat/spec.md
+cat .tat/plan.md
+cat ~/.tinyaiteam/lessons.md 2>/dev/null
+cat .tat/gpt.md 2>/dev/null
 ```
 
-If `NO_TAT_DIR`:
-- If Sonnet: "No .tat/ found. Start an Opus session first to create the project plan."
-- If Opus: announce and proceed:
-  ```
-  [TAT] ▶ Project Setup
-  ```
-  1. Check if git is initialized:
-     ```bash
-     git rev-parse --is-inside-work-tree 2>/dev/null || echo "NO_GIT"
-     ```
-     - If `NO_GIT`: run `git init` and make an initial commit
-     - If git exists: skip git init, do NOT re-initialize
-  2. Create `.tat/spec.md` with this template:
-     ```
-     # <Project Name>
-
-     ## What
-     <describe your project>
-
-     ## Why
-     <why are you building this>
-
-     ## Constraints
-     <any constraints>
-
-     ## Non-goals
-     <what this is NOT>
-     ```
-  3. Create `.tat/plan.md` with this template:
-     ```
-     # Plan
-
-     ## Current Sprint: Sprint 1 — Foundation
-
-     Goal: Set up project structure and define scope.
-
-     | ID | Task | Epic | Status |
-     |----|------|------|--------|
-     | TAT-001 | Define project scope and spec | E1 | [ ] |
-     | TAT-002 | Set up project structure | E1 | [ ] |
-
-     ## Backlog
-
-     | ID | Idea | Noted during |
-     |----|------|--------------|
-     ```
-  4. Install git hooks (automatic — best practices by default):
-     ```bash
-     if [ -d ~/.tinyaiteam/hooks ]; then
-       cp ~/.tinyaiteam/hooks/* .git/hooks/ && chmod +x .git/hooks/*
-     fi
-     ```
-     Print:
-     ```
-     [TAT] ✓ Git hooks installed:
-       - pre-commit: blocks non-plan commits on main
-       - commit-msg: enforces conventional commit format
-       - pre-push: blocks direct pushes to main
-     ```
-     If hooks directory doesn't exist, warn: `[TAT] ⚠ No hooks found at ~/.tinyaiteam/hooks/. Run install.sh from the tinyaiteam repo first.`
-  5. Enable GitHub branch protection if `gh` is available:
-     ```bash
-     gh api repos/:owner/:repo/branches/main/protection -X PUT --silent --input - <<'PROTECTION'
-     {"required_pull_request_reviews":{"required_approving_review_count":0},"enforce_admins":true,"required_status_checks":null,"restrictions":null}
-     PROTECTION
-     ```
-     Print: `[TAT] ✓ GitHub branch protection enabled on main`
-     If `gh` not available or fails, warn: `[TAT] ⚠ Could not set branch protection. Do it manually in GitHub settings.`
-  6. Print:
-     ```
-     [TAT] Project initialized with best practices:
-       ✓ .tat/ project state (spec + plan)
-       ✓ Git hooks (commit format, branch enforcement)
-       ✓ Branch protection (PRs required)
-     [TAT] Let's start with the spec — what are you building?
-     ```
-
-If `.tat/` exists, read the state:
-
-```bash
-cat "$PROJECT_ROOT/.tat/spec.md" 2>/dev/null
-cat "$PROJECT_ROOT/.tat/plan.md" 2>/dev/null
-cat "$PROJECT_ROOT/.tat/state.json" 2>/dev/null
+```
+[TAT] Active v<version>. Role: <Orchestrator|Coder> (<model>)
+[TAT] Loaded spec + plan + <N> lessons.
 ```
 
-If `state.json` exists and `phase` is not `IDLE`, hint about resume:
-```
-[TAT] Active session detected (phase: <phase>, task: <task_id>). Use /tat resume to continue, or proceed to pick a new task.
-```
+### Step 2: Detect model role
 
-## Step 4: Show current position
+From your system prompt:
+- `claude-opus-*` → **Orchestrator**: plan, delegate to Sonnet, review
+- `claude-sonnet-*` → **Coder**: code the current task, escalate architecture to Opus
 
-Parse `plan.md` and display:
+### Step 3: Show current position
 
 ```
 [TAT] Project: <name from spec>
-[TAT] Current epic: <epic heading containing active task>
-[TAT] Current task: <first [~] task, or first [ ] if none in-progress>
-[TAT] Progress: <X of Y tasks complete>
+[TAT] Current task: <first [ ] task from plan.md>
+[TAT] Progress: <X of Y done>
 ```
 
-## Step 5: Route and suggest
+### Step 4: Start working
 
-Based on the current task and your model role:
+**If Opus:**
+- No spec → "What are you building?"
+- Spec but no plan → "Let me break this into tasks."
+- Plan exists → Pick next `[ ]` task, create branch if needed, start working
+- All done → "All tasks complete. Add more or wrap up?"
 
-**If Opus (Orchestrator):**
-- If no spec exists → "Let's start with the spec. What are you building?"
-- If spec exists but no plan → "Spec is ready. Let me break this into epics and tasks."
-- If plan exists, assess current task complexity:
-  - Complex (multi-file, architectural, new system) → "This is complex — I'll handle this directly on Opus."
-  - Standard coding task → Delegate to a Sonnet subagent (see **Delegation** below)
-- If all tasks done → "All tasks complete. Want to review, add new work, or wrap up?"
+**If Sonnet:**
+- Show task context, start coding
+- Escalate architecture questions to Opus
 
-**If Sonnet (Coder):**
-- Show the current task context bundle (scope, guardrails, files to change)
-- "Ready to code. Confirm the task or adjust scope."
-- If the task looks architectural → "[TAT] This task needs architecture decisions. Start an Opus session for this one."
+### Delegation (Opus → Sonnet)
 
-### Delegation (Opus → Sonnet subagent)
+When Opus identifies a standard coding task:
 
-When Opus identifies a coding task, delegate it using the Agent tool with `model: "sonnet"`. The user never switches models — Opus orchestrates everything.
-
-1. **Prepare the context bundle** — gather everything Sonnet needs:
+1. Prepare context:
    ```
    [TAT] Delegating to Sonnet →
-   [TAT] Task: <task description>
-   [TAT] Branch: tat/<epic>/<task-name>
-   [TAT] Files to change: <list>
-   [TAT] Guardrails: <what NOT to touch>
+   [TAT] Task: <description>
+   [TAT] Branch: tat/<task-name>
+   [TAT] Files: <list>
    ```
 
-2. **Spawn the subagent** with a detailed prompt containing:
-   - The task description and acceptance criteria
-   - Branch name (create it first if needed)
-   - Files to read and modify
-   - Guardrails (files/patterns to avoid)
-   - Instruction to commit when done with a conventional commit message
+2. Spawn Agent with `model: "sonnet"` — include task, branch, files, guardrails
 
-3. **Review the result** — when Sonnet returns, Opus:
-   - Self-review first: read the diff, check scope, check for bugs, fix anything found
-   - Then run GPT review (`~/.tinyaiteam/scripts/tat-code-review.sh`) as second opinion
-   - Present both self-review and GPT feedback to the user
-   - Proceeds with PR flow if approved
-
-This keeps Opus as the orchestrator and Sonnet as the executor. The user stays in one session.
-
-### Parallel Delegation (multiple independent tasks)
-
-When Opus identifies **2+ tasks that are independent** (no shared files, no dependency between them), it can spawn parallel Sonnet subagents using multiple Agent tool calls in a single message.
-
-**FILE-OVERLAP GATE (mandatory — ADR-009):**
-Before deciding to parallelize, list every file each task will modify. If ANY file appears in both lists, STOP — run sequentially. This is a hard gate, not a suggestion. Shared files like SKILL.md, plan.md, lessons.md, and install.sh are red flags.
-
-**Pre-flight checklist:**
-1. [ ] List files per task — no overlap
-2. [ ] Merge all pending PRs that affect shared state (GL-18)
-3. [ ] Neither task depends on the other's output
-4. [ ] Both are standard coding tasks (not architectural)
-
-If all pass → parallelize. If any fail → sequential.
-
-**Parallel delegation flow:**
-1. **Confirm file-overlap gate passes** — print the file lists and confirm no overlap
-2. **Create separate branches** for each task (e.g., `tat/11/task-a`, `tat/11/task-b`)
-3. **Spawn subagents in parallel** — use `isolation: "worktree"` so each gets its own copy:
-   ```
-   [TAT] Parallel delegation →
-   [TAT] Agent 1: TAT-062 — CONTRIBUTING.md (branch: tat/11/contributing)
-   [TAT] Agent 2: TAT-063 — Repo cleanup (branch: tat/11/cleanup)
-   [TAT] Both agents running in parallel...
-   ```
-4. **Review each result independently** — self-review + GPT review per task
-5. **Ship as separate PRs** — one branch = one PR rule still applies
-
-**Key constraint:** Each parallel subagent works in a git worktree (`isolation: "worktree"`), so they can't conflict. Opus reviews and ships each result sequentially after all agents return.
-
-## Step 6: Enter the SSD loop
-
-From here, follow the SSD loop from TAT.md. At each transition, print and follow the checkpoint map below. Do NOT skip steps or combine them.
+3. When Sonnet returns:
+   - Self-review the diff
+   - Check `.tat/gpt.md` for background GPT notes
+   - Fix issues
+   - Push, PR, merge
 
 ---
 
-### Checkpoint Map
+## Working Flow
 
-At every task transition, print this map and check off each step as you complete it. This is mandatory — not optional guidance.
+This is guidance, not a checkpoint map. Follow the spirit, not numbered steps.
 
-**PLAN checkpoint:**
+**Before coding:** Know what task you're doing and which files you'll touch.
+
+**While coding:** Stay in scope. Off-topic ideas → append to bottom of plan.md:
 ```
-[TAT] ▶ PLAN checkpoint:
-  [ ] 0. Update state: tat-state.sh transition PLAN (+ set epic, task, branch)
-  [ ] 1. Show task + epic from plan.md
-  [ ] 2. Offer GPT plan review (tat-plan-review.sh)
-  [ ] 3. User approves plan
+[TAT] Noted — added to backlog.
 ```
 
-**CODE checkpoint:**
-```
-[TAT] ▶ CODE checkpoint:
-  [ ] 0. Update state: tat-state.sh transition CODE
-  [ ] 1. Create branch: tat/<epic>/<task-name>
-  [ ] 2. Show scope: files to change + guardrails
-  [ ] 3. User confirms scope
-  [ ] 4. Code the task
-```
+**After coding:**
+1. Self-review your diff (`git diff main...HEAD`). Check scope, bugs, completeness.
+2. Read `.tat/gpt.md` if GPT has reviewed in background.
+3. For complex changes, run `/tat review` for deep GPT analysis.
+4. Mark task `[x]` in plan.md (on the branch, not main).
+5. Push, create PR, merge.
 
-**REVIEW checkpoint (after coding, before PR):**
-```
-[TAT] ▶ REVIEW checkpoint:
-  [ ] 0. Update state: tat-state.sh transition REVIEW
-  [ ] 1. SELF-REVIEW: read full diff (git diff main...HEAD)
-  [ ] 2. SELF-REVIEW: check scope — any files that shouldn't be here?
-  [ ] 3. SELF-REVIEW: check for bugs, edge cases, incomplete work
-  [ ] 4. SELF-REVIEW: fix anything found, commit fixes
-  [ ] 5. Show self-review summary to user
-  [ ] 6. GPT REVIEW: run tat-code-review.sh
-  [ ] 7. Show GPT feedback to user
-  [ ] 8. Address GPT blockers if any
-  [ ] 9. Save review artifact: tat-save-review.sh <task-id> "<self-review summary>"
-```
-
-**SHIP checkpoint (after review, before merge):**
-```
-[TAT] ▶ SHIP checkpoint:
-  [ ] 0. Update state: tat-state.sh transition SHIP
-  [ ] 1. REVIEW GATE: verify .tat/reviews/<task-id>-review.md exists (refuse if missing)
-  [ ] 2. Rebase on latest main
-  [ ] 3. Verify diff scope (git diff origin/main --name-only)
-  [ ] 4. No untracked files (git ls-files --others --exclude-standard)
-  [ ] 5. Update plan.md — mark task(s) [x] (include in this branch, not on main)
-  [ ] 6. Push branch
-  [ ] 7. Create PR with GPT review response
-  [ ] 8. User approves merge
-```
-
-**POST-MERGE checkpoint:**
-```
-[TAT] ▶ POST-MERGE checkpoint:
-  [ ] 0. Update state: tat-state.sh transition POST-MERGE
-  [ ] 1. git checkout main && git pull origin main
-  [ ] 2. Verify plan.md shows task [x] (was updated in SHIP step 5)
-  [ ] 3. Run install.sh if skills/config changed
-  [ ] 4. Show next task + model routing
-  [ ] 5. Update state: tat-state.sh transition IDLE (reset for next task)
-  [ ] 6. If current sprint is complete → prompt: "[TAT] Sprint complete! Run /tat sprint-end for retro, then /tat sprint-start for next sprint."
-```
-
----
-
-**Rule: print the checkpoint map at each transition.** Seeing the checklist prevents skipping steps. Check off each item as you complete it. If you catch yourself about to skip ahead, stop and go back to the map.
-
-**State update protocol (step 0 in each checkpoint):**
-Step 0 is **graceful** — if `.tat/state.json` doesn't exist, the script prints a skip message and continues. Projects without state.json are unaffected.
+**After merge:**
 ```bash
-# Transition phase (no-op if state.json missing)
-~/.tinyaiteam/scripts/tat-state.sh transition <PHASE>
-
-# Set context fields (at PLAN checkpoint — these persist through the task lifecycle)
-~/.tinyaiteam/scripts/tat-state.sh set epic "<epic name>"
-~/.tinyaiteam/scripts/tat-state.sh set task "<task description>"
-~/.tinyaiteam/scripts/tat-state.sh set branch "$(git branch --show-current)"
-~/.tinyaiteam/scripts/tat-state.sh set session.model "<model name>"
+git checkout main && git pull origin main
 ```
-Context fields are set once at PLAN and carry through CODE → REVIEW → SHIP. Reset to IDLE at POST-MERGE.
-
-**Review artifact protocol (step 9 in REVIEW checkpoint):**
-```bash
-# Save review artifact after self-review + GPT review are complete
-~/.tinyaiteam/scripts/tat-save-review.sh <task-id> "<self-review summary>"
-```
-This creates `.tat/reviews/<task-id>-review.md`. The SHIP checkpoint gate checks for this file.
-
-**Review gate (step 1 in SHIP checkpoint):**
-```bash
-# Check review artifact exists — refuse to ship without it
-ls .tat/reviews/<task-id>-review.md 2>/dev/null || echo "GATE_FAILED"
-```
-If `GATE_FAILED`:
-```
-[TAT] ✗ REVIEW gate failed — no review artifact for <task-id>
-[TAT] Complete the REVIEW checkpoint first (self-review + GPT review + save artifact).
-```
-**This is a hard stop.** Do not proceed to push/PR without the review artifact.
-
----
-
-## Inline GPT Second Opinion
-
-When the user asks for a quick GPT opinion during work (e.g., "ask GPT about this", "what does GPT think", "can you check with GPT"):
-
-1. Run `ask-gpt.sh` with the question:
-   ```bash
-   ~/.tinyaiteam/scripts/ask-gpt.sh "<question>"
-   ```
-   Or call `tat_gpt_call` directly if you need custom context.
-
-2. Present GPT's response with `[GPT]` tag.
-
-3. **Opus gives its own opinion after GPT.** Agree, disagree, or add what GPT missed. Tag with `[OPUS]`.
-
-4. **Do NOT auto-update plans, spec, or any files.** Wait for the user to decide what to do with the opinions.
-
-5. **If the user makes a decision**, offer to record it as an ADR in `.tat/decisions/`:
-   ```
-   [TAT] Record this decision as an ADR? (e.g., ADR-005: chose X because Y)
-   ```
+Show next task. If skills/scripts changed, run `install.sh`.
 
 ---
 
 ## Source Tagging
 
-While in TAT mode, tag all guidance and warnings with their source:
+Tag guidance with source:
+- `[TAT]` — TAT workflow rules
+- `[GPT]` — GPT review feedback
+- `[OPUS]` — Opus's own opinion (after GPT)
+- `[SYSTEM]` — Claude safety rules
+- `[CLAUDE.md]` — User's global rules
+- `[PROJECT]` — Project CLAUDE.md rules
 
-- `[SYSTEM]` — Built-in Claude safety rules (destructive actions, security)
-- `[CLAUDE.md]` — User's global ~/.claude/CLAUDE.md rules
-- `[PROJECT]` — Project-level CLAUDE.md rules
-- `[TAT]` — TAT workflow rules (from TAT.md or .tat/ state)
-- `[GPT]` — Feedback from GPT review
-
-**When to tag**: Warnings, workflow guidance, rule enforcement, review results, model routing suggestions.
-**When NOT to tag**: Normal conversation, code output, answering questions, tool calls.
-
----
-
-## Backlog Capture
-
-When the user mentions an idea or feature that is NOT related to the current task:
-
-1. Do NOT act on it
-2. Acknowledge it: `[TAT] Noted — added to backlog.`
-3. Append a row to `plan.md` under the `## Backlog` table:
-   ```
-   | TAT-XXX | <idea>. Ref: <related ADR/GL/GPT consultation if any> | <current sprint> |
-   ```
-   Use the next available TAT-XXX ID (check the last ID in plan.md and increment).
-   Always include `Ref:` if there's a related ADR, lesson (GL-XX/L-XX), or GPT consultation that informed the idea. This ensures context travels with the task.
-4. Continue with the current task
-
-Never silently dismiss an idea. Always confirm capture.
+Normal conversation and code output is NOT tagged.
 
 ---
 
-## Git Workflow
+## Inline GPT Opinion
 
-- One subtask = one branch = one PR
-- Branch naming: `tat/<epic-number>/<task-name>`
-- Always work on a branch, never directly on main
-- Plan updates (marking tasks [x]) go in the feature branch before merge — never on main
-- After merge, sync local main and run `install.sh` if skills/config changed
+When the user asks for GPT's take ("ask GPT", "what does GPT think"):
 
-### PR Template
-
-```
-Title: <short description>
-
-## Summary
-- <what changed and why, 1-3 bullets>
-
-## Task
-<epic and task from plan.md>
-
-## GPT Review Response
-- "<GPT suggestion>" → <accept/dismiss with reasoning>
-
-## Test plan
-- [x] <what was tested>
+```bash
+~/.tinyaiteam/scripts/ask-gpt.sh "<question>"
 ```
 
-Note: Pre-PR checks (rebase, diff scope, untracked files) are handled by the SHIP checkpoint.
-Post-merge steps (sync main, install.sh, next task) are handled by the POST-MERGE checkpoint.
-
----
-
-## Project State Schema
-
-TAT maintains machine-readable state in `.tat/state.json`. Managed by `~/.tinyaiteam/scripts/tat-state.sh`.
-
-```json
-{
-  "version": 1,
-  "project": "<name from spec.md>",
-  "phase": "IDLE",
-  "epic": null,
-  "task": null,
-  "task_id": null,
-  "branch": null,
-  "last_action": {
-    "type": null,
-    "model": null,
-    "timestamp": null
-  },
-  "session": {
-    "model": null,
-    "started_at": null,
-    "updated_at": null
-  },
-  "next_task_id": 1
-}
-```
-
-**Valid phases:** `IDLE` | `PLAN` | `CODE` | `REVIEW` | `SHIP` | `POST-MERGE`
-
-Use `~/.tinyaiteam/scripts/tat-state.sh <subcommand>` to read and update state:
-- `init` — create state.json with IDLE defaults
-- `get <field>` — read a field (dot notation)
-- `set <field> <value>` — write a field
-- `transition <phase>` — set phase and update timestamps
-- `show` — pretty-print current state
-- `new-task-id` — generate next TAT-XXX ID and increment counter
-
----
-
-## Plan Format (Sprint Tables)
-
-Plans use sprint-based tables with task IDs. Epics define WHAT to build, sprints define WHAT ORDER.
-
-```markdown
-## Current Sprint: Sprint N — <goal>
-
-Goal: <one-line sprint goal>
-
-| ID | Task | Epic | Status |
-|----|------|------|--------|
-| TAT-053 | Add task IDs + sprint format | E8 | [~] |
-| TAT-054 | Add /tat resume | E8 | [ ] |
-
-### Sprint N+1 — <goal>
-| ID | Task | Epic | Status |
-|----|------|------|--------|
-| TAT-058 | Optional gstack integration | E9 | [ ] |
-```
-
-**Task IDs:**
-- Format: `TAT-XXX` (zero-padded to 3 digits)
-- Generated via `~/.tinyaiteam/scripts/tat-state.sh new-task-id` (auto-increments counter in state.json)
-- Assigned when a task is created, never reused
-- Used in branch names, review artifacts, and state.json tracking
-
-**Sprint rules:**
-- Group tasks by delivery value, not by epic
-- Current sprint at the top, future sprints below
-- Completed sprints collapse into a "Completed Sprints" section
-- After completing a sprint, reprioritize remaining tasks into the next sprint
-
----
-
-## Important Rules
-
-1. **Never jump to code without a plan.** If there's no spec or plan, create one first.
-2. **User is product owner.** Final authority on all decisions.
-3. **GPT is an advisor, not a gatekeeper.** Present GPT feedback, let user decide.
-4. **Stay focused.** Off-scope ideas go to backlog, not into the current task.
-5. **Tag your guidance.** The user should always know why you're saying something.
-6. **Delegate, don't suggest.** If you're Opus and the task is coding, spawn a Sonnet subagent — don't ask the user to switch models. If you're Sonnet and the task needs architecture, escalate to Opus.
-7. **Self-review before GPT review. Always.** Read the diff, check scope, fix issues — THEN send to GPT. GPT is a second opinion, not a substitute for your own QA. Never skip this.
+Show with `[GPT]` tag. Opus adds opinion with `[OPUS]` tag. Don't auto-update files — wait for user decision.
