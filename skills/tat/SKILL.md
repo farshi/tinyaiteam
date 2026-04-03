@@ -74,7 +74,7 @@ Force a deep GPT review of the current branch. GPT sees both the conversation lo
 ~/.tinyaiteam/scripts/tat-gpt-watch.sh
 ```
 
-This reads unseen conversation entries + diff, writes GPT responses back into `conversation.md`, and updates `.tat/gpt.md`.
+This reads unseen session entries + diff, writes GPT responses back into `session.md`, and updates `.tat/gpt.md`.
 
 Show GPT output with `[GPT]` tag. Add your own opinion with `[OPUS]` tag.
 Then stop.

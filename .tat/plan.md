@@ -5,7 +5,7 @@
 | ID | Task | Status |
 |----|------|--------|
 | TAT-111 | Enforce task-ID branch naming + commit messages | [x] |
-| TAT-101 | Update spec.md to match v2 reality | [ ] |
+| TAT-101 | Update spec.md to match v2 reality | [x] |
 | TAT-105 | Optimize GPT review payloads — send task description instead of raw context | [ ] |
 | TAT-107 | Cross-project cd limitation — detect and warn instead of letting user retry | [ ] |
 | TAT-068 | Optional skill adapter hooks — detect/use external skills as plugins | [ ] |
