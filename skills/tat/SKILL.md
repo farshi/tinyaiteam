@@ -330,7 +330,7 @@ Claude maintains `.tat/session.md` — a timestamped log of the session. All thr
 - [14:30][Design][User] wants GPT to see conversations, not just diffs
 - [14:32][Design][Opus] proposed session.md with three voices
 - [14:35][Design][GPT] sound approach, add ack mechanism for continuity
-- [14:40][Design][User] !! what about brainstorming, don't lose that
+- [14:40][Design][User] @@ what about brainstorming, don't lose that
 - [14:42][Decision] keep /brainstorm as explicit 3-round flow
 ```
 
@@ -338,7 +338,7 @@ Claude maintains `.tat/session.md` — a timestamped log of the session. All thr
 - One bullet per significant action. Keep each line short.
 - Tag with mode and speaker: `[User]`, `[Opus]`, `[Sonnet]`, `[GPT]`, `[Decision]`
 - `[Decision]` entries also go into decisions.md.
-- `!!` marks urgent — GPT addresses these first.
+- `@@` marks urgent — GPT addresses these first.
 - When file exceeds 400 lines, archive older entries to `.tat/archive/session-<date>.md` and add a summary block at top.
 - session.md is in `.gitignore` — it's session state, not code.
 - **This is mandatory.** Every user turn gets logged.
