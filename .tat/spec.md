@@ -34,7 +34,7 @@ AI coding tools write code but lack long-term planning, decision memory, and mul
 ### File Structure
 **Per-project (`.tat/`):**
 - `spec.md` — project definition (this file)
-- `plan.md` — prioritized task list (Tasks + Done tables)
+- `plan.md` — version-grouped task list (Next: vX.Y.Z + Backlog + Done)
 - `decisions.md` — append-only ADRs with rationale
 - `gpt.md` — latest GPT review summary (auto-updated)
 - `gpt-cursor` — tracks last session.md line GPT has seen

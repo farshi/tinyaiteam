@@ -42,3 +42,7 @@ Option 2: gstack integration dropped from v1. TAT-058 and TAT-059 are moved to v
 3. **Sync main before spawning worktree agents.** Ensure all pending PRs that affect shared state (lessons, plan, spec) are merged first.
 **Why:** Parallel agents save time only when tasks are truly independent. File overlap means sequential rebases, merge conflicts, and manual fixups — which cost more time than sequential execution. The "check file overlap" advice in SKILL.md was too soft and got ignored under speed pressure.
 
+### ADR-010: Version-Based Planning
+Tasks grouped by version milestone instead of flat list. Current version = latest git tag. Next version = `## Next: vX.Y.Z` header in plan.md. Backlog lives below the next version section.
+**Why:** Flat task lists lack release boundaries — you never know when to ship. Version milestones give a natural "done" signal: all tasks for vX.Y.Z complete → tag + changelog + release. Git tags are the source of truth for current version, plan.md declares the target. Projects without tags start as `unversioned → v0.1.0`.
+
