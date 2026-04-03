@@ -6,6 +6,34 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2.1.0] — 2026-04-03
+
+### Added
+- **Three-Chair Model**: User (Product Owner) + GPT (Senior Advisor) + Opus (Orchestrator)
+- **session.md**: live session log with three voices, mode-tagged entries
+- **today.md**: daily scope file — goals, mode, constraints
+- **GPT briefing header**: every GPT call gets MODE + TODAY + DECISIONS + SESSION + DIFF
+- **ACK mechanism**: GPT must restate context before advising
+- **Meeting modes**: Design, Planning, Coding, Review — changes GPT's role
+- **`@@` red flag**: user prefix for urgent GPT attention (replaces `!!`)
+- **3-turn gate**: auto-triggers GPT review after 3+ user turns without GPT input (`tat-gpt-gate.sh`)
+- **Cost guard**: daily budget ($3 default), downgrades from codex to 5.4-mini after budget hit
+- **Symlink install**: `git pull` = instant update, no re-install needed
+- **GL-20**: log [User] entries in session.md every turn
+- **Migration script fix**: handles varied ADR formats across projects
+
+### Changed
+- **Model routing**: codex for code review only, gpt-5.4-mini for brainstorm/planning/ask
+- **GPT review flow**: commit first, GPT reviews automatically via hook, fix in next commit
+- **install.sh**: symlinks instead of copies (except config.sh and hooks)
+
+### Removed
+- `!!` red flag marker (conflicts with Claude Code `!` prefix)
+- Rate limit on GPT watcher (every commit reviewed)
+- Stale `backlog-notes.md`
+
+---
+
 ## [2.0.0] — 2026-04-03
 
 ### Breaking Changes
