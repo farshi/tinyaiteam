@@ -109,6 +109,20 @@ Normal conversation and code output is not tagged.
 | `/tat init` | Setup .tat/ for new project |
 | `/tat version` | Show installed version |
 
+## GPT Call Points
+
+Call `tat-gpt-watch.sh` at these checkpoints — not just on commits:
+- End of planning discussion (before coding starts)
+- Before creating a PR
+- When user asks for GPT's opinion
+- After 3+ user turns without a GPT call
+
+## Session Log Enforcement
+
+Log `[User]` entries in session.md after EVERY user turn — no exceptions.
+Summarize intent in one line, don't quote verbatim.
+Without user entries, GPT has no planning context and the audit trail is broken.
+
 ## Rules
 
 1. User is product owner — final authority
