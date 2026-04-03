@@ -30,7 +30,29 @@ if [ -z "$BRANCH" ] || [ "$BRANCH" = "main" ]; then exit 0; fi
 [ -f "$CONFIG" ] && source "$CONFIG"
 source "$SCRIPT_DIR/tat-gpt.sh"
 
-MODEL="${TAT_CODE_REVIEW_MODEL:-gpt-5.2-codex}"
+# --- Cost guard: track daily spend, downgrade model after budget ---
+
+COST_FILE="/tmp/tat-gpt-cost-$(date +%Y%m%d)"
+DAILY_BUDGET="${TAT_DAILY_BUDGET:-3.00}"
+COST_PER_CODEX="${TAT_COST_PER_CODEX:-0.05}"
+COST_PER_FALLBACK="${TAT_COST_PER_FALLBACK:-0.02}"
+FALLBACK_MODEL="${TAT_FALLBACK_MODEL:-gpt-5.4-mini}"
+QUALITY_MODEL="${TAT_CODE_REVIEW_MODEL:-gpt-5.2-codex}"
+
+# Read today's spend
+DAILY_SPEND="0.00"
+[ -f "$COST_FILE" ] && DAILY_SPEND=$(cat "$COST_FILE")
+
+# Pick model based on budget
+MODEL="$QUALITY_MODEL"
+COST_THIS_CALL="$COST_PER_CODEX"
+
+OVER_BUDGET=$(python3 -c "print('yes' if float('$DAILY_SPEND') >= float('$DAILY_BUDGET') else 'no')" 2>/dev/null || echo "no")
+if [ "$OVER_BUDGET" = "yes" ]; then
+  MODEL="$FALLBACK_MODEL"
+  COST_THIS_CALL="$COST_PER_FALLBACK"
+fi
+
 export TAT_GPT_TIMEOUT=300
 
 # --- Read cursor ---
@@ -144,6 +166,10 @@ $TRIMMED_DIFF"
 
 tat_gpt_call "$MODEL" "$SYSTEM_PROMPT" "$USER_PROMPT" 2>/dev/null || exit 0
 
+# --- Update daily cost ---
+NEW_SPEND=$(python3 -c "print(f'{float(\"$DAILY_SPEND\") + float(\"$COST_THIS_CALL\"):.2f}')" 2>/dev/null || echo "$DAILY_SPEND")
+echo "$NEW_SPEND" > "$COST_FILE"
+
 # --- Write GPT response into session.md ---
 
 if [ -n "$REVIEW" ] && [ -f "$SESSION_FILE" ]; then
@@ -172,6 +198,7 @@ cat > "$TAT_DIR/gpt.md" <<GPTEOF
 **Mode:** $MODE
 **Unseen entries:** $ENTRY_COUNT
 **Diff:** $DIFF_LINES lines
+**Daily spend:** \$$NEW_SPEND / \$$DAILY_BUDGET
 
 $REVIEW
 GPTEOF
