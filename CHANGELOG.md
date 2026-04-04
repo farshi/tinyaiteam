@@ -6,6 +6,27 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2.2.0] — 2026-04-04
+
+### Added
+- **Version-based planning**: tasks grouped by `## Next: vX.Y.Z` milestone in plan.md. Current version from git tags, target from plan header. (TAT-112)
+- **Task-ID branch naming**: branches use `<TASK-ID>/<slug>` format (e.g. `om-083/history-fetch`). No more `tat/` prefix — project-namespaced, not tool-namespaced. (TAT-111)
+- **Task-ID commit enforcement**: `commit-msg` hook requires `(TASK-ID)` suffix. Auto-detects from branch name and suggests it. (TAT-111)
+- **Cross-project cd guard**: detects missing `.tat/` and warns that `cd` doesn't persist in Claude Code sessions. (TAT-107)
+- **GL-21**: branch names and commits must include task IDs
+- **ADR-010**: version-based planning decision
+
+### Changed
+- **GPT payload optimization**: both `tat-code-review.sh` and `tat-gpt-watch.sh` send trimmed context — spec summary instead of raw excerpt, ADR headings instead of full content, task detection from branch name. (TAT-105)
+- **Branch task detection**: scripts extract task ID from `<TASK-ID>/<slug>` branch format first, fall back to keyword match for old branches. Fixes false positive GPT reviews.
+- **spec.md**: full rewrite to match v2 reality — commands, file structure, scripts, GPT integration, architecture. (TAT-101)
+- **GPT review flow**: corrected TAT.md — review is manual/gated, not automatic PostToolUse hook.
+
+### Fixed
+- `conversation.md` reference in SKILL.md → corrected to `session.md`
+
+---
+
 ## [2.1.0] — 2026-04-03
 
 ### Added

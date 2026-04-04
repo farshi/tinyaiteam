@@ -1,16 +1,6 @@
 # Plan
 
-## Next: v2.2.0
-
-| ID | Task | Status |
-|----|------|--------|
-| TAT-112 | Version-based planning — derive milestones from git tags | [x] |
-| TAT-111 | Enforce task-ID branch naming + commit messages | [x] |
-| TAT-101 | Update spec.md to match v2 reality | [x] |
-| TAT-105 | Optimize GPT review payloads — send task description instead of raw context | [x] |
-| TAT-107 | Cross-project cd limitation — detect and warn instead of letting user retry | [x] |
-
-## Backlog
+## Next: v2.3.0
 
 | ID | Task | Status |
 |----|------|--------|
@@ -22,6 +12,11 @@
 
 | ID | Task | Status |
 |----|------|--------|
+| TAT-112 | Version-based planning — derive milestones from git tags | [x] |
+| TAT-111 | Enforce task-ID branch naming + commit messages | [x] |
+| TAT-101 | Update spec.md to match v2 reality | [x] |
+| TAT-105 | Optimize GPT review payloads — send task description instead of raw context | [x] |
+| TAT-107 | Cross-project cd limitation — detect and warn instead of letting user retry | [x] |
 | TAT-110 | TAT v2 simplification — strip ceremony, keep value (-1181 lines) | [x] |
 | TAT-109 | GPT review auto-save to .tat/gpt.md | [x] |
 | TAT-108 | /tat report command — real-time capture to ~/.tinyaiteam/reports.md | [x] |
