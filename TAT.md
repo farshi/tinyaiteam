@@ -87,7 +87,7 @@ Tasks grouped by version milestone. Current version = latest git tag. Next versi
 
 **GPT briefing:** Every GPT call gets: MODE + TODAY + DECISIONS + SESSION + DIFF. GPT must ACK context before advising.
 
-**Background (automatic):** PostToolUse hook triggers GPT review on commits. GPT reads unseen session entries + diff, writes responses back into session.md.
+**Review flow:** GPT reviews on request (`/tat review`, `tat-code-review.sh main`) or after 3+ user turns (gated, not automatic). GPT reads session entries + diff, writes responses back into session.md.
 
 **`@@` red flag:** User prefixes with `@@` for urgent GPT attention.
 

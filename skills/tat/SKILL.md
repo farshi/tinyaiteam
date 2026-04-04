@@ -205,6 +205,30 @@ If `NO_TAT_DIR`:
 
 ## Full Activation
 
+### Pre-Step: Cross-Project Guard
+
+```bash
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+ls "$PROJECT_ROOT/.tat/" 2>/dev/null || echo "NO_TAT_DIR"
+```
+
+If `NO_TAT_DIR` and user appears to have changed directories (e.g., they mentioned `cd` or the working directory differs from the session start):
+
+```
+[TAT] ✗ No .tat/ directory here.
+[TAT]   Working directory: <pwd>
+[TAT]   Note: Claude Code sessions are pinned to the startup directory.
+[TAT]   `cd` does not persist — open a new session in the target project instead.
+```
+
+Then stop. Do NOT offer to run `cd` or retry — it won't help.
+
+If `.tat/` exists but is a different project than expected, warn:
+```
+[TAT] ⚠ You appear to be in <project name>, not the session's original project.
+[TAT]   Start a new Claude Code session from that directory.
+```
+
 ### Pre-Step: Branch Guard
 
 ```bash
