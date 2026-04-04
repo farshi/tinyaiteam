@@ -391,21 +391,7 @@ This forces GPT to prove it understands the context before advising.
 
 ## Working Flow
 
-**Before coding:** Know what task you're doing. Read the fix-spec.
-
-**While coding:** Stay in scope. Off-topic ideas → append to bottom of plan.md:
-```
-[TAT] Noted — added to backlog.
-```
-
-**After coding:**
-1. Self-review your diff (`git diff`). Check scope, bugs, completeness.
-2. Commit.
-3. GPT reviews automatically (PostToolUse hook fires after commit).
-4. Read GPT's response in `.tat/session.md` or `.tat/gpt.md`.
-5. If GPT flagged issues → fix and commit again.
-6. Mark task `[x]` in plan.md (on the branch).
-7. Push, create PR, merge.
+Follow the 7-step flow and output rules defined in TAT.md (Progress Bar + GPT Review Display + Steps + Gates sections).
 
 **After merge:**
 ```bash

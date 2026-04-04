@@ -120,6 +120,46 @@ Log `[User]` entries in session.md after EVERY user turn — no exceptions.
 Summarize intent in one line, don't quote verbatim.
 Without user entries, GPT has no planning context and the audit trail is broken.
 
+## Progress Bar (MANDATORY)
+
+After EVERY step, show this bar with `▲` under the current step:
+
+```
+Load → Pick → Branch → Code → Self-review → GPT review → Ship
+                                ▲
+                             YOU ARE HERE
+```
+
+## GPT Review Display (MANDATORY)
+
+Summarize GPT results as a table — never dump raw output:
+
+```
+GPT says (TAT-XXX):
+| # | Type | Issue | Action |
+|---|------|-------|--------|
+| 1 | BLOCKER | description | fix needed |
+| 2 | SUGGESTION | description | skip/fix/defer |
+
+Verdict: CLEARED / BLOCKED / NEEDS_INPUT
+```
+
+Then show the progress bar.
+
+## Working Flow
+
+1. **Load** — read spec, plan, decisions, gpt.md
+2. **Pick** — select next `[ ]` task, show fix-spec
+3. **Branch** — create/switch to `<TASK-ID>/<slug>`
+4. **Code** — implement the fix-spec. Stay in scope. Off-topic → backlog
+5. **Self-review** — `git diff`, check scope/bugs/completeness
+6. **GPT review** — run `tat-code-review.sh main`, show summary table
+7. **Ship** — commit, mark `[x]`, push, create PR. User merges.
+
+**Gates:**
+- Auto-proceed: Load, Branch, Code (unless decision needed)
+- STOP: Pick (if ambiguous), Self-review (if issues), GPT review (if BLOCKED), Ship (user merges)
+
 ## Rules
 
 1. User is product owner — final authority
