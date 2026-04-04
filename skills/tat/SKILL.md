@@ -4,7 +4,7 @@ version: 2.0.0
 description: |
   Tiny AI Team v2 — lightweight orchestration for Claude Code. Loads project
   context, picks next task, coordinates Opus/Sonnet/GPT. GPT reviews in
-  background. Use when asked to "/tat", "/tat status", or "/tat report".
+  background. Use when asked to "/tat", "/tat status", or "/tat replan".
 allowed-tools:
   - Bash
   - Read
@@ -25,7 +25,7 @@ Parse the user's input:
 - `/tat status` → **Status Command**
 - `/tat init` → **Init Flow**
 - `/tat review` → **Review Command**
-- `/tat report` → **Report Command**
+
 - `/tat replan` → **Replan Command**
 - `/tat version` → **Version Command**
 
@@ -86,22 +86,6 @@ This reads unseen session entries + diff, writes GPT responses back into `sessio
 
 Show GPT output with `[GPT]` tag. Add your own opinion with `[OPUS]` tag.
 Then stop.
-
----
-
-## Report Command
-
-When the user says `/tat report <text>` or Claude spots a pattern/bug worth capturing:
-
-```bash
-PROJECT_NAME=$(basename "$(git rev-parse --show-toplevel 2>/dev/null || pwd)")
-DATE=$(date -u +"%Y-%m-%d")
-echo -e "\n### $DATE — $PROJECT_NAME\n$TEXT\n" >> ~/.tinyaiteam/reports.md
-```
-
-Print: `[TAT] Noted.`
-
-Then stop. No ceremony. Claude should also call this proactively when hitting errors or spotting patterns during work.
 
 ---
 
@@ -260,13 +244,12 @@ Also load:
 cat .tat/spec.md
 cat .tat/plan.md
 cat .tat/decisions.md 2>/dev/null
-cat ~/.tinyaiteam/lessons.md 2>/dev/null
 cat .tat/gpt.md 2>/dev/null
 ```
 
 ```
 [TAT] Active v<version>. Role: <Orchestrator|Coder> (<model>)
-[TAT] Loaded spec + plan + decisions + <N> lessons.
+[TAT] Loaded spec + plan + decisions.
 ```
 
 Check replan freshness:
@@ -387,36 +370,12 @@ Claude maintains `.tat/session.md` — a timestamped log of the session. All thr
 
 ---
 
-## Today File
-
-At session start, Opus creates or updates `.tat/today.md`:
-
-```markdown
-DATE: 2026-04-03
-TARGET: v2.2.0
-MODE: Planning
-
-GOALS:
-- TAT-112: Version-based planning
-
-SCOPE:
-- SKILL.md, TAT.md, plan.md
-
-OUT OF SCOPE:
-- Anything not tied to today's goals
-```
-
-User confirms or adjusts. GPT sees this on every call. today.md is in `.gitignore`.
-
----
-
 ## GPT Briefing
 
 Every GPT call automatically gets this header:
 
 ```
-MODE: <Design|Planning|Coding|Review>
-TODAY: <from today.md>
+TASK: <current task ID + title>
 LAST DECISIONS: <last 3 from decisions.md>
 SESSION: <last 10 entries from session.md>
 DIFF: <if coding/review mode>
@@ -432,7 +391,7 @@ This forces GPT to prove it understands the context before advising.
 
 ## Working Flow
 
-**Before coding:** Know what task you're doing. Confirm today.md scope.
+**Before coding:** Know what task you're doing. Read the fix-spec.
 
 **While coding:** Stay in scope. Off-topic ideas → append to bottom of plan.md:
 ```

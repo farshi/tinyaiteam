@@ -41,9 +41,6 @@ fi
 link_dir "$SCRIPT_DIR/scripts" ~/.tinyaiteam/scripts
 echo "  ✓ scripts → ~/.tinyaiteam/scripts/"
 
-# Lessons
-link_file "$SCRIPT_DIR/lessons/library.md" ~/.tinyaiteam/lessons.md
-echo "  ✓ lessons → ~/.tinyaiteam/lessons.md"
 
 # Git hooks (copy, not symlink — installed per-project, not global)
 mkdir -p ~/.tinyaiteam/hooks
@@ -71,8 +68,6 @@ if [ -d "$SCRIPT_DIR/commands" ]; then
   echo "  ✓ commands → ~/.claude/commands/"
 fi
 
-# Reports file (create if missing)
-touch ~/.tinyaiteam/reports.md
 
 echo ""
 echo "TAT v$TAT_VERSION installed (symlink mode)."

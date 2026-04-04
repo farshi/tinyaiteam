@@ -31,15 +31,11 @@ Opus delegates coding to Sonnet subagents. GPT watches in background. User is pr
   plan.md           # Prioritized task list (top = next)
   decisions.md      # Key decisions with rationale (append-only)
   session.md        # Live session log — User + Opus + GPT voices (gitignored)
-  today.md          # Daily scope — goals, mode, constraints (gitignored)
   gpt.md            # GPT's latest review summary (auto-updated)
-  gpt-cursor        # Last session entry GPT has reviewed
 
 ~/.tinyaiteam/
   TAT.md          # This file
   config.sh       # GPT model settings
-  lessons.md      # Global lessons (one file, append-only)
-  reports.md      # Real-time observations from any project
   scripts/        # Minimal script set
   hooks/          # Git hooks
 ```
@@ -93,11 +89,6 @@ Tasks grouped by version milestone. Current version = latest git tag. Next versi
 
 **Self-review first (always).** Claude reads its own diff before GPT sees it.
 
-## Lessons
-
-One global file: `~/.tinyaiteam/lessons.md`. Append-only. No lifecycle states.
-
-Capture anytime via `/tat report`. Don't wait for retros.
 
 ## Source Tagging
 
@@ -111,7 +102,6 @@ Normal conversation and code output is not tagged.
 | `/tat` | Load context, pick next task, create branch, go |
 | `/tat status` | Show plan progress (read-only) |
 | `/tat review` | Force GPT deep review |
-| `/tat report` | Log observation to ~/.tinyaiteam/reports.md |
 | `/tat replan` | Reprioritize with GPT |
 | `/tat init` | Setup .tat/ for new project |
 | `/tat version` | Show installed version |
@@ -134,8 +124,16 @@ Without user entries, GPT has no planning context and the audit trail is broken.
 
 1. User is product owner — final authority
 2. GPT is advisor, not gatekeeper
-3. Self-review before GPT review
-4. One task = one branch = one PR
-5. Never work on main
-6. Off-scope ideas go to bottom of plan.md
-7. Tag your guidance with source
+3. Spec before code — every task gets: what changes, what to reuse, done means
+4. Self-review your diff before GPT sees it
+5. One task = one branch = one PR
+6. Never commit directly to main — plan updates go in the feature branch
+7. Never auto-merge — create PR, read GPT review, show user, user decides
+8. Never chain `gh pr merge` with `&&` — one merge at a time
+9. Never bypass hooks — fix the root cause, don't use `TAT_FORCE=1`
+10. Branch: `<TASK-ID>/<slug>`, commit: `type(scope): description (TASK-ID)`
+11. Off-scope ideas go to bottom of plan.md
+12. Tag guidance with source: `[TAT]`, `[GPT]`, `[OPUS]`
+13. Log `[User]` entry in session.md after every user turn
+14. Sync main and check file overlap before spawning parallel agents
+15. Announce what you're doing — silence is bad UX
