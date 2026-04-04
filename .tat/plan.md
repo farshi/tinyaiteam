@@ -4,6 +4,7 @@
 
 | ID | Task | Status |
 |----|------|--------|
+| TAT-113 | Auto-upgrade on /tat activation — sync hooks + version marker | [x] |
 | TAT-068 | Optional skill adapter hooks — detect/use external skills as plugins | [ ] |
 | TAT-079 | Docs follow context — auto-detect new concepts, prompt for glossary | [ ] |
 | TAT-080 | Split large tasks by value layer — suggest core/enhancement splits | [ ] |

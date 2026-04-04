@@ -179,9 +179,10 @@ If `NO_TAT_DIR`:
    |----|------|--------|
    ```
 
-3. Initialize state counter:
+3. Initialize state counter and version marker:
    ```bash
    ~/.tinyaiteam/scripts/tat-state.sh init
+   cat ~/.tinyaiteam/VERSION > .tat/version 2>/dev/null
    ```
 
 4. Install git hooks:
@@ -249,6 +250,7 @@ If no task is active (all tasks done or plan empty), allow main for planning.
 ```bash
 cat ~/.tinyaiteam/TAT.md 2>/dev/null || echo "TAT_NOT_INSTALLED"
 cat ~/.tinyaiteam/VERSION 2>/dev/null || echo "unknown"
+~/.tinyaiteam/scripts/tat-upgrade.sh  # auto-sync hooks + version marker
 ```
 
 If `TAT_NOT_INSTALLED`: tell user to run `install.sh`. Stop.
