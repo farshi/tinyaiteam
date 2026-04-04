@@ -41,6 +41,8 @@ fi
 link_dir "$SCRIPT_DIR/scripts" ~/.tinyaiteam/scripts
 echo "  ✓ scripts → ~/.tinyaiteam/scripts/"
 
+# Clean up dead symlinks from older versions
+rm -f ~/.tinyaiteam/lessons.md ~/.tinyaiteam/reports.md 2>/dev/null
 
 # Git hooks (copy, not symlink — installed per-project, not global)
 mkdir -p ~/.tinyaiteam/hooks
