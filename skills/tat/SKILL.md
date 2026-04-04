@@ -115,8 +115,9 @@ If `NO_TAT_DIR`:
    | ID | Task | Status |
    |----|------|--------|
    ```
-4. `~/.tinyaiteam/scripts/tat-state.sh init`
-5. Install git hooks from `~/.tinyaiteam/hooks/`
+4. Create `.tat/aux/` directory for project artifacts
+5. `~/.tinyaiteam/scripts/tat-state.sh init`
+6. Install git hooks from `~/.tinyaiteam/hooks/`
 6. Print initialized summary. Ask "What are you building?"
 
 ---
