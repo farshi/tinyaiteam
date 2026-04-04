@@ -20,6 +20,7 @@ These always apply, regardless of session type:
 | `decisions.md` | ADRs — what we decided + why + alternatives rejected | Casual notes, task status |
 | `session.md` | Live session log — decisions + GPT calls (gitignored) | Code, full diffs |
 | `gpt.md` | Latest GPT review cache (generated, gitignored) | Anything hand-written |
+| `aux/` | Project artifacts — brainstorm drafts, proposals, research, demos | Core TAT state |
 
 ## Fix-Spec Format
 

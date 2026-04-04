@@ -7,7 +7,7 @@
 | TAT-115 | Kill lessons/reports/today/gpt-cursor — plan is single source | [x] |
 | TAT-116 | Fix-spec task card format — table index + task cards | [x] |
 | TAT-117 | Rewrite TAT.md — flows replace rules, kill role theater | [x] |
-| TAT-118 | Slim SKILL.md + guardrailed flows — 4 modes, step visibility | [ ] |
+| TAT-118 | Slim SKILL.md + guardrailed flows — 4 modes, step visibility | [x] |
 | TAT-119 | Move migration scripts out of core scripts/ | [ ] |
 | TAT-120 | Update install.sh — remove lessons/reports symlinks | [ ] |
 | TAT-121 | Update spec.md + README + CHANGELOG for v3 | [ ] |
