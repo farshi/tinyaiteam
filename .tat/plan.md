@@ -6,7 +6,7 @@
 |----|------|--------|
 | TAT-115 | Kill lessons/reports/today/gpt-cursor — plan is single source | [x] |
 | TAT-116 | Add task descriptions to plan format — table index + task cards | [ ] |
-| TAT-117 | Trim TAT.md — single canonical rules doc, kill role theater | [ ] |
+| TAT-117 | Rewrite TAT.md — flows replace rules, kill role theater | [x] |
 | TAT-118 | Slim SKILL.md + guardrailed flows — 4 modes, step visibility | [ ] |
 | TAT-119 | Move migration scripts out of core scripts/ | [ ] |
 | TAT-120 | Update install.sh — remove lessons/reports symlinks | [ ] |
@@ -24,11 +24,11 @@
 - **Reuse:** OM-096 pattern from oneminuta
 - **Done means:** TAT.md documents fix-spec format. /tat init creates plan with example. Reviews check against fix-spec
 
-### TAT-117 — Trim TAT.md — single rules doc
-- **What:** TAT.md is THE one rules doc. Kill Three-Chair/meeting modes/role branding. Add "where things belong" table. CLAUDE.md becomes 5-line pointer
+### TAT-117 — Rewrite TAT.md — flows replace rules
+- **What:** Kill Rules section. Replace with 3 session flows (Coding/Planning/Design) where each step has script + gate. Keep only 4 global invariants. Kill Three-Chair/meeting modes. Add "where things belong" table
 - **File:** TAT.md, CLAUDE.md
-- **Reuse:** Existing TAT.md structure
-- **Done means:** No rule duplicated across files. TAT.md under 120 lines. CLAUDE.md under 10 lines
+- **Reuse:** Existing scripts mapped to flow steps. GPT consultation from this session
+- **Done means:** No standalone Rules section. Every rule embedded in a flow step. TAT.md under 120 lines. CLAUDE.md under 10 lines
 
 ### TAT-118 — Slim SKILL.md + guardrailed flows
 - **What:** SKILL.md as thin activation wrapper with 4 modes: /tat (8-step coding loop), /tat brainstorm (ideas → fix-specs), /tat replan (reorder), /tat ask (inline GPT). Each step shows one-line status. Auto-proceed default, STOP with lettered options when needed
