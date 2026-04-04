@@ -5,7 +5,7 @@
 | ID | Task | Status |
 |----|------|--------|
 | TAT-115 | Kill lessons/reports/today/gpt-cursor — plan is single source | [x] |
-| TAT-116 | Add task descriptions to plan format — table index + task cards | [ ] |
+| TAT-116 | Fix-spec task card format — table index + task cards | [x] |
 | TAT-117 | Rewrite TAT.md — flows replace rules, kill role theater | [x] |
 | TAT-118 | Slim SKILL.md + guardrailed flows — 4 modes, step visibility | [ ] |
 | TAT-119 | Move migration scripts out of core scripts/ | [ ] |
