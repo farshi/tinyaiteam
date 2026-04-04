@@ -136,9 +136,6 @@ If `NO_TAT_DIR`:
 
    ## Constraints
    <any constraints>
-
-   ## Constraints
-   <any constraints>
    ```
 
 3. Create `.tat/decisions.md`:
@@ -152,13 +149,27 @@ If `NO_TAT_DIR`:
    ```markdown
    # Plan
 
-   ## Tasks
+   ## Next: v0.1.0
+
    | ID | Task | Status |
    |----|------|--------|
-   | TAT-001 | Define project scope and spec | [ ] |
-   | TAT-002 | Set up project structure | [ ] |
+   | <PREFIX>-001 | Define project scope and spec | [ ] |
+   | <PREFIX>-002 | Set up project structure | [ ] |
+
+   ### <PREFIX>-001 — Define project scope and spec
+   - What: Fill in spec.md with what, why, and constraints
+   - File: .tat/spec.md
+   - Reuse: n/a
+   - Done means: spec.md has concrete project definition
+
+   ### <PREFIX>-002 — Set up project structure
+   - What: Create initial file structure and install dependencies
+   - File: project root
+   - Reuse: n/a
+   - Done means: Project runs or builds successfully
 
    ## Done
+
    | ID | Task | Status |
    |----|------|--------|
    ```
@@ -391,7 +402,7 @@ This forces GPT to prove it understands the context before advising.
 
 ## Working Flow
 
-Follow the 7-step flow and output rules defined in TAT.md (Progress Bar + GPT Review Display + Steps + Gates sections).
+Follow the session flows defined in TAT.md (Coding/Planning/Design). Each step has script + gate. Show progress bar after every step. Show GPT review as summary table.
 
 **After merge:**
 ```bash
