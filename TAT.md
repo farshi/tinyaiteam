@@ -22,19 +22,27 @@ These always apply, regardless of session type:
 | `gpt.md` | Latest GPT review cache (generated, gitignored) | Anything hand-written |
 | `aux/` | Project artifacts — brainstorm drafts, proposals, research, demos | Core TAT state |
 
-## Fix-Spec Format
+## Task Format
 
-Every task gets a fix-spec before coding:
+Every task is a card with fix-spec + subtasks. One task = one branch = one PR.
 
 ```
 ### TAT-XXX — Short title
 - What: what changes
-- File: which files
+- Files: which files
 - Reuse: existing code to leverage
-- Done means: how to verify it works
+- Done: how to verify it works
+- [ ] First subtask
+- [ ] Second subtask
+- [ ] Third subtask
 ```
 
-The fix-spec IS the design. Self-review and GPT review check against it.
+The fix-spec IS the design. Subtasks ARE the steps. Self-review and GPT review check against it.
+
+**Sizing rules:**
+- Too small? (file move, rename, <30min) → merge into nearest real task
+- Too big? (>7 subtasks or needs "and then...") → split
+- Just right = one coherent outcome, one PR
 
 ## Session: Coding
 

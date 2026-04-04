@@ -95,25 +95,21 @@ If `.tat/` exists: `[TAT] Already initialized.` Stop.
 If `NO_TAT_DIR`:
 1. Create `.tat/spec.md` (What/Why/Constraints template)
 2. Create `.tat/decisions.md` (append-only ADR log)
-3. Create `.tat/plan.md` with fix-spec task cards:
+3. Create `.tat/plan.md` with task cards:
    ```markdown
    # Plan
 
    ## Next: v0.1.0
 
-   | ID | Task | Status |
-   |----|------|--------|
-   | <PREFIX>-001 | Define project scope and spec | [ ] |
-
    ### <PREFIX>-001 — Define project scope and spec
    - What: Fill in spec.md with what, why, and constraints
-   - File: .tat/spec.md
-   - Reuse: n/a
-   - Done means: spec.md has concrete project definition
+   - Files: .tat/spec.md
+   - Done: spec.md has concrete project definition
+   - [ ] Describe what the project does
+   - [ ] Describe why it exists
+   - [ ] List constraints
 
    ## Done
-   | ID | Task | Status |
-   |----|------|--------|
    ```
 4. Create `.tat/aux/` directory for project artifacts
 5. `~/.tinyaiteam/scripts/tat-state.sh init`
