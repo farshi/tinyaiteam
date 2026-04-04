@@ -96,17 +96,36 @@ fi
 MODE="Coding"
 [ -f "$TODAY_FILE" ] && MODE=$(grep -m1 '^MODE:' "$TODAY_FILE" | sed 's/^MODE: *//' || echo "Coding")
 
-# Today's goals
+# Today's goals (just the GOALS section, not full file)
 TODAY=""
-[ -f "$TODAY_FILE" ] && TODAY=$(cat "$TODAY_FILE")
+if [ -f "$TODAY_FILE" ]; then
+  TODAY=$(grep -E '^(DATE|TARGET|MODE|GOALS):|^- ' "$TODAY_FILE" | head -8)
+fi
 
-# Last 3 decisions
+# Last 3 decisions (just the headings, not full content)
 DECISIONS=""
-[ -f "$TAT_DIR/decisions.md" ] && DECISIONS=$(tail -20 "$TAT_DIR/decisions.md")
+[ -f "$TAT_DIR/decisions.md" ] && DECISIONS=$(grep -E '^### ADR-' "$TAT_DIR/decisions.md" | tail -3)
 
-# Spec summary
+# Spec summary (project name + what it does, not raw file)
 SPEC=""
-[ -f "$TAT_DIR/spec.md" ] && SPEC=$(head -15 "$TAT_DIR/spec.md")
+if [ -f "$TAT_DIR/spec.md" ]; then
+  SPEC=$(awk '
+    /^#/ && !found_title { found_title=1; print; next }
+    found_title && /^##/ && !found_section { found_section=1; print; next }
+    found_section && /^$/ && got_content { exit }
+    found_section { got_content=1; print }
+  ' "$TAT_DIR/spec.md" | head -5)
+fi
+
+# Current task (from branch name → plan.md)
+CURRENT_TASK=""
+BRANCH_TASK_ID=$(echo "$BRANCH" | sed -nE 's|^([a-zA-Z]+-[0-9]+)/.*|\1|p' | tr '[:lower:]' '[:upper:]')
+if [ -n "$BRANCH_TASK_ID" ] && [ -f "$TAT_DIR/plan.md" ]; then
+  CURRENT_TASK=$(grep -i -m1 "| *$BRANCH_TASK_ID *|" "$TAT_DIR/plan.md" || true)
+fi
+if [ -z "$CURRENT_TASK" ] && [ -f "$TAT_DIR/plan.md" ]; then
+  CURRENT_TASK=$(sed '/^## Backlog/,$d' "$TAT_DIR/plan.md" | grep -m1 '|.*\[ \]' || true)
+fi
 
 # Last 10 session entries for context (even seen ones)
 SESSION_CONTEXT=""
@@ -144,24 +163,22 @@ Keep responses concise. One bullet per observation. Tag each: BLOCKER / SUGGESTI
 
 USER_PROMPT="MODE: $MODE
 
-PROJECT:
-$SPEC
+PROJECT: $SPEC
 
-TODAY:
-$TODAY
+CURRENT TASK: $CURRENT_TASK
 
-LAST DECISIONS:
-$DECISIONS
+TODAY: $TODAY
 
-SESSION (last 10 entries):
+RECENT DECISIONS: $DECISIONS
+
+SESSION (last 10):
 $SESSION_CONTEXT
 
-NEW ENTRIES (unseen by you):
+NEW (unseen):
 $UNSEEN_ENTRIES
 
-CODE CHANGES:
+DIFF ($DIFF_LINES lines):
 Files: $FILES_CHANGED
-Diff ($DIFF_LINES lines, first 300):
 $TRIMMED_DIFF"
 
 tat_gpt_call "$MODEL" "$SYSTEM_PROMPT" "$USER_PROMPT" 2>/dev/null || exit 0

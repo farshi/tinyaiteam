@@ -7,7 +7,7 @@
 | TAT-112 | Version-based planning — derive milestones from git tags | [x] |
 | TAT-111 | Enforce task-ID branch naming + commit messages | [x] |
 | TAT-101 | Update spec.md to match v2 reality | [x] |
-| TAT-105 | Optimize GPT review payloads — send task description instead of raw context | [ ] |
+| TAT-105 | Optimize GPT review payloads — send task description instead of raw context | [x] |
 | TAT-107 | Cross-project cd limitation — detect and warn instead of letting user retry | [ ] |
 
 ## Backlog
