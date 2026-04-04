@@ -1,14 +1,13 @@
 # TAT — Tiny AI Team
 
 ## What
-An orchestration layer for Claude Code. Adds planning, multi-model coordination (Opus plans, Sonnet codes, GPT reviews), and persistent project memory to AI-assisted development.
+An orchestration layer for Claude Code. Memory + review + coordination for AI-assisted development.
 
 ## What TAT Is
-- A core loop: Pick task → Branch → Code → Self-review → GPT review → Ship → Repeat
-- Persistent project state via `.tat/` files (spec, plan, decisions, session log, GPT notes)
-- Three-Chair Model: User (Product Owner) + GPT (Senior Advisor) + Opus (Orchestrator)
-- Multi-model coordination with GPT as background reviewer
-- A system that captures lessons globally across projects
+- Session flows: Coding, Planning, Design — each with steps, scripts, gates
+- Persistent project state via `.tat/` (spec, plan, decisions, session log)
+- Multi-model: Opus orchestrates, Sonnet codes, GPT reviews
+- Task cards with fix-specs (What/Files/Reuse/Done) + subtasks
 
 ## What TAT Is Not
 - Not a process framework — no sprints, no phases, no ceremonies
@@ -16,36 +15,38 @@ An orchestration layer for Claude Code. Adds planning, multi-model coordination 
 - Not replacing Claude Code — orchestrating it
 
 ## Why
-AI coding tools write code but lack long-term planning, decision memory, and multi-model coordination. TAT adds memory and review on top of existing tools.
+AI coding tools write code but lack long-term planning, decision memory, and multi-model coordination. TAT adds structure on top of existing tools.
 
 ## Architecture
 
 ### Commands
-| Command | Purpose |
+| Command | Session |
 |---------|---------|
-| `/tat` | Full activation — load context, pick next task, start working |
-| `/tat status` | Show plan progress, current task, open PRs |
-| `/tat init` | Initialize `.tat/` directory for a new project |
+| `/tat` | Coding — load context, pick task, code, review, ship |
+| `/tat brainstorm` | Planning — generate candidate tasks |
+| `/tat replan` | Planning — reprioritize existing tasks |
+| `/tat design <ID>` | Design — write fix-spec before coding |
+| `/tat ask "<q>"` | GPT consult — inline question |
+| `/tat status` | Dashboard — read-only |
 | `/tat review` | Force GPT review of current branch |
-| `/tat replan` | Reprioritize tasks with GPT input |
-| `/tat version` | Show installed version |
+| `/tat init` | Setup `.tat/` for new project |
 
 ### File Structure
 **Per-project (`.tat/`):**
 - `spec.md` — project definition (this file)
-- `plan.md` — version-grouped task list (Next: vX.Y.Z + Backlog + Done)
+- `plan.md` — task cards with fix-specs + subtasks
 - `decisions.md` — append-only ADRs with rationale
-- `gpt.md` — latest GPT review summary (auto-updated, gitignored)
 - `state.json` — task ID counter
-- `session.md` — live session log (gitignored)
+- `aux/` — project artifacts (brainstorm drafts, proposals, research)
+- `session.md` — session log (gitignored)
+- `gpt.md` — GPT review cache (gitignored)
 
 **Global (`~/.tinyaiteam/`):**
-- `TAT.md` — master workflow rules
+- `TAT.md` — canonical workflow rules and session flows
 - `VERSION` — installed version
-- `config.sh` — model and budget configuration
-- `replan.log` — replan history timestamps
-- `scripts/` — GPT integration and utility scripts
-- `hooks/` — git hooks (commit-msg, pre-commit, pre-push)
+- `config.sh` — GPT model and budget settings
+- `scripts/` — runtime scripts
+- `hooks/` — git hooks (deployed per-project)
 
 ### Scripts
 | Script | Purpose |
@@ -53,44 +54,24 @@ AI coding tools write code but lack long-term planning, decision memory, and mul
 | `tat-gpt.sh` | Shared GPT API caller (model routing, cost tracking) |
 | `ask-gpt.sh` | Inline GPT questions |
 | `tat-code-review.sh` | Code diff review via GPT |
-| `tat-gpt-watch.sh` | Background watcher — reads session + diff, writes to gpt.md |
-| `tat-gpt-gate.sh` | 3-turn gate — auto-triggers GPT after 3+ user turns |
+| `tat-gpt-watch.sh` | Background watcher — reads session + diff, writes gpt.md |
 | `tat-state.sh` | Task ID counter management |
 | `tat-pr-description.sh` | Generate PR description from artifacts |
-| `tat-publish.sh` | Medium/Dev.to article publishing |
 
 ### GPT Integration
-- **Model routing:** `gpt-5.2-codex` for code review, `gpt-5.4-mini` for planning/brainstorming
-- **Cost guard:** daily budget ($3 default), auto-downgrades model when exceeded
-- **Review flow:** manual via `/tat review` or `tat-code-review.sh main`
-- **GPT briefing:** every call gets MODE, TODAY, LAST DECISIONS, SESSION context
+- **Model routing:** configurable via `config.sh`
+- **Cost guard:** daily budget, auto-downgrades model when exceeded
+- **Review:** manual via `/tat review` or `tat-code-review.sh main`
 - **ACK mechanism:** GPT must restate context before advising
 
-### Git Workflow
-- One task = one branch = one PR
-- Branch naming: `<TASK-ID>/<slug>` (e.g. `om-083/history-fetch`)
-- Commits: `type(scope): description (TASK-ID)` — hooks enforce both
-- Never commit code directly to main (`.tat/` metadata allowed)
-- Self-review diff before GPT review
-
 ## Constraints
-- Built as Claude Code skills — no external framework
-- GPT integration via API calls (bash scripts with Python for JSON)
+- Claude Code skills — no external framework
+- GPT via API (bash scripts with Python for JSON)
 - All state is flat files (markdown + JSON counter)
-- User is always in the loop as product owner
+- User is product owner — always in the loop
 - Git discipline: branches, PRs, conventional commits
 
 ## Non-goals
 - Complex state machines or phase tracking
 - Sprint ceremonies or checkpoint maps
-- Automatic GPT review on every commit (review is manual/gated)
-- gstack or external tool dependencies in core workflow
-
-## Key Principles
-- Git is source of truth — no phase tracking, derive state from branches/PRs
-- GPT reviews on request — manual trigger, not automatic hook
-- Self-review before GPT — Claude reads its own diff first
-- User is product owner — final authority on everything
-- Decisions tracked in `.tat/decisions.md` (single file, append-only)
-- Lessons are global — earned in one project, available in all
-- Graceful degradation — missing artifacts mean feature inactive, not error
+- Automatic GPT review on every commit

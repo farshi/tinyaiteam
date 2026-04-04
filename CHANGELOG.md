@@ -6,6 +6,38 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [3.0.0] — 2026-04-04
+
+### Added
+- **Session flows**: Coding (7 steps), Planning, Design — each with scripts, gates, progress bar
+- **Task cards with subtasks**: fix-spec (What/Files/Reuse/Done) + checkbox subtasks in plan.md
+- **Task sizing rules**: too small → merge, too big → split, just right = one branch + one PR
+- **`.tat/aux/`**: project artifacts folder (brainstorm drafts, proposals, research)
+- **New commands**: `/tat brainstorm`, `/tat design <ID>`, `/tat ask "<q>"`
+- **GPT review summary table**: structured Type/Issue/Action format, never raw dump
+- **ADR-011**: fix-spec replaces lessons/reports/design as single source of truth
+
+### Removed
+- **Lessons library** (`lessons/library.md`): rules baked into flows, not markdown lists
+- **Reports** (`reports.md`): used once ever, replaced by backlog tasks
+- **`today.md`**: ceremony — current task is in plan.md
+- **`gpt-cursor`**: implementation detail, not an artifact
+- **`/tat report` command**: replaced by backlog tasks
+- **Three-Chair Model**: replaced with simple User/Claude/GPT
+- **Meeting Modes**: replaced with session flows
+- **Rules section in TAT.md**: rules embedded in flow steps
+- **Source Tagging section**: simplified
+
+### Changed
+- **TAT.md**: rewritten — flows replace rules, 180 → 103 lines
+- **SKILL.md**: rewritten as thin activation wrapper, 11.4KB → 4.7KB (-59%)
+- **CLAUDE.md**: trimmed to 5-line pointer
+- **plan.md**: task cards with subtasks replace flat tables
+- **Migration scripts**: moved to `scripts/archive/`
+- **`.tat/archive/`**: moved to `.tat/aux/archive/`
+
+---
+
 ## [2.2.0] — 2026-04-04
 
 ### Added
