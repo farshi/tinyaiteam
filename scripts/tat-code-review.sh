@@ -63,15 +63,23 @@ if [ -f "$TAT_DIR/plan.md" ]; then
     fi
   fi
 
-  # 3. Branch name match (e.g., tat/19/wrapup → search plan for matching task)
+  # 3. Branch name match — extract task ID from <TASK-ID>/<slug> format
   if [ -z "$CURRENT_TASK" ]; then
     BRANCH_NAME=$(git branch --show-current 2>/dev/null || true)
     if [ -n "$BRANCH_NAME" ] && [ "$BRANCH_NAME" != "$BASE_BRANCH" ]; then
-      # Extract last segment of branch name as keyword
-      BRANCH_KEYWORD=$(echo "$BRANCH_NAME" | sed 's|.*/||' | tr '-' ' ')
-      if [ -n "$BRANCH_KEYWORD" ]; then
-        BRANCH_MATCH=$(grep -i -m1 "|.*$BRANCH_KEYWORD" "$TAT_DIR/plan.md" || true)
+      # New format: tat-105/optimize-gpt or om-083/history-fetch
+      BRANCH_TASK_ID=$(echo "$BRANCH_NAME" | sed -nE 's|^([a-zA-Z]+-[0-9]+)/.*|\1|p' | tr '[:lower:]' '[:upper:]')
+      if [ -n "$BRANCH_TASK_ID" ]; then
+        BRANCH_MATCH=$(grep -i -m1 "| *$BRANCH_TASK_ID *|" "$TAT_DIR/plan.md" || true)
         [ -n "$BRANCH_MATCH" ] && CURRENT_TASK="$BRANCH_MATCH" && TASK_SOURCE="branch name"
+      fi
+      # Fallback: old tat/<slug> format — keyword match
+      if [ -z "$CURRENT_TASK" ]; then
+        BRANCH_KEYWORD=$(echo "$BRANCH_NAME" | sed 's|.*/||' | tr '-' ' ')
+        if [ -n "$BRANCH_KEYWORD" ]; then
+          BRANCH_MATCH=$(grep -i -m1 "|.*$BRANCH_KEYWORD" "$TAT_DIR/plan.md" || true)
+          [ -n "$BRANCH_MATCH" ] && CURRENT_TASK="$BRANCH_MATCH" && TASK_SOURCE="branch name"
+        fi
       fi
     fi
   fi
@@ -152,8 +160,8 @@ if [ -n "$UNTRACKED_FILES" ]; then
   FILES_CHANGED=$(printf '%s\n%s' "$FILES_CHANGED" "$UNTRACKED_FILES" | sort -u)
 fi
 
+# spec excerpt kept for backward compat but replaced by SPEC_SUMMARY below
 SPEC_EXCERPT=""
-[ -f "$TAT_DIR/spec.md" ] && SPEC_EXCERPT=$(head -20 "$TAT_DIR/spec.md")
 
 # --- Decide tier ---
 
@@ -273,8 +281,8 @@ $CURRENT_BRANCH (based on $BASE_BRANCH)
 ## Files Changed
 $FILES_CHANGED
 
-## Spec Context
-$SPEC_EXCERPT
+## Project Context
+$SPEC_SUMMARY
 
 ## Diff ($DIFF_LINES lines)
 $FULL_DIFF"
