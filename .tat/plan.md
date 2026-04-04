@@ -4,6 +4,7 @@
 
 | ID | Task | Status |
 |----|------|--------|
+| TAT-114 | Update README to match v2.2.0 reality | [x] |
 | TAT-113 | Auto-upgrade on /tat activation — sync hooks + version marker | [x] |
 | TAT-068 | Optional skill adapter hooks — detect/use external skills as plugins | [ ] |
 | TAT-079 | Docs follow context — auto-detect new concepts, prompt for glossary | [ ] |
