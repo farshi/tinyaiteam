@@ -105,7 +105,7 @@ The AI reads these before it acts. Context survives across sessions. No database
 | `/tat status` | Project dashboard — version, progress, open PRs |
 | `/tat init` | Initialize `.tat/` for a new project |
 | `/tat review` | Force GPT review of current branch |
-| `/tat report` | Log observation to `~/.tinyaiteam/reports.md` |
+
 | `/tat replan` | Reprioritize tasks with GPT input |
 | `/tat version` | Show installed version |
 
@@ -152,7 +152,6 @@ cd ~/your-project
 | `TAT.md` | `~/.tinyaiteam/` | Workflow rules |
 | `scripts/` | `~/.tinyaiteam/scripts/` | GPT review + utility scripts |
 | `hooks/` | `~/.tinyaiteam/hooks/` | Git hooks (auto-synced per project on `/tat` activation) |
-| `lessons/` | `~/.tinyaiteam/lessons.md` | Universal lessons across projects |
 
 ### Prerequisites
 

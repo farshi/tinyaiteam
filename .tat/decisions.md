@@ -42,6 +42,12 @@ Option 2: gstack integration dropped from v1. TAT-058 and TAT-059 are moved to v
 3. **Sync main before spawning worktree agents.** Ensure all pending PRs that affect shared state (lessons, plan, spec) are merged first.
 **Why:** Parallel agents save time only when tasks are truly independent. File overlap means sequential rebases, merge conflicts, and manual fixups — which cost more time than sequential execution. The "check file overlap" advice in SKILL.md was too soft and got ignored under speed pressure.
 
+### ADR-011: Fix-Spec as Design — Kill Separate Lessons/Reports/Design
+- Date: 2026-04-04
+- Decision: Tasks use 4-line fix-spec format (What/File/Reuse/Done means). Fix-spec IS the design — no separate design step or mode. Kill lessons/library.md, reports.md, today.md, gpt-cursor. Everything actionable is a task in plan.md. Everything durable is an ADR in decisions.md. No third category.
+- Rationale: Lessons became a rules junk drawer (25 rules nobody reads). Reports used once ever. Design as a 6-step flow is ceremony — a 4-line spec forces the same thinking with zero overhead. Proven in oneminuta (OM-096).
+- Consequences: TAT v3 has 4 modes not 5. Plan.md grows (task cards) but is the single source of truth. Reviews check code against fix-spec contract.
+
 ### ADR-010: Version-Based Planning
 Tasks grouped by version milestone instead of flat list. Current version = latest git tag. Next version = `## Next: vX.Y.Z` header in plan.md. Backlog lives below the next version section.
 **Why:** Flat task lists lack release boundaries — you never know when to ship. Version milestones give a natural "done" signal: all tasks for vX.Y.Z complete → tag + changelog + release. Git tags are the source of truth for current version, plan.md declares the target. Projects without tags start as `unversioned → v0.1.0`.

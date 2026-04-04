@@ -1,6 +1,6 @@
 #!/bin/bash
 # tat-gpt-watch.sh — GPT third-eye reviewer for TAT v2
-# Reads session.md + today.md + decisions.md + diff → sends briefing to GPT
+# Reads session.md + decisions.md + diff → sends briefing to GPT
 # GPT responses written back into session.md as [GPT] entries.
 #
 # Usage: tat-gpt-watch.sh [project-root]
@@ -11,9 +11,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CONFIG="$HOME/.tinyaiteam/config.sh"
 PROJECT_ROOT="${1:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 TAT_DIR="$PROJECT_ROOT/.tat"
-CURSOR_FILE="$TAT_DIR/gpt-cursor"
 SESSION_FILE="$TAT_DIR/session.md"
-TODAY_FILE="$TAT_DIR/today.md"
 
 # --- Validation ---
 
@@ -55,10 +53,9 @@ fi
 
 export TAT_GPT_TIMEOUT=300
 
-# --- Read cursor ---
+# --- Read cursor (stored in gpt.md header or default to 0) ---
 
 LAST_SEEN=0
-[ -f "$CURSOR_FILE" ] && LAST_SEEN=$(cat "$CURSOR_FILE" 2>/dev/null || echo "0")
 
 # --- Count unseen session entries ---
 
@@ -92,15 +89,8 @@ fi
 
 # --- Build GPT briefing ---
 
-# Mode detection (from today.md or default)
+# Mode detection (from branch context)
 MODE="Coding"
-[ -f "$TODAY_FILE" ] && MODE=$(grep -m1 '^MODE:' "$TODAY_FILE" | sed 's/^MODE: *//' || echo "Coding")
-
-# Today's goals (just the GOALS section, not full file)
-TODAY=""
-if [ -f "$TODAY_FILE" ]; then
-  TODAY=$(grep -E '^(DATE|TARGET|MODE|GOALS):|^- ' "$TODAY_FILE" | head -8)
-fi
 
 # Last 3 decisions (just the headings, not full content)
 DECISIONS=""
@@ -131,13 +121,11 @@ fi
 SESSION_CONTEXT=""
 [ -f "$SESSION_FILE" ] && SESSION_CONTEXT=$(grep '^\- \[' "$SESSION_FILE" | tail -10)
 
-# Diff (only in Coding/Review mode)
+# Diff
 TRIMMED_DIFF=""
 FILES_CHANGED=""
-if [ "$MODE" = "Coding" ] || [ "$MODE" = "Review" ]; then
-  FILES_CHANGED=$(git diff --name-only main...HEAD 2>/dev/null || true)
-  TRIMMED_DIFF=$(git diff main...HEAD 2>/dev/null | head -300 || true)
-fi
+FILES_CHANGED=$(git diff --name-only main...HEAD 2>/dev/null || true)
+TRIMMED_DIFF=$(git diff main...HEAD 2>/dev/null | head -300 || true)
 
 # --- Call GPT ---
 
@@ -166,8 +154,6 @@ USER_PROMPT="MODE: $MODE
 PROJECT: $SPEC
 
 CURRENT TASK: $CURRENT_TASK
-
-TODAY: $TODAY
 
 RECENT DECISIONS: $DECISIONS
 
@@ -200,10 +186,7 @@ if [ -n "$REVIEW" ] && [ -f "$SESSION_FILE" ]; then
   done
 fi
 
-# Update cursor
-echo "$TOTAL_ENTRIES" > "$CURSOR_FILE"
-
-# --- Also write gpt.md as quick-reference ---
+# --- Write gpt.md as quick-reference ---
 
 TIMESTAMP_FULL=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 cat > "$TAT_DIR/gpt.md" <<GPTEOF

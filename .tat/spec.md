@@ -27,7 +27,6 @@ AI coding tools write code but lack long-term planning, decision memory, and mul
 | `/tat status` | Show plan progress, current task, open PRs |
 | `/tat init` | Initialize `.tat/` directory for a new project |
 | `/tat review` | Force GPT review of current branch |
-| `/tat report` | Log observation to `~/.tinyaiteam/reports.md` |
 | `/tat replan` | Reprioritize tasks with GPT input |
 | `/tat version` | Show installed version |
 
@@ -36,18 +35,14 @@ AI coding tools write code but lack long-term planning, decision memory, and mul
 - `spec.md` — project definition (this file)
 - `plan.md` — version-grouped task list (Next: vX.Y.Z + Backlog + Done)
 - `decisions.md` — append-only ADRs with rationale
-- `gpt.md` — latest GPT review summary (auto-updated)
-- `gpt-cursor` — tracks last session.md line GPT has seen
+- `gpt.md` — latest GPT review summary (auto-updated, gitignored)
 - `state.json` — task ID counter
-- `session.md` — live session log, all three voices (gitignored)
-- `today.md` — daily scope and goals (gitignored)
+- `session.md` — live session log (gitignored)
 
 **Global (`~/.tinyaiteam/`):**
 - `TAT.md` — master workflow rules
 - `VERSION` — installed version
 - `config.sh` — model and budget configuration
-- `lessons.md` — universal lessons across all projects
-- `reports.md` — cross-project observations
 - `replan.log` — replan history timestamps
 - `scripts/` — GPT integration and utility scripts
 - `hooks/` — git hooks (commit-msg, pre-commit, pre-push)

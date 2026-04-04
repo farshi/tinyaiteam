@@ -1,11 +1,63 @@
 # Plan
 
-## Next: v2.3.0
+## Next: v3.0.0
 
 | ID | Task | Status |
 |----|------|--------|
-| TAT-114 | Update README to match v2.2.0 reality | [x] |
-| TAT-113 | Auto-upgrade on /tat activation — sync hooks + version marker | [x] |
+| TAT-115 | Kill lessons/reports/today/gpt-cursor — plan is single source | [x] |
+| TAT-116 | Add task descriptions to plan format — table index + task cards | [ ] |
+| TAT-117 | Trim TAT.md — single canonical rules doc, kill role theater | [ ] |
+| TAT-118 | Slim SKILL.md + guardrailed flows — 4 modes, step visibility | [ ] |
+| TAT-119 | Move migration scripts out of core scripts/ | [ ] |
+| TAT-120 | Update install.sh — remove lessons/reports symlinks | [ ] |
+| TAT-121 | Update spec.md + README + CHANGELOG for v3 | [ ] |
+
+### TAT-115 — Kill lessons/reports/today/gpt-cursor
+- **What:** Delete lessons/library.md, ~/.tinyaiteam/reports.md, today.md, gpt-cursor. Remove /tat report and lessons loading from SKILL.md
+- **File:** lessons/, skills/tat/SKILL.md, TAT.md, install.sh
+- **Reuse:** Actionable lessons already captured as tasks in this plan
+- **Done means:** No separate lessons/reports files. SKILL.md doesn't load lessons. /tat report removed
+
+### TAT-116 — Fix-spec task card format
+- **What:** Tasks use fix-spec format (What/File/Reuse/Done means). Table as index, specs below. Fix-spec IS the design — no separate design step
+- **File:** TAT.md (document format), skills/tat/SKILL.md (enforce at task creation)
+- **Reuse:** OM-096 pattern from oneminuta
+- **Done means:** TAT.md documents fix-spec format. /tat init creates plan with example. Reviews check against fix-spec
+
+### TAT-117 — Trim TAT.md — single rules doc
+- **What:** TAT.md is THE one rules doc. Kill Three-Chair/meeting modes/role branding. Add "where things belong" table. CLAUDE.md becomes 5-line pointer
+- **File:** TAT.md, CLAUDE.md
+- **Reuse:** Existing TAT.md structure
+- **Done means:** No rule duplicated across files. TAT.md under 120 lines. CLAUDE.md under 10 lines
+
+### TAT-118 — Slim SKILL.md + guardrailed flows
+- **What:** SKILL.md as thin activation wrapper with 4 modes: /tat (8-step coding loop), /tat brainstorm (ideas → fix-specs), /tat replan (reorder), /tat ask (inline GPT). Each step shows one-line status. Auto-proceed default, STOP with lettered options when needed
+- **File:** skills/tat/SKILL.md
+- **Reuse:** gstack step/gate patterns. Merge standalone /brainstorm skill into /tat brainstorm
+- **Done means:** SKILL.md under 6KB. User always knows what step they're on. /tat status shows dashboard
+
+### TAT-119 — Move migration scripts out of core
+- **What:** Move tat-migrate-v2.sh, tat-migrate-plan.sh to scripts/archive/
+- **File:** scripts/ → scripts/archive/
+- **Reuse:** n/a
+- **Done means:** Core scripts/ has only runtime scripts
+
+### TAT-120 — Update install.sh
+- **What:** Remove lessons/reports symlinks, clean dead paths
+- **File:** install.sh
+- **Reuse:** Existing structure
+- **Done means:** install.sh doesn't reference lessons.md or reports.md
+
+### TAT-121 — Update spec.md + README + CHANGELOG for v3
+- **What:** Docs match what shipped
+- **File:** .tat/spec.md, README.md, CHANGELOG.md
+- **Reuse:** Existing doc structure
+- **Done means:** spec.md reflects v3 files. README updated. CHANGELOG has v3.0.0 entry
+
+## Backlog
+
+| ID | Task | Status |
+|----|------|--------|
 | TAT-068 | Optional skill adapter hooks — detect/use external skills as plugins | [ ] |
 | TAT-079 | Docs follow context — auto-detect new concepts, prompt for glossary | [ ] |
 | TAT-080 | Split large tasks by value layer — suggest core/enhancement splits | [ ] |
@@ -14,6 +66,8 @@
 
 | ID | Task | Status |
 |----|------|--------|
+| TAT-114 | Update README to match v2.2.0 reality | [x] |
+| TAT-113 | Auto-upgrade on /tat activation — sync hooks + version marker | [x] |
 | TAT-112 | Version-based planning — derive milestones from git tags | [x] |
 | TAT-111 | Enforce task-ID branch naming + commit messages | [x] |
 | TAT-101 | Update spec.md to match v2 reality | [x] |
